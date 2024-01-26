@@ -1,6 +1,6 @@
-﻿using mar_sumaken_app.Views;
+﻿using mar_sumaken_app.Services;
 using Microsoft.Extensions.Logging;
-using Plugin.Maui.Audio;
+using mar_sumaken_app.Views;
 
 namespace mar_sumaken_app
 {
@@ -22,10 +22,10 @@ namespace mar_sumaken_app
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
-            //builder.Services.AddSingleton<LocalDbService>();
+            builder.Services.AddSingleton<LocalDbService>();
             builder.Services.AddTransient<LoginPage>();
             //builder.Services.AddTransient<MenuPage>();
-            //builder.Services.AddTransient<LoadingPage>();
+            builder.Services.AddTransient<LoadingPage>();
 
             return builder.Build();
         }

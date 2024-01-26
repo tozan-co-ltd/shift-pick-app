@@ -41,8 +41,8 @@ public partial class LoginPage : ContentPage
     /// <returns>設定画面</returns>
     private async void OnSettingClicked(object sender, EventArgs e)
     {
-        //Application.Current.MainPage = new LoadingPage();
-        //await Task.Delay(100);
-        //Application.Current.MainPage = new SettingPage();
+        Application.Current.MainPage = new LoadingPage();
+        await Task.Delay(100);
+        Application.Current.MainPage = new HandySettingPage();
     }
 }

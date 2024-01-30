@@ -24,7 +24,7 @@ namespace mar_sumaken_app
 #endif
             builder.Services.AddSingleton<LocalDbService>();
             builder.Services.AddTransient<LoginPage>();
-            //builder.Services.AddTransient<MenuPage>();
+            builder.Services.AddTransient<MenuPage>();
             builder.Services.AddTransient<LoadingPage>();
 
             return builder.Build();

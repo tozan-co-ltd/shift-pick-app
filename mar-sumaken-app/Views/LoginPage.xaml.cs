@@ -23,9 +23,9 @@ public partial class LoginPage : ContentPage
             }
             else
             {
-                //Application.Current.MainPage = new LoadingPage();
-                //await Task.Delay(100);
-                //Application.Current.MainPage = new MenuPage();
+                Application.Current.MainPage = new LoadingPage();
+                await Task.Delay(100);
+                Application.Current.MainPage = new MenuPage();
             }
         }
         catch (Exception ex)

@@ -11,12 +11,12 @@ public partial class RegisterBulkStoreInPage : ContentPage
 {
     int count = 0;
     bool isItemTapped = false;
-    private ObservableCollection<ProductDemo> items;
-    private ObservableCollection<ProductDemo> itemsNotDelete;
-    private ObservableCollection<ProductDemo> itemsHistory;
+    private ObservableCollection<ProductDemo> _items;
+    private ObservableCollection<ProductDemo> _itemsNotDelete;
+    private ObservableCollection<ProductDemo> _itemsHistory;
     private readonly LocalDbService _dbService;
-    private ScanAndSound scanAndSound;
-    private bool IsScanPageActive = false;
+    private ScanAndSound _scanAndSound;
+    private bool _IsScanPageActive = false;
     string productNumValue = string.Empty;
     string uniformNumValue = string.Empty;
     string keyValue = string.Empty;
@@ -27,9 +27,9 @@ public partial class RegisterBulkStoreInPage : ContentPage
         InitializeComponent();
         Clipboard.ClipboardContentChanged += OnClipboardContentChanged;
         _dbService = new LocalDbService();
-        items = new ObservableCollection<ProductDemo>();
-        itemsNotDelete = new ObservableCollection<ProductDemo>();
-        itemsHistory = new ObservableCollection<ProductDemo>();
+        _items = new ObservableCollection<ProductDemo>();
+        _itemsNotDelete = new ObservableCollection<ProductDemo>();
+        _itemsHistory = new ObservableCollection<ProductDemo>();
         CounterBtn.Text = $"{count}";
         numberOfBoxListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
@@ -44,7 +44,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        IsScanPageActive = true;
+        _IsScanPageActive = true;
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        IsScanPageActive = false;
+        _IsScanPageActive = false;
     }
 
     /// <summary>
@@ -79,11 +79,11 @@ public partial class RegisterBulkStoreInPage : ContentPage
     {
         try
         {
-            if (IsScanPageActive)
+            if (_IsScanPageActive)
             {
                 // サウンドのパスを取得する
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, scanAndSound);
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, scanAndSound);
+                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
+                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _scanAndSound);
 
                 clipboardContent = Clipboard.GetTextAsync().Result;
                 if (clipboardContent != string.Empty)
@@ -99,7 +99,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                             keyValue = resString.Substring(4, 11);
                         }
                         // 既存の製品に同じ製品番号があるかチェックする
-                        ProductDemo duplicateProduct = itemsNotDelete.FirstOrDefault(p => p.product_num == productNumValue && p.key == keyValue);
+                        ProductDemo duplicateProduct = _itemsNotDelete.FirstOrDefault(p => p.product_num == productNumValue && p.key == keyValue);
                         if (duplicateProduct != null)
                         {
                             // エラーサウンド
@@ -167,8 +167,8 @@ public partial class RegisterBulkStoreInPage : ContentPage
         try
         {
             // サウンドのパスを取得する
-            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, scanAndSound);
-            string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, scanAndSound);
+            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
+            string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _scanAndSound);
 
             if (enteredNumberLabel.Text.Length > 3)
             {
@@ -193,9 +193,9 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 else
                 {
                     // 既存の製品に同じ製品番号があるかチェックする
-                    ProductDemo existingProduct = items.FirstOrDefault(p => p.product_num == productNumValue);
+                    ProductDemo existingProduct = _items.FirstOrDefault(p => p.product_num == productNumValue);
                     // 既存の製品に同じ製品番号とキーがあるかチェックする 
-                    ProductDemo duplicateProduct = itemsNotDelete.FirstOrDefault(p => p.product_num == productNumValue && p.key == keyValue);
+                    ProductDemo duplicateProduct = _itemsNotDelete.FirstOrDefault(p => p.product_num == productNumValue && p.key == keyValue);
                     if (duplicateProduct == null)
                     {
                         count++;
@@ -206,7 +206,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
 
                         if (existingProduct != null)
                         {
-                            items.Add(new ProductDemo
+                            _items.Add(new ProductDemo
                             {
                                 Id = 2,
                                 product_num = productNumValue,
@@ -215,11 +215,11 @@ public partial class RegisterBulkStoreInPage : ContentPage
                                 box_num = ((enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0) + existingProduct.box_num
                             });
                             // 既存の製品を削除する
-                            items.Remove(existingProduct);
+                            _items.Remove(existingProduct);
                         }
                         else
                         {
-                            items.Add(new ProductDemo
+                            _items.Add(new ProductDemo
                             {
                                 Id = 2,
                                 product_num = productNumValue,
@@ -228,13 +228,13 @@ public partial class RegisterBulkStoreInPage : ContentPage
                                 box_num = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0
                             });
                             // 重複処理前のすべてのアイテムを取得する
-                            itemsNotDelete.Add(new ProductDemo { Id = 2, product_num = productNumValue, uniform_num = uniformNumValue, key = keyValue, box_num = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
+                            _itemsNotDelete.Add(new ProductDemo { Id = 2, product_num = productNumValue, uniform_num = uniformNumValue, key = keyValue, box_num = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
                         }
-                        itemsHistory.Add(new ProductDemo { Id = 2, product_num = productNumValue, key = keyValue, uniform_num = uniformNumValue, box_num = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
+                        _itemsHistory.Add(new ProductDemo { Id = 2, product_num = productNumValue, key = keyValue, uniform_num = uniformNumValue, box_num = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
                         // 履歴コレクションビュー
-                        historyCollectionView.ItemsSource = itemsHistory.Reverse();
+                        historyCollectionView.ItemsSource = _itemsHistory.Reverse();
 
-                        collectionView.ItemsSource = items.Reverse();
+                        collectionView.ItemsSource = _items.Reverse();
                     }
                     else
                     {
@@ -298,10 +298,10 @@ public partial class RegisterBulkStoreInPage : ContentPage
     {
         try
         {
-            if (items.Count() > 0)
+            if (_items.Count() > 0)
             {
                 // サウンドのパスを取得す
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, scanAndSound);
+                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
 
                 // OKサウンド
                 SoundPlayer.PlaySound(resultOkSound);
@@ -313,7 +313,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
             else
             {
                 // サウンドのパスを取得す
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, scanAndSound);
+                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _scanAndSound);
                 // エラーサウンド
                 SoundPlayer.PlaySound(resultErrorSound);
                 await Application.Current.MainPage.DisplayAlert("お知らせ", "データがありません", "OK");

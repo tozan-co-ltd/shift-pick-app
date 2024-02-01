@@ -13,8 +13,8 @@ public partial class MenuPage : FlyoutPage
     public MenuPage()
 	{
 		InitializeComponent();
-        CompanyCode.Text = "marutama";
-        LoginId.Text = "test001";
+        companyCode.Text = "marutama";
+        loginId.Text = "test001";
 
         // メニュー一覧
         myListView.ItemsSource = new ObservableCollection<MenuItem>

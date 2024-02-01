@@ -13,21 +13,21 @@ public partial class RegisterStoreInPage : ContentPage
     int count = 0;
     int boxCout = 1;
     bool isItemTapped = false;
-    private ObservableCollection<ProductDemo> items;
-    private ObservableCollection<ProductDemo> itemsNotDelete;
-    private ObservableCollection<ProductDemo> itemsHistory;
+    private ObservableCollection<ProductDemo> _items;
+    private ObservableCollection<ProductDemo> _itemsNotDelete;
+    private ObservableCollection<ProductDemo> _itemsHistory;
     private readonly LocalDbService _dbService;
-    private ScanAndSound scanAndSound;
-    private bool IsScanPageActive = false;
+    private ScanAndSound _scanAndSound;
+    private bool _IsScanPageActive = false;
     public RegisterStoreInPage()
 	{
 		InitializeComponent();
         _dbService = new LocalDbService();
         CounterBtn.Text = $"{count}";
         Clipboard.ClipboardContentChanged += OnClipboardContentChanged;
-        items = new ObservableCollection<ProductDemo>();
-        itemsNotDelete = new ObservableCollection<ProductDemo>();
-        itemsHistory = new ObservableCollection<ProductDemo>();
+        _items = new ObservableCollection<ProductDemo>();
+        _itemsNotDelete = new ObservableCollection<ProductDemo>();
+        _itemsHistory = new ObservableCollection<ProductDemo>();
         numberOfBoxListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
         scanTextResult.Text = string.Empty;
@@ -40,7 +40,7 @@ public partial class RegisterStoreInPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        IsScanPageActive = true;
+        _IsScanPageActive = true;
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public partial class RegisterStoreInPage : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        IsScanPageActive = false;
+        _IsScanPageActive = false;
     }
 
     /// <summary>
@@ -75,11 +75,11 @@ public partial class RegisterStoreInPage : ContentPage
     {
         try
         {
-            if (IsScanPageActive)
+            if (_IsScanPageActive)
             {
                 // サウンドのパスを取得する
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, scanAndSound);
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, scanAndSound);
+                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
+                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _scanAndSound);
 
                 string clipboardContent = Clipboard.GetTextAsync().Result;
                 if (clipboardContent != string.Empty)
@@ -99,9 +99,9 @@ public partial class RegisterStoreInPage : ContentPage
                         }
 
                         // 既存の製品に同じ製品番号があるかチェックする
-                        ProductDemo existingProduct = items.FirstOrDefault(p => p.product_num == productNumValue);
+                        ProductDemo existingProduct = _items.FirstOrDefault(p => p.product_num == productNumValue);
                         // 既存の製品に同じ製品番号とキーがあるかチェックする 
-                        ProductDemo duplicateProduct = itemsNotDelete.FirstOrDefault(p => p.product_num == productNumValue && p.key == keyValue);
+                        ProductDemo duplicateProduct = _itemsNotDelete.FirstOrDefault(p => p.product_num == productNumValue && p.key == keyValue);
 
                         if (duplicateProduct == null)
                         {
@@ -114,16 +114,16 @@ public partial class RegisterStoreInPage : ContentPage
                             if (existingProduct != null)
                             {
                                 existingProduct.box_num++;
-                                items.Add(new ProductDemo { Id = 2, product_num = productNumValue, uniform_num = uniformNumValue, key = keyValue, box_num = existingProduct.box_num });
+                                _items.Add(new ProductDemo { Id = 2, product_num = productNumValue, uniform_num = uniformNumValue, key = keyValue, box_num = existingProduct.box_num });
                                 // 既存のデータを削除する
-                                items.Remove(existingProduct);
+                                _items.Remove(existingProduct);
                             }
                             else
                             {
-                                items.Add(new ProductDemo { Id = 2, product_num = productNumValue, uniform_num = uniformNumValue, key = keyValue, box_num = boxCout });
+                                _items.Add(new ProductDemo { Id = 2, product_num = productNumValue, uniform_num = uniformNumValue, key = keyValue, box_num = boxCout });
                             }
                             // 重複ハンドル前のすべてのアイテムを取得する
-                            itemsNotDelete.Add(new ProductDemo { Id = 2, product_num = productNumValue, uniform_num = uniformNumValue, key = keyValue, box_num = boxCout });
+                            _itemsNotDelete.Add(new ProductDemo { Id = 2, product_num = productNumValue, uniform_num = uniformNumValue, key = keyValue, box_num = boxCout });
                         }
                         else
                         {
@@ -139,11 +139,11 @@ public partial class RegisterStoreInPage : ContentPage
                         scanTextResult.Text = "スキャンOK";
                         scanTextResult.TextColor = Colors.Black;
 
-                        itemsHistory.Add(new ProductDemo { Id = 2, product_num = productNumValue, key = keyValue, uniform_num = uniformNumValue });
+                        _itemsHistory.Add(new ProductDemo { Id = 2, product_num = productNumValue, key = keyValue, uniform_num = uniformNumValue });
                         // 履歴コレクションビュー
-                        historyCollectionView.ItemsSource = itemsHistory.Reverse();
+                        historyCollectionView.ItemsSource = _itemsHistory.Reverse();
                         // ボックスリストの数
-                        collectionView.ItemsSource = items.Reverse();
+                        collectionView.ItemsSource = _items.Reverse();
                     }
                     else
                     {
@@ -169,10 +169,10 @@ public partial class RegisterStoreInPage : ContentPage
     {
         try
         {
-            if (items.Count() > 0)
+            if (_items.Count() > 0)
             {
                 // サウンドのパスを取得する
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, scanAndSound);
+                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
 
                 // OKサウン
                 SoundPlayer.PlaySound(resultOkSound);
@@ -184,7 +184,7 @@ public partial class RegisterStoreInPage : ContentPage
             else
             {
                 // サウンドのパスを取得する
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, scanAndSound);
+                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _scanAndSound);
                 // エラーサウンド
                 SoundPlayer.PlaySound(resultErrorSound);
                 await Application.Current.MainPage.DisplayAlert("お知らせ", "データがありません", "OK");

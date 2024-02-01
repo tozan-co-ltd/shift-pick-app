@@ -7,7 +7,9 @@ namespace mar_sumaken_app.Views;
 
 public partial class HandySettingPage : ContentPage
 {
-    ObservableCollection<string> items = new ObservableCollection<string> { "ハンディリーダー", "カメラ" };
+    List<string> items = new List<string> { "ハンディリーダー", "カメラ" };
+    List<string> okSoundNameList = new List<string>();
+    List<string> errorSsoundNameList = new List<string>();
     private readonly LocalDbService _dbService;
     private ScanAndSound _scanAndSound;
     private bool _isChangedOkSound = true;
@@ -21,11 +23,13 @@ public partial class HandySettingPage : ContentPage
         ScanModel.ItemsSource = items;
         ScanModel.SelectedItem = "ハンディリーダー";
 
-        List<string> okSoundNameList = sound.SoundOkeyList.Select(sound => sound.DisplayName).ToList();
+        okSoundNameList = sound.SoundOkeyList.Select(sound => sound.DisplayName).ToList();
         ScanOkSound.ItemsSource = okSoundNameList;
 
-        List<string> errorSsoundNameList = sound.SoundErrorList.Select(sound => sound.DisplayName).ToList();
+        errorSsoundNameList = sound.SoundErrorList.Select(sound => sound.DisplayName).ToList();
         ScanErrorSound.ItemsSource = errorSsoundNameList;
+
+        // サウンドピッカーの設定
         SetSoundPicker(okSoundNameList, errorSsoundNameList);
     }
 
@@ -37,17 +41,24 @@ public partial class HandySettingPage : ContentPage
     private async void SetSoundPicker(List<string> okSoundNameList, List<string> errorSsoundNameList)
     {
         var scanAndSoundList = await _dbService.GetScanAndSound();
-        _scanAndSound = scanAndSoundList.Last();
-
-        if (_scanAndSound != null)
+        if (scanAndSoundList.Count() > 0)
         {
-            ScanOkSound.SelectedItem = _scanAndSound.OkSound;
-            ScanErrorSound.SelectedItem = _scanAndSound.ErrorSound;
+            _scanAndSound = scanAndSoundList.Last();
+            if (_scanAndSound != null)
+            {
+                ScanOkSound.SelectedItem = _scanAndSound.OkSound;
+                ScanErrorSound.SelectedItem = _scanAndSound.ErrorSound;
+            }
+            else
+            {
+                ScanOkSound.SelectedItem = okSoundNameList.FirstOrDefault();
+                ScanErrorSound.SelectedItem = errorSsoundNameList.FirstOrDefault();
+            }
         }
         else
         {
-            ScanOkSound.SelectedItem = okSoundNameList.FirstOrDefault();
-            ScanErrorSound.SelectedItem = errorSsoundNameList.FirstOrDefault();
+            ScanOkSound.SelectedItem = okSoundNameList.First();
+            ScanErrorSound.SelectedItem = errorSsoundNameList.First();
         }
     }
 
@@ -85,7 +96,7 @@ public partial class HandySettingPage : ContentPage
     /// スキャンエラーサウンドが変更
     /// </summary>
     private void OnScanErrorSoundChanged(object sender, EventArgs e)
-    {
+    { 
         if (_isChangedErrorSound)
         {
             _isChangedErrorSound = false;

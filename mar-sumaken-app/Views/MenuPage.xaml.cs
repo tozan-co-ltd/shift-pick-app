@@ -93,8 +93,8 @@ public partial class MenuPage : FlyoutPage
         {
             if (title == "入庫")
                 Application.Current.MainPage = new RegisterStoreInPage();
-            //else if (title == "まとめ入庫")
-            //    Application.Current.MainPage = new BulkStockReceivedPage();
+            else if (title == "まとめ入庫")
+                Application.Current.MainPage = new RegisterBulkStoreInPage();
             //else if (title == "出庫")
             //    Application.Current.MainPage = new NormalShipmentOutPage();
         }

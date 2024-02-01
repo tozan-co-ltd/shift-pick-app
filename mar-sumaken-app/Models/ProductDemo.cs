@@ -12,13 +12,14 @@ namespace mar_sumaken_app.Models
 
         public string No { get; set; }
 
-
         public string product_num { get; set; }
 
         public string uniform_num { get; set; }
 
-
         public string contain_num { get; set; }
+
+        public string key { get; set; }
+
         public int box_num { get; set; }
     }
 }

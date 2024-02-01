@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="mar_sumaken_app.Views.RegisterStoreOutPage"
+             NavigationPage.HasNavigationBar="False"
+             Background="#f2f2f2">
+
+    <ContentPage.Resources>
+        <!--ラベル:アプリ名-->
+        <Style x:Key="LabelTitleStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontAttributes" Value="Bold" />
+        </Style>
+        <Style TargetType="Frame">
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+    </ContentPage.Resources>
+    
+    <ScrollView>
+        <StackLayout>
+            <StackLayout Grid.Row="0" BackgroundColor=" Transparent" Orientation="Horizontal" Margin="10">
+                <Button FontFamily="FontAwesome6Solid" Text="&#xf048; 戻る" Background="Gray" TextColor=" White"  HorizontalOptions="StartAndExpand" CornerRadius="25" WidthRequest="120" HeightRequest="50" FontSize="18" Margin="25,0,0,0"  Clicked="OnBackButtonClicked"/>
+                <Button FontFamily="FontAwesome6Solid" Text="&#xe09a; 登録" Background="#F56462" TextColor=" White" HorizontalOptions="EndAndExpand" CornerRadius="25" WidthRequest="120" HeightRequest="50" FontSize="18" Margin="0,0,25,0" Clicked="OnRegisterButtonClicked"/>
+            </StackLayout>
+
+            <Frame CornerRadius="0" BorderColor="Transparent" Background="#f2f2f2" Padding="10">
+                <StackLayout HorizontalOptions="Center">
+                    <Label Text="出庫" FontSize="20" />
+                </StackLayout>
+            </Frame>
+
+            <Frame BorderColor="Transparent" Margin="0" Padding="0" >
+                <StackLayout HorizontalOptions="Center">
+                    <Frame BorderColor="Transparent" Margin="0" Padding="0" BackgroundColor="#FD5A00">
+                        <StackLayout HorizontalOptions="Center" Margin="0" Padding="0">
+                            <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
+                                <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
+                                    <Label Text="納入指示日:" FontSize="16" TextColor="#fff"/>
+                                    <Label x:Name="selectedDateLabel" FontSize="16" TextColor="#fff" Margin="0, 0, 10, 0"/>
+                                    <Label Text="納場:" FontSize="16" TextColor="#fff"/>
+                                    <Label x:Name="selectedPlaceLabel" FontSize="16" TextColor="#fff" />
+                                </FlexLayout>
+                            </Frame>
+
+                            <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5">
+                                <FlexLayout Direction="Row" JustifyContent="Center" Padding="0" Margin="0">
+                                    <Label Text ="便:" FontSize="16"  TextColor="#fff" Margin="0"/>
+                                    <Label x:Name="selectedTripLabel" FontSize="16"  TextColor="#fff"  Margin="0, 0, 10, 0"/>
+                                    <Label Text ="納番:" FontSize="16" TextColor="#fff" />
+                                    <Label Text ="Y1670" FontSize="16" TextColor="#fff" />
+                                </FlexLayout>
+                            </Frame>
+                        </StackLayout>
+                    </Frame>
+                    <StackLayout Padding="10" Margin="0">
+                        <Label FontFamily="FontAwesome6Solid" Style="{StaticResource LabelTitleStyle}" Text="①納入先 &#xf061; ➁仕入先かんばんの順で読み取ってください" Margin="0" Padding="0,0,2,0"/>
+                        <FlexLayout Direction="Row" JustifyContent="SpaceBetween" Margin="0, 10, 0, 0" BackgroundColor="#f2f2f2">
+                            <Label FontAttributes="Bold" Text="①2424030" FontSize="16" Padding="12"/>
+                            <Label FontAttributes="Bold" Text="➁スキャンOK" FontSize="16" Padding="12"/>
+                        </FlexLayout>
+                    </StackLayout>
+
+                    <StackLayout>
+                        <Grid RowDefinitions="30, *, *" Padding="8, 10, 8, 0" RowSpacing="5" >
+                            <Grid ColumnDefinitions="60, *, 50" Grid.Row="0">
+                                <Label Text="全体進捗" Grid.Row="0" Grid.Column="0" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" TextColor="Gray"/>
+                                <Label x:Name="progressBarValueLabel" Text="150/300" Grid.Row="0" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="16" TextColor="#0D2C54" FontAttributes="Bold"/>
+                                <Label x:Name="completeLabel" Grid.Row="0" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="18" TextColor="#0D2C54" FontAttributes="Bold"/>
+                            </Grid>
+                        </Grid>
+                        <!--<Slider x:Name="sliderLine" Minimum="1" Maximum="348" ValueChanged="Slider_ValueChanged" MaximumTrackColor="Gray" MinimumTrackColor="#008080" ThumbColor="#F56462"></Slider>-->
+                        <ProgressBar x:Name="progressBar" Margin="10, 0"/>
+                    </StackLayout>
+
+                    <FlexLayout Direction="Row" JustifyContent="Center" AlignItems="Center" Margin="0,20,0,20" Padding="0,0,0,10">
+                        <Button x:Name="shippingListBtn" FontFamily="FontAwesome6Solid" Text="出荷指示リスト表示" TextColor=" White"  HorizontalOptions="StartAndExpand" CornerRadius="10" WidthRequest="140" HeightRequest="50" FontSize="14" Margin="10" Clicked="OnShippingListBtnClicked" Padding="0"/>
+                        <Button x:Name="historyListBtn" FontFamily="FontAwesome6Solid" Text="履歴一覧表示" TextColor=" White" HorizontalOptions="EndAndExpand" CornerRadius="10" WidthRequest="140" HeightRequest="50" FontSize="14" Margin="10" Clicked="OnHistoryListBtnBClicked" Padding="0"/>
+                    </FlexLayout>
+
+                    <StackLayout x:Name="shippingList"  Margin="0">
+                        <Frame Padding="0" Margin="0" HasShadow="False">
+                            <StackLayout HorizontalOptions="Center" >
+                                <Grid RowDefinitions="40, *" Padding="5, 5, 5, 0" ColumnSpacing="5" >
+                                    <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="0" BackgroundColor="#008080">
+                                        <Label Text="No." Grid.Row="0" Grid.Column="0" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                        <Label Text="品番" Grid.Row="0" Grid.Column="1"  TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                        <Label Text="背番号" Grid.Row="0" Grid.Column="2" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                        <Label Text="収容数" Grid.Row="0" Grid.Column="3" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                        <Label Text="箱数" Grid.Row="0" Grid.Column="4" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                        <Label Text="残り" Grid.Row="0" Grid.Column="5" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                    </Grid>
+                                    <CollectionView x:Name="collectionView" Grid.Row="1">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackLayout>
+                                                    <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="1" Padding="0, 5, 0, 5">
+                                                        <Label Text="{Binding No}" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding product_num}" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding uniform_num}" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding contain_num}" Grid.Column="3" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding box_num}" Grid.Column="4" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding box_num}" Grid.Column="5" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                    </Grid>
+                                                    <Grid Padding="0" VerticalOptions="Center" >
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="1" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="#C9C9C9" HeightRequest="1" VerticalOptions="Start" HorizontalOptions="FillAndExpand"/>
+                                                    </Grid>
+                                                </StackLayout>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </Grid>
+                            </StackLayout>
+                        </Frame>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                            <Button FontFamily="FontAwesome6Solid" Text="&#xf048;" Clicked="OnPreviousClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
+                            <Label x:Name="pageNumber" VerticalOptions="CenterAndExpand" TextColor="#008080"/>
+                            <Label x:Name="totalPage" VerticalOptions="CenterAndExpand" />
+                            <Button FontFamily="FontAwesome6Solid" Text="&#xf051;" Clicked="OnNextClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
+                        </StackLayout>
+                    </StackLayout>
+
+                    <StackLayout x:Name="historyList" IsVisible="False" Padding="0" Margin="0">
+                        <Frame Padding="0" Margin="0" HasShadow="False">
+                            <StackLayout HorizontalOptions="Center">
+                                <Grid RowDefinitions="40, *"  RowSpacing="5" ColumnSpacing="5"  Padding="5, 5, 5, 0">
+                                    <Grid ColumnDefinitions="40, 75, 60, 50, 120" Grid.Row="0" BackgroundColor="#FD5A00"  Padding="0" >
+                                        <Label Text="No." Grid.Row="0" Grid.Column="0" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="14"/>
+                                        <Label Text="品番" Grid.Row="0" Grid.Column="1"  TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="14"/>
+                                        <Label Text="背番号" Grid.Row="0" Grid.Column="2" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="14"/>
+                                        <Label Text="収容数" Grid.Row="0" Grid.Column="3" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="14"/>
+                                        <Label Text="スキャン数/箱数" Grid.Row="0" Grid.Column="4" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="14"/>
+                                    </Grid>
+                                    <CollectionView x:Name="collectionViewHistory" Grid.Row="1">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackLayout>
+                                                    <Grid ColumnDefinitions="40, 75, 60, 50, 120" Grid.Row="1" Padding="0, 5, 0, 5">
+                                                        <Label Text="{Binding No}" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding product_num}" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding uniform_num}" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding contain_num}" Grid.Column="3" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding box_num}" Grid.Column="4" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                    </Grid>
+                                                    <Grid Padding="0" VerticalOptions="Center" >
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="1" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="#C9C9C9" HeightRequest="1" VerticalOptions="Start" HorizontalOptions="FillAndExpand"/>
+                                                    </Grid>
+                                                </StackLayout>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                </Grid>
+                            </StackLayout>
+                        </Frame>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                            <Button FontFamily="FontAwesome6Solid" Text="&#xf048;" Clicked="HistoryOnPreviousClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
+                            <Label x:Name="historyPageNumber" VerticalOptions="CenterAndExpand" TextColor="#FD5A00"/>
+                            <Label x:Name="totalHistoryPage" VerticalOptions="CenterAndExpand" />
+                            <Button FontFamily="FontAwesome6Solid" Text="&#xf051;" Clicked="HistoryOnNextClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
+                        </StackLayout>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

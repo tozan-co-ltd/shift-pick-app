@@ -5,7 +5,6 @@ using mar_sumaken_app.Common;
 using Plugin.Maui.Audio;
 using mar_sumaken_app.Services;
 using Microsoft.Maui.Animations;
-using mar_sumaken_app.ViewModels;
 
 namespace mar_sumaken_app.Views;
 

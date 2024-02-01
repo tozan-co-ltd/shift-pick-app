@@ -95,8 +95,8 @@ public partial class MenuPage : FlyoutPage
                 Application.Current.MainPage = new RegisterStoreInPage();
             else if (title == "まとめ入庫")
                 Application.Current.MainPage = new RegisterBulkStoreInPage();
-            //else if (title == "出庫")
-            //    Application.Current.MainPage = new NormalShipmentOutPage();
+            else if (title == "出庫")
+                Application.Current.MainPage = new SearchShippingInstructionListPage();
         }
         catch (Exception)
         {

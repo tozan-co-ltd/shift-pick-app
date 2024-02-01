@@ -20,14 +20,14 @@ public partial class HandySettingPage : ContentPage
         _dbService = new LocalDbService();
         Sound sound = new Sound();
 
-        ScanModel.ItemsSource = items;
-        ScanModel.SelectedItem = "ハンディリーダー";
+        scanModel.ItemsSource = items;
+        scanModel.SelectedItem = "ハンディリーダー";
 
         okSoundNameList = sound.SoundOkeyList.Select(sound => sound.DisplayName).ToList();
-        ScanOkSound.ItemsSource = okSoundNameList;
+        scanOkSound.ItemsSource = okSoundNameList;
 
         errorSsoundNameList = sound.SoundErrorList.Select(sound => sound.DisplayName).ToList();
-        ScanErrorSound.ItemsSource = errorSsoundNameList;
+        scanErrorSound.ItemsSource = errorSsoundNameList;
 
         // サウンドピッカーの設定
         SetSoundPicker(okSoundNameList, errorSsoundNameList);
@@ -46,19 +46,19 @@ public partial class HandySettingPage : ContentPage
             _scanAndSound = scanAndSoundList.Last();
             if (_scanAndSound != null)
             {
-                ScanOkSound.SelectedItem = _scanAndSound.OkSound;
-                ScanErrorSound.SelectedItem = _scanAndSound.ErrorSound;
+                scanOkSound.SelectedItem = _scanAndSound.OkSound;
+                scanErrorSound.SelectedItem = _scanAndSound.ErrorSound;
             }
             else
             {
-                ScanOkSound.SelectedItem = okSoundNameList.FirstOrDefault();
-                ScanErrorSound.SelectedItem = errorSsoundNameList.FirstOrDefault();
+                scanOkSound.SelectedItem = okSoundNameList.FirstOrDefault();
+                scanErrorSound.SelectedItem = errorSsoundNameList.FirstOrDefault();
             }
         }
         else
         {
-            ScanOkSound.SelectedItem = okSoundNameList.First();
-            ScanErrorSound.SelectedItem = errorSsoundNameList.First();
+            scanOkSound.SelectedItem = okSoundNameList.First();
+            scanErrorSound.SelectedItem = errorSsoundNameList.First();
         }
     }
 
@@ -77,9 +77,9 @@ public partial class HandySettingPage : ContentPage
     {
         await _dbService.Create(new ScanAndSound
         {
-            OkSound = (string)ScanOkSound.SelectedItem,
-            ErrorSound = (string)ScanErrorSound.SelectedItem,
-            ScandMode = (string)ScanModel.SelectedItem
+            OkSound = (string)scanOkSound.SelectedItem,
+            ErrorSound = (string)scanErrorSound.SelectedItem,
+            ScandMode = (string)scanModel.SelectedItem
         });
 
         // サウンドのパスを取得する
@@ -102,8 +102,8 @@ public partial class HandySettingPage : ContentPage
             _isChangedErrorSound = false;
             return;
         }
-        string errorSoundNumber = new string(ScanErrorSound.SelectedItem.ToString().Where(char.IsDigit).ToArray());
-        ScanErrorSound.SelectedItem = ScanErrorSound.SelectedItem.ToString();
+        string errorSoundNumber = new string(scanErrorSound.SelectedItem.ToString().Where(char.IsDigit).ToArray());
+        scanErrorSound.SelectedItem = scanErrorSound.SelectedItem.ToString();
 
         //  サウンドのパスを取得する
         string resultErrorSound = "ScanErrorSound/ScanErrorSound" + errorSoundNumber + ".mp3";
@@ -120,8 +120,8 @@ public partial class HandySettingPage : ContentPage
             _isChangedOkSound = false;
             return;
         }
-        string okSoundNumber = new string(ScanOkSound.SelectedItem.ToString().Where(char.IsDigit).ToArray());
-        ScanOkSound.SelectedItem = ScanOkSound.SelectedItem.ToString();
+        string okSoundNumber = new string(scanOkSound.SelectedItem.ToString().Where(char.IsDigit).ToArray());
+        scanOkSound.SelectedItem = scanOkSound.SelectedItem.ToString();
 
         //  サウンドのパスを取得する
         string resultOkSound = "ScanOkeySound/ScanOkeySound" + okSoundNumber + ".mp3";
@@ -133,6 +133,6 @@ public partial class HandySettingPage : ContentPage
     /// </summary>
     private void OnScanModelChanged(object sender, EventArgs e)
     {
-        ScanModel.SelectedItem = ScanModel.SelectedItem.ToString();
+        scanModel.SelectedItem = scanModel.SelectedItem.ToString();
     }
 }

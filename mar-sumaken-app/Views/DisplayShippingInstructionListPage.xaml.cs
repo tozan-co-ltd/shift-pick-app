@@ -8,8 +8,8 @@ namespace mar_sumaken_app.Views;
 
 public partial class DisplayShippingInstructionListPage : ContentPage
 {
-    private ObservableCollection<ProductDemo> items;
-    private int itemsPerPage = 10;
+    private ObservableCollection<ProductDemo> _items;
+    private int _itemsPerPage = 10;
     public int currentPage = 1;
     public string currentDate = string.Empty;
     public string slectedTrip = string.Empty;
@@ -24,7 +24,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         selectedPlaceLabel.Text = $"{place}";
         selectedPlace = $"{place}";
         
-        items = new ObservableCollection<ProductDemo>();
+        _items = new ObservableCollection<ProductDemo>();
         // sample data
         for (int i = 1; i <= 25; i++)
         {
@@ -38,19 +38,19 @@ public partial class DisplayShippingInstructionListPage : ContentPage
                 box_num = i
             };
 
-            items.Add(productDemo);
+            _items.Add(productDemo);
         }
 
         // 箱数降順
-        items = new ObservableCollection<ProductDemo>(items.OrderByDescending(p => p.box_num));
+        _items = new ObservableCollection<ProductDemo>(_items.OrderByDescending(p => p.box_num));
         // No昇順
-        for (int i = 0; i < items.Count; i++)
+        for (int i = 0; i < _items.Count; i++)
         {
-            items[i].No = $"{i+1}";
+            _items[i].No = $"{i+1}";
         }
 
         // APIからデータを取得
-        //items = GetDataFromApi(items);
+        //_items = GetDataFromApi(_items);
     }
 
     /// <summary>
@@ -70,11 +70,11 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     {
         try
         {
-            //items = await GetDataFromApi();
-            if (items.Count() % itemsPerPage == 0)
-                totalPage.Text = "/" + (items.Count() / itemsPerPage).ToString();
+            //_items = await GetDataFromApi();
+            if (_items.Count() % _itemsPerPage == 0)
+                totalPage.Text = "/" + (_items.Count() / _itemsPerPage).ToString();
             else
-                totalPage.Text = "/" + ((items.Count() / itemsPerPage) + 1).ToString();
+                totalPage.Text = "/" + ((_items.Count() / _itemsPerPage) + 1).ToString();
 
             pageNumber.Text = currentPage.ToString();
 
@@ -121,9 +121,9 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     {
         try
         {
-            var startIndex = (currentPage - 1) * itemsPerPage;
-            var endIndex = startIndex + itemsPerPage;
-            var pageItems = items.Skip(startIndex).Take(itemsPerPage);
+            var startIndex = (currentPage - 1) * _itemsPerPage;
+            var endIndex = startIndex + _itemsPerPage;
+            var pageItems = _items.Skip(startIndex).Take(_itemsPerPage);
 
             collectionView.ItemsSource = pageItems;
             return collectionView;
@@ -152,7 +152,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     /// </summary>
     private void OnNextClicked(object sender, EventArgs e)
     {
-        var totalPages = (int)Math.Ceiling((double)items.Count / itemsPerPage);
+        var totalPages = (int)Math.Ceiling((double)_items.Count / _itemsPerPage);
         if (currentPage < totalPages)
         {
             currentPage++;
@@ -178,7 +178,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         {
             Application.Current.MainPage = new LoadingPage();
             await Task.Delay(200);
-            Application.Current.MainPage = new RegisterStoreOutPage(currentDate, slectedTrip, items, selectedPlace);
+            Application.Current.MainPage = new RegisterStoreOutPage(currentDate, slectedTrip, _items, selectedPlace);
         }
         catch (Exception ex)
         {

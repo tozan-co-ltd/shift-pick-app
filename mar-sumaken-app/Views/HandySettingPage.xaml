@@ -82,7 +82,7 @@
                         <Label Text="スキャンモード" FontAttributes="Bold" Padding=" 15, 5, 10, 2" FontSize="14"/>
                         <StackLayout>
                             <StackLayout  Margin="30, 0,30, 5" Padding="10, 0, 10,0" BackgroundColor="#f2f2f2" HeightRequest="40" >
-                                <Picker x:Name="ScanModel" SelectedIndexChanged="OnScanModelChanged" VerticalOptions="CenterAndExpand" FontSize="15" Title="スキャンモード"/>
+                                <Picker x:Name="scanModel" SelectedIndexChanged="OnScanModelChanged" VerticalOptions="CenterAndExpand" FontSize="15" Title="スキャンモード"/>
                             </StackLayout>
                             <BoxView HeightRequest="1" Color="#ccc" HorizontalOptions="FillAndExpand" />
                         </StackLayout>
@@ -90,7 +90,7 @@
                         <Label Text="スキャンOKサウンド" FontAttributes="Bold" Padding=" 15, 5, 10, 2" FontSize="14"/>
                         <StackLayout>
                             <StackLayout  Margin="30, 0, 30, 5" Padding="10, 0, 10,0" BackgroundColor="#f2f2f2" HeightRequest="40" >
-                                <Picker x:Name="ScanOkSound" SelectedIndexChanged="OnScanOkSoundChanged" VerticalOptions="CenterAndExpand" FontSize="15" Title="スキャンOKサウンド"/>
+                                <Picker x:Name="scanOkSound" SelectedIndexChanged="OnScanOkSoundChanged" VerticalOptions="CenterAndExpand" FontSize="15" Title="スキャンOKサウンド"/>
                             </StackLayout>
                             <BoxView HeightRequest="1" Color="#ccc" HorizontalOptions="FillAndExpand" />
                         </StackLayout>
@@ -98,7 +98,7 @@
                         <Label Text="スキャンERRORサウンド" FontAttributes="Bold" Padding=" 15, 5, 10, 2" FontSize="14"/>
                         <StackLayout>
                             <StackLayout  Margin="30, 0,30, 5" Padding="10, 0, 10,0" BackgroundColor="#f2f2f2" HeightRequest="40" >
-                                <Picker x:Name="ScanErrorSound" SelectedIndexChanged="OnScanErrorSoundChanged" VerticalOptions="CenterAndExpand" FontSize="15" Title="スキャンERRORサウンド"/>
+                                <Picker x:Name="scanErrorSound" SelectedIndexChanged="OnScanErrorSoundChanged" VerticalOptions="CenterAndExpand" FontSize="15" Title="スキャンERRORサウンド"/>
                             </StackLayout>
                         </StackLayout>
                     </StackLayout>

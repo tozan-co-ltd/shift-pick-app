@@ -11,17 +11,17 @@ using ProductDemo = mar_sumaken_app.Models.ProductDemo;
 public partial class RegisterStoreOutPage : ContentPage
 {
     public DateTime selectedDate;
-    private ObservableCollection<ProductDemo> items;
-    private ObservableCollection<ProductDemo> itemsHistory;
+    private ObservableCollection<ProductDemo> _items;
+    private ObservableCollection<ProductDemo> _itemsHistory;
     public string chosedTrip = string.Empty;
-    private int itemsPerPage = 10;
+    private int _itemsPerPage = 10;
     public int currentPage = 1;
     public int currentHistoryPage = 1;
     public string currentDate = string.Empty; 
     public string selectedTrip = string.Empty;
     public string chosedPlace = string.Empty;
     private readonly LocalDbService _dbService;
-    private ScanAndSound scanAndSound;
+    private ScanAndSound _scanAndSound;
     public RegisterStoreOutPage(string currentDate, string selectedTrip, ObservableCollection<ProductDemo> itemsData, string place)
     {
 		InitializeComponent();
@@ -51,13 +51,13 @@ public partial class RegisterStoreOutPage : ContentPage
         try
         {
             // 出荷指示リスト表示
-            items = itemsData;
+            _items = itemsData;
             collectionView = DisplayItems();
 
-            if (items.Count() % itemsPerPage == 0)
-                totalPage.Text = "/" + (items.Count() / itemsPerPage).ToString();
+            if (_items.Count() % _itemsPerPage == 0)
+                totalPage.Text = "/" + (_items.Count() / _itemsPerPage).ToString();
             else
-                totalPage.Text = "/" + ((items.Count() / itemsPerPage) + 1).ToString();
+                totalPage.Text = "/" + ((_items.Count() / _itemsPerPage) + 1).ToString();
 
             pageNumber.Text = currentPage.ToString();
 
@@ -83,13 +83,13 @@ public partial class RegisterStoreOutPage : ContentPage
         try
         {
             // 履歴一覧表示
-            itemsHistory = itemsData;
+            _itemsHistory = itemsData;
             collectionViewHistory = DisplayItemsHistory();
 
-            if (items.Count() % itemsPerPage == 0)
-                totalHistoryPage.Text = "/" + (itemsHistory.Count() / itemsPerPage).ToString();
+            if (_items.Count() % _itemsPerPage == 0)
+                totalHistoryPage.Text = "/" + (_itemsHistory.Count() / _itemsPerPage).ToString();
             else
-                totalHistoryPage.Text = "/" + ((itemsHistory.Count() / itemsPerPage) + 1).ToString();
+                totalHistoryPage.Text = "/" + ((_itemsHistory.Count() / _itemsPerPage) + 1).ToString();
 
             historyPageNumber.Text = currentHistoryPage.ToString();
 
@@ -113,9 +113,9 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
-            var startIndex = (currentPage - 1) * itemsPerPage;
-            var endIndex = startIndex + itemsPerPage;
-            var pageItems = items.Skip(startIndex).Take(itemsPerPage);
+            var startIndex = (currentPage - 1) * _itemsPerPage;
+            var endIndex = startIndex + _itemsPerPage;
+            var pageItems = _items.Skip(startIndex).Take(_itemsPerPage);
 
             collectionView.ItemsSource = pageItems;
             return collectionView;
@@ -133,9 +133,9 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
-            var startIndex = (currentHistoryPage - 1) * itemsPerPage;
-            var endIndex = startIndex + itemsPerPage;
-            var pageItems = items.Skip(startIndex).Take(itemsPerPage);
+            var startIndex = (currentHistoryPage - 1) * _itemsPerPage;
+            var endIndex = startIndex + _itemsPerPage;
+            var pageItems = _items.Skip(startIndex).Take(_itemsPerPage);
 
             collectionViewHistory.ItemsSource = pageItems;
             return collectionViewHistory;
@@ -206,7 +206,7 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
-            var totalPages = (int)Math.Ceiling((double)items.Count / itemsPerPage);
+            var totalPages = (int)Math.Ceiling((double)_items.Count / _itemsPerPage);
             if (currentPage < totalPages)
             {
                 currentPage++;
@@ -247,7 +247,7 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
-            var totalPages = (int)Math.Ceiling((double)itemsHistory.Count / itemsPerPage);
+            var totalPages = (int)Math.Ceiling((double)_itemsHistory.Count / _itemsPerPage);
             if (currentHistoryPage < totalPages)
             {
                 currentHistoryPage++;
@@ -291,7 +291,7 @@ public partial class RegisterStoreOutPage : ContentPage
         try
         {
             // サウンドのパスを取得する
-            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, scanAndSound);
+            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
             // OKサウンド
             SoundPlayer.PlaySound(resultOkSound);
             await Application.Current.MainPage.DisplayAlert("完了", "データ登録が完了しました", "OK");

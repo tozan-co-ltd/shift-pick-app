@@ -10,7 +10,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 {
     bool isItemTapped = false;
     ObservableCollection<string> items = new ObservableCollection<string> { "E5", "T5" };
-    string selectedOption = "1";
+    string selectedTripOption = "1"; // デフォルトでは、便は 1 です
     public SearchShippingInstructionListPage()
 	{
 		InitializeComponent();
@@ -50,9 +50,9 @@ public partial class SearchShippingInstructionListPage : ContentPage
         trip3.BackgroundColor = Colors.Gray;
         trip4.BackgroundColor = Colors.Gray;
 
-        Button selectedButton = (Button)sender;
-        selectedButton.BackgroundColor = Color.FromHex("#008577");
-        selectedOption = selectedButton.Text;
+        Button selectedTrip = (Button)sender;
+        selectedTrip.BackgroundColor = Color.FromHex("#008577");
+        selectedTripOption = selectedTrip.Text;
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
             Application.Current.MainPage = new LoadingPage();
             await Task.Delay(200);
-            Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDate, selectedOption, (string)place.SelectedItem);
+            Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDate, selectedTripOption, (string)place.SelectedItem);
         }
         catch (Exception ex)
         {

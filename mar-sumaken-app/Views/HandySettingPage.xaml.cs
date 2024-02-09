@@ -1,73 +1,84 @@
 using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using System.Net.Http.Json;
+using System.Text;
 
 namespace mar_sumaken_app.Views;
 
 public partial class HandySettingPage : ContentPage
 {
-    List<string> items = new List<string> { "ハンディリーダー", "カメラ" };
+    List<string> scanModeList = new List<string> { "ハンディリーダー", "カメラ" };
     List<string> okSoundNameList = new List<string>();
     List<string> errorSsoundNameList = new List<string>();
     private readonly LocalDbService _dbService;
-    private ScanAndSound _scanAndSound;
+    private Setting.HandySetting _handySetting;
+    private string _requestApiUrl;
     private bool _isChangedOkSound = true;
     private bool _isChangedErrorSound = true;
+    public string txtUrlApi = string.Empty;
+    public string companyCode = string.Empty;
+    public string companyPassword = string.Empty;
+    public string loginID = string.Empty;
     public HandySettingPage()
 	{
         InitializeComponent();
         _dbService = new LocalDbService();
-        Sound sound = new Sound();
 
-        scanModel.ItemsSource = items;
-        scanModel.SelectedItem = "ハンディリーダー";
-
-        okSoundNameList = sound.SoundOkeyList.Select(sound => sound.DisplayName).ToList();
-        scanOkSound.ItemsSource = okSoundNameList;
-
-        errorSsoundNameList = sound.SoundErrorList.Select(sound => sound.DisplayName).ToList();
-        scanErrorSound.ItemsSource = errorSsoundNameList;
-
-        // サウンドピッカーの設定
-        SetSoundPicker(okSoundNameList, errorSsoundNameList);
+        // フィールドの設定
+        SetHandySetting();
     }
 
     /// <summary>
-    /// サウンドピッカーの設定
+    /// フィールドの設定
     /// </summary>
-    /// <param name="okSoundNameList">OKサウン一覧</param>
-    /// <param name="errorSsoundNameList">エラーサウン一覧</param>
-    private async void SetSoundPicker(List<string> okSoundNameList, List<string> errorSsoundNameList)
+    private async void SetHandySetting()
     {
-        var scanAndSoundList = await _dbService.GetScanAndSound();
-        if (scanAndSoundList.Count() > 0)
+        // 接続先
+        _requestApiUrl = "https://www.tozan.co.jp/sumaken-api-MRq2xg5/api/";
+        txtUrl.Text = _requestApiUrl;
+        txtUrlApi = txtUrl.Text;
+
+        // スキャンモードの設定
+        scanMode.ItemsSource = scanModeList;
+
+        // サウンドピッカーの設定
+        Sound sound = new Sound();
+        okSoundNameList = sound.SoundOkeyList.Select(sound => sound.DisplayName).ToList();
+        scanOkSound.ItemsSource = okSoundNameList;
+        errorSsoundNameList = sound.SoundErrorList.Select(sound => sound.DisplayName).ToList();
+        scanErrorSound.ItemsSource = errorSsoundNameList;
+
+        var settings = await _dbService.GetSetting();
+        if (settings.Count() > 0 && settings.Last() != null)
         {
-            _scanAndSound = scanAndSoundList.Last();
-            if (_scanAndSound != null)
-            {
-                scanOkSound.SelectedItem = _scanAndSound.OkSound;
-                scanErrorSound.SelectedItem = _scanAndSound.ErrorSound;
-            }
-            else
-            {
-                scanOkSound.SelectedItem = okSoundNameList.FirstOrDefault();
-                scanErrorSound.SelectedItem = errorSsoundNameList.FirstOrDefault();
-            }
+            _handySetting = settings.Last();
+            txtUrl.Text = _handySetting.HandyApiUrl;
+            txtCompanyCode.Text = _handySetting.CompanyCode;
+            txtLoginId.Text = _handySetting.LoginID;
+            txtCompanyPassword.Text = _handySetting.CompanyPassword;
+            scanMode.SelectedItem = _handySetting.ScanMode;
+            scanOkSound.SelectedItem = _handySetting.ScanOkSound;
+            scanErrorSound.SelectedItem = _handySetting.ScanErrorSound;
         }
         else
         {
-            scanOkSound.SelectedItem = okSoundNameList.First();
-            scanErrorSound.SelectedItem = errorSsoundNameList.First();
+            scanMode.SelectedItem = scanModeList.FirstOrDefault();
+            scanOkSound.SelectedItem = okSoundNameList.FirstOrDefault();
+            scanErrorSound.SelectedItem = errorSsoundNameList.FirstOrDefault();
         }
-    }
+     }
 
     /// <summary>
     /// 戻る
     /// </summary>
-    private void OnBackButtonClicked(object sender, EventArgs e)
+    private async void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new LoginPage();
+        var result = await Application.Current.MainPage.DisplayAlert("警告", "入力内容は破棄されます\n戻ってよろしいですか？", "OK", "キャンセル");
+        if (result)
+            Application.Current.MainPage = new LoginPage();
     }
 
     /// <summary>
@@ -75,21 +86,51 @@ public partial class HandySettingPage : ContentPage
     /// </summary>
     private async void OnRegisterButtonClicked(object sender, EventArgs e)
     {
-        await _dbService.Create(new ScanAndSound
-        {
-            OkSound = (string)scanOkSound.SelectedItem,
-            ErrorSound = (string)scanErrorSound.SelectedItem,
-            ScandMode = (string)scanModel.SelectedItem
-        });
+        var settingApiRequestBody = new Setting.SettingPostBody();
 
-        // サウンドのパスを取得する
-        string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
-        // OKサウンド
-        SoundPlayer.PlaySound(resultOkSound);
-        await DisplayAlert("完了", "登録が完了しました。", "OK");
-        Application.Current.MainPage = new LoadingPage();
-        await Task.Delay(100);
-        Application.Current.MainPage = new LoginPage();
+        companyCode = txtCompanyCode.Text;
+        companyPassword = txtCompanyPassword.Text;
+        loginID = txtLoginId.Text;
+        settingApiRequestBody.CompanyCode = companyCode == null ? "" : companyCode.Trim();
+        settingApiRequestBody.CompanyPassword = companyPassword == null ? "" : companyPassword.Trim();
+        settingApiRequestBody.LoginID = loginID == null ? "" : loginID.Trim();
+
+        if (txtUrlApi == "" || settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "" || settingApiRequestBody.LoginID == "")
+        {
+            await DisplayAlert("警告", "未入力項目があります。", "OK");
+            return;
+        }
+
+        var jsonDataSend = JsonConvert.SerializeObject(settingApiRequestBody);
+        // APIを接続
+        var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "Setting");
+        if (response.success)
+        {
+            await _dbService.Create(new Setting.HandySetting
+            {
+                HandyApiUrl = txtUrlApi,
+                CompanyCode = settingApiRequestBody.CompanyCode,
+                CompanyPassword = settingApiRequestBody.CompanyPassword,
+                LoginID = settingApiRequestBody.LoginID,
+                ScanMode = (string)scanMode.SelectedItem,
+                ScanOkSound = (string)scanOkSound.SelectedItem,
+                ScanErrorSound = (string)scanErrorSound.SelectedItem
+            });
+
+            // サウンドのパスを取得する
+            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
+            // OKサウンド
+            SoundPlayer.PlaySound(resultOkSound);
+            await DisplayAlert("完了", "登録が完了しました。", "OK");
+            Application.Current.MainPage = new LoadingPage();
+            await Task.Delay(100);
+            Application.Current.MainPage = new LoginPage();
+        }
+        else
+        {
+            await DisplayAlert("警告", response.content, "OK");
+            return;
+        }
     }
 
     /// <summary>
@@ -133,6 +174,6 @@ public partial class HandySettingPage : ContentPage
     /// </summary>
     private void OnScanModelChanged(object sender, EventArgs e)
     {
-        scanModel.SelectedItem = scanModel.SelectedItem.ToString();
+        scanMode.SelectedItem = scanMode.SelectedItem.ToString();
     }
 }

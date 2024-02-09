@@ -16,47 +16,57 @@ namespace mar_sumaken_app.Services
         public LocalDbService()
         {
             _connection = new SQLiteAsyncConnection(Path.Combine(FileSystem.AppDataDirectory, DB_NAME));
-            _connection.CreateTableAsync<ScanAndSound>();
+            try
+            {
+                var createTableSetting = _connection.CreateTableAsync<Setting.HandySetting>();
+                createTableSetting.Wait(); // Wait for table creation to finish
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        /// Setting.HandySetting
+
+        /// <summary>
+        /// スキャンとサウンドを取得
+        /// </summary>
+        public async Task<List<Setting.HandySetting>> GetSetting()
+        {
+            return await _connection.Table<Setting.HandySetting>().ToListAsync();
         }
 
         /// <summary>
         /// スキャンとサウンドを取得
         /// </summary>
-        public async Task<List<ScanAndSound>> GetScanAndSound()
+        public async Task<Setting.HandySetting> GetByCompanyID(int Id)
         {
-            return await _connection.Table<ScanAndSound>().ToListAsync();
-        }
-
-        /// <summary>
-        /// スキャンとサウンドを取得
-        /// </summary>
-        public async Task<ScanAndSound> GetById(int id)
-        {
-            return await _connection.Table<ScanAndSound>().Where(x => x.Id == id).FirstOrDefaultAsync();
+            return await _connection.Table<Setting.HandySetting>().Where(x => x.Id == Id).FirstOrDefaultAsync();
         }
 
         /// <summary>
         /// 作成
         /// </summary>
-        public async Task Create(ScanAndSound scanAndSound)
+        public async Task Create(Setting.HandySetting handySetting)
         {
-            await _connection.InsertAsync(scanAndSound);
+            await _connection.InsertAsync(handySetting);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        public async Task Update(ScanAndSound scanAndSound)
+        public async Task Update(Setting.HandySetting handySetting)
         {
-            await _connection.UpdateAsync(scanAndSound);
+            await _connection.UpdateAsync(handySetting);
         }
 
         /// <summary>
         /// 削除
         /// </summary>
-        public async Task Delete(ScanAndSound scanAndSound)
+        public async Task Delete(Setting.HandySetting handySetting)
         {
-            await _connection.DeleteAsync(scanAndSound);
+            await _connection.DeleteAsync(handySetting);
         }
     }
 }

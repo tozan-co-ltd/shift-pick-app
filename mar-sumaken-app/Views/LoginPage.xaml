@@ -63,7 +63,7 @@
                             <Label Text="ログインID" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start"  Margin="0,10,0,0" FontSize="20"/>
                             <Frame Padding="10,0,10,0" CornerRadius="10" BackgroundColor="#f2f2f2"  Margin="0,0,0,20">
                                 <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal" VerticalOptions="CenterAndExpand">
-                                    <Entry x:Name="txtUser" Text="test01" FontSize="26" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Center" HorizontalOptions="FillAndExpand" IsTextPredictionEnabled="False"/>
+                                    <Entry x:Name="txtLoginId" FontSize="26" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Center" HorizontalOptions="FillAndExpand" IsTextPredictionEnabled="False"/>
                                 </StackLayout>
                             </Frame>
                             <Label x:Name="loginError" FontSize="15" TextColor="Red"/>

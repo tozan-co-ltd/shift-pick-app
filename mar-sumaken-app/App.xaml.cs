@@ -1,4 +1,5 @@
-﻿using mar_sumaken_app.Views;
+﻿using mar_sumaken_app.Common;
+using mar_sumaken_app.Views;
 #if __ANDROID__
 using Android.Content.Res;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
@@ -10,6 +11,19 @@ namespace mar_sumaken_app
 {
     public partial class App : Application
     {
+        static APIClass m_api;
+        public static APIClass API
+        {
+            get
+            {
+                if (m_api == null)
+                {
+                    m_api = new APIClass();
+                }
+                return m_api;
+            }
+        }
+
         public App()
         {
             InitializeComponent();

@@ -59,9 +59,9 @@
                             <Frame BackgroundColor="#FD5A00" CornerRadius="0" BorderColor="#FD5A00">
                                 <StackLayout HorizontalOptions="Center">
                                     <FlexLayout Direction="Row" JustifyContent="Center" Padding="0" Margin="0">
-                                        <Label Text="山田太郎" FontSize="18" TextColor="#fff"/>
+                                        <Label x:Name="userName" FontSize="18" TextColor="#fff"/>
                                         <Label Text="さん" FontSize="14" TextColor="#fff" Padding="0, 5, 0, 0"/>
-                                        <Label Text="西尾物流センター" FontSize="18" TextColor="#fff" Margin="5, 0, 0 ,0"/>
+                                        <Label x:Name="companyName" FontSize="18" TextColor="#fff" Margin="5, 0, 0 ,0"/>
                                         <Label Text="で作業中" FontSize="14" TextColor="#fff" Padding="0, 5, 0, 0"/>
                                     </FlexLayout>
                                 </StackLayout>

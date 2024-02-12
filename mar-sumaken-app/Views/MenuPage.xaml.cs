@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
 using mar_sumaken_app.Common;
+using mar_sumaken_app.Models;
+using mar_sumaken_app.Services;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Xaml;
 using Plugin.Maui.Audio;
@@ -9,12 +11,16 @@ namespace mar_sumaken_app.Views;
 
 public partial class MenuPage : FlyoutPage
 {
+    private readonly LocalDbService _dbService;
+    private Setting.HandySetting _handySetting;
+    private string? _handyApiUrl;
     bool isItemTapped = false;
     public MenuPage()
 	{
 		InitializeComponent();
-        companyCode.Text = "marutama";
-        loginId.Text = "test001";
+        _dbService = new LocalDbService();
+        // メニューの設定
+        SetMenuPage();
 
         // メニュー一覧
         myListView.ItemsSource = new ObservableCollection<MenuItem>
@@ -26,6 +32,26 @@ public partial class MenuPage : FlyoutPage
 
         //　メニューのアイテムをタップ
         myListView.ItemTapped += OnItemTapped;
+    }
+
+    /// <summary>
+    /// メニューの設定
+    /// </summary>
+    private async void SetMenuPage()
+    {
+        try
+        {
+            var settings = await _dbService.GetSetting();
+            _handySetting = settings.Last();
+            companyCode.Text = _handySetting.CompanyCode;
+            loginId.Text = _handySetting.LoginID;
+            userName.Text = _handySetting.UserName;
+            companyName.Text = _handySetting.CompanyName;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     /// <summary>

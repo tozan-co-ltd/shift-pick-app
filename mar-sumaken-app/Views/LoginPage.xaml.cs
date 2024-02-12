@@ -22,13 +22,13 @@ public partial class LoginPage : ContentPage
         companyPassword = string.Empty;
         AppVersion = 0;
         // ログインIDの設定
-        SetLoginId();
+        SetLoginPage();
      }
 
     /// <summary>
     /// ログインIDの設定
     /// </summary>
-    private async void SetLoginId()
+    private async void SetLoginPage()
     {
         var settings = await _dbService.GetSetting();
         if (settings.Count() > 0 && settings.Last() != null)
@@ -64,17 +64,32 @@ public partial class LoginPage : ContentPage
                 if (Decimal.TryParse(GetAppVersion(), out decimal appVersion)) // アプリのバージョンをチェックとAPIを呼び出し
                 {
                     AppVersion = appVersion;
-                    var loginRequestBody = new LoginModel.LoginRequestBody();
-                    loginRequestBody.LoginID = loginId;
-                    loginRequestBody.CompanyCode = _handySetting.CompanyCode;
-                    loginRequestBody.CompanyPassword = _handySetting.CompanyPassword;
-                    loginRequestBody.HandyAppVersion = Convert.ToDecimal(AppVersion);
+                    var loginRequestBody = new
+                    {
+                        LoginID = loginId,
+                        CompanyCode = _handySetting.CompanyCode,
+                        CompanyPassword = _handySetting.CompanyPassword,
+                        HandyAppVersion = Convert.ToDecimal(AppVersion)
+                    };
                     try
                     {
                         var jsonDataSend = JsonConvert.SerializeObject(loginRequestBody);
                         var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "Login");
                         if (response.success)
                         {
+                            var contentFromApi = JsonConvert.DeserializeObject<Setting.HandySetting>(response.content);
+                            await _dbService.Create(new Setting.HandySetting
+                            {
+                                HandyApiUrl = _handySetting.HandyApiUrl,
+                                CompanyCode = _handySetting.CompanyCode,
+                                CompanyName = contentFromApi.CompanyName,
+                                CompanyPassword = _handySetting.CompanyPassword,
+                                LoginID = loginId,
+                                UserName = contentFromApi.UserName,
+                                ScanMode = (string)_handySetting.ScanMode,
+                                ScanOkSound = (string)_handySetting.ScanOkSound,
+                                ScanErrorSound = (string)_handySetting.ScanErrorSound
+                            });
                             Application.Current.MainPage = new LoadingPage();
                             await Task.Delay(100);
                             Application.Current.MainPage = new MenuPage();

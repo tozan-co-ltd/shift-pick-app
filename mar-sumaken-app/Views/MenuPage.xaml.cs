@@ -12,8 +12,7 @@ namespace mar_sumaken_app.Views;
 public partial class MenuPage : FlyoutPage
 {
     private readonly LocalDbService _dbService;
-    private Setting.HandySetting _handySetting;
-    private string? _handyApiUrl;
+    private Login.LoginUserSqlLite _loginUserSqlLite;
     bool isItemTapped = false;
     public MenuPage()
 	{
@@ -41,12 +40,12 @@ public partial class MenuPage : FlyoutPage
     {
         try
         {
-            var settings = await _dbService.GetSetting();
-            _handySetting = settings.Last();
-            companyCode.Text = _handySetting.CompanyCode;
-            loginId.Text = _handySetting.LoginID;
-            userName.Text = _handySetting.UserName;
-            companyName.Text = _handySetting.CompanyName;
+            var loginUsers = await _dbService.GetLoginAsync();
+            _loginUserSqlLite = loginUsers.Last();
+            companyCode.Text = _loginUserSqlLite.CompanyCode;
+            loginId.Text = _loginUserSqlLite.LoginID;
+            userName.Text = _loginUserSqlLite.UserName;
+            companyName.Text = _loginUserSqlLite.CompanyName;
         }
         catch (Exception)
         {

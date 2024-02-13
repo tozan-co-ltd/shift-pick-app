@@ -18,8 +18,10 @@ namespace mar_sumaken_app.Services
             _connection = new SQLiteAsyncConnection(Path.Combine(FileSystem.AppDataDirectory, DB_NAME));
             try
             {
-                var createTableSetting = _connection.CreateTableAsync<Setting.HandySetting>();
-                createTableSetting.Wait(); // Wait for table creation to finish
+                //ログインデータテーブル
+                _connection.CreateTableAsync<Login.LoginUserSqlLite>().Wait();
+                //設定データテーブル
+                _connection.CreateTableAsync<Setting.HandySetting>().Wait();
             }
             catch (Exception ex)
             {
@@ -27,8 +29,7 @@ namespace mar_sumaken_app.Services
             }
         }
 
-        /// Setting.HandySetting
-
+        #region Settingテーブル操作
         /// <summary>
         /// スキャンとサウンドを取得
         /// </summary>
@@ -68,5 +69,35 @@ namespace mar_sumaken_app.Services
         {
             await _connection.DeleteAsync(handySetting);
         }
+        #endregion
+
+
+
+        #region Loginテーブル操作
+        /// <summary>
+        /// 作成
+        /// </summary>
+        public async Task Create(Login.LoginUserSqlLite loginUserSqlLite)
+        {
+            await _connection.InsertAsync(loginUserSqlLite);
+        }
+
+        /// <summary>
+        /// ログインの非同期を取得する
+        /// </summary>
+        public async Task<List<Login.LoginUserSqlLite>> GetLoginAsync()
+        {
+            return await _connection.Table<Login.LoginUserSqlLite>().ToListAsync();
+        }
+
+        /// <summary>
+        /// ログインユーザーを保存
+        /// </summary>
+        public async Task<int> SavLoginAsync(Login.LoginUserSqlLite login)
+        {
+            await _connection.DeleteAllAsync<Login.LoginUserSqlLite>();
+            return await _connection.InsertAsync(login);
+        }
+        #endregion
     }
 }

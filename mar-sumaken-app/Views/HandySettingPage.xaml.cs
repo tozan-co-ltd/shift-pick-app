@@ -15,10 +15,8 @@ public partial class HandySettingPage : ContentPage
     List<string> errorSsoundNameList = new List<string>();
     private readonly LocalDbService _dbService;
     private Setting.HandySetting _handySetting;
-    private string _requestApiUrl;
     private bool _isChangedOkSound = true;
     private bool _isChangedErrorSound = true;
-    public string txtUrlApi = string.Empty;
     public string companyCode = string.Empty;
     public string companyPassword = string.Empty;
     public string loginID = string.Empty;
@@ -36,11 +34,6 @@ public partial class HandySettingPage : ContentPage
     /// </summary>
     private async void SetHandySetting()
     {
-        // 接続先
-        _requestApiUrl = "https://www.tozan.co.jp/sumaken-api-MRq2xg5/api/";
-        txtUrl.Text = _requestApiUrl;
-        txtUrlApi = txtUrl.Text;
-
         // スキャンモードの設定
         scanMode.ItemsSource = scanModeList;
 
@@ -97,11 +90,12 @@ public partial class HandySettingPage : ContentPage
             settingApiRequestBody.CompanyPassword = companyPassword == null ? "" : companyPassword.Trim();
             settingApiRequestBody.LoginID = loginID == null ? "" : loginID.Trim();
 
-            if (txtUrlApi == "" || settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "" || settingApiRequestBody.LoginID == "")
+            if ( string.IsNullOrWhiteSpace(txtUrl.Text) || settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "" || settingApiRequestBody.LoginID == "")
             {
                 await DisplayAlert("警告", "未入力項目があります。", "OK");
                 return;
             }
+            string txtUrlApi = txtUrl.Text;
 
             var jsonDataSend = JsonConvert.SerializeObject(settingApiRequestBody);
             // APIを接続
@@ -130,13 +124,13 @@ public partial class HandySettingPage : ContentPage
             }
             else
             {
-                await DisplayAlert("警告", response.content, "OK");
+                await DisplayAlert("警告", "接続先URLにアクセスできません", "OK");
                 return;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            await DisplayAlert("警告", ex.Message, "OK");
             throw;
         }
     }

@@ -43,7 +43,7 @@
                         <StackLayout>
                             <Frame BackgroundColor="#f2f2f2" HeightRequest="40" Padding="0" Margin="30,0,30, 5" HasShadow="False">
                                 <StackLayout>
-                                    <Entry x:Name="txtUrl" VerticalOptions="CenterAndExpand" Margin="10, 0, 10, 0" FontSize="15" IsReadOnly="True"/>
+                                    <Entry x:Name="txtUrl" VerticalOptions="CenterAndExpand" Margin="10, 0, 10, 0" FontSize="15"/>
                                 </StackLayout>
                             </Frame>
                             <BoxView HeightRequest="1" Color="#ccc" HorizontalOptions="FillAndExpand" />

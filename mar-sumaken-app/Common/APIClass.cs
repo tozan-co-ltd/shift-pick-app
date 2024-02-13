@@ -35,8 +35,12 @@ namespace mar_sumaken_app.Common
             catch (Exception ex)
             {
                 var w32ex = ex as Win32Exception;
-                if (w32ex == null)
+                if(w32ex == null)
+                {
                     w32ex = ex.InnerException as Win32Exception;
+                    if (ex.Message != null)
+                        return (false, "接続先URLにアクセスできません");
+                }
                 if (w32ex != null)
                 {
                     int code = w32ex.ErrorCode;
@@ -80,7 +84,11 @@ namespace mar_sumaken_app.Common
             {
                 var w32ex = ex as Win32Exception;
                 if (w32ex == null)
+                {
                     w32ex = ex.InnerException as Win32Exception;
+                    if(ex.Message != null)
+                        return (false, "接続先URLにアクセスできません");
+                }
                 if (w32ex != null)
                 {
                     int code = w32ex.ErrorCode;

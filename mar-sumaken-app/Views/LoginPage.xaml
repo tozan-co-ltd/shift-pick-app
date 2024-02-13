@@ -50,7 +50,7 @@
                         <StackLayout VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
                             <Label Text="在庫管理システム" FontSize="26" TextColor="#FD5A00" FontAttributes="Bold" HorizontalOptions="Center" />
                             <Label Text="ハンディアプリ(仮)" FontSize="26" TextColor="#FD5A00" FontAttributes="Bold" HorizontalOptions="Center" />
-                            <Label x:Name="appVersion" Text="ver1.0" FontSize="24" Margin="0, 10, 0, 0" HorizontalOptions="Center"/>
+                            <Label x:Name="appVersion" FontSize="24" Margin="0, 10, 0, 0" HorizontalOptions="Center"/>
                         </StackLayout>
 
                         <Frame WidthRequest="120" CornerRadius="30" HeightRequest="120"
@@ -63,7 +63,7 @@
                             <Label Text="ログインID" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start"  Margin="0,10,0,0" FontSize="20"/>
                             <Frame Padding="10,0,10,0" CornerRadius="10" BackgroundColor="#f2f2f2"  Margin="0,0,0,20">
                                 <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal" VerticalOptions="CenterAndExpand">
-                                    <Entry x:Name="txtUser" Text="test01" FontSize="26" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Center" HorizontalOptions="FillAndExpand" IsTextPredictionEnabled="False"/>
+                                    <Entry x:Name="txtLoginId" FontSize="26" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Center" HorizontalOptions="FillAndExpand" IsTextPredictionEnabled="False"/>
                                 </StackLayout>
                             </Frame>
                             <Label x:Name="loginError" FontSize="15" TextColor="Red"/>

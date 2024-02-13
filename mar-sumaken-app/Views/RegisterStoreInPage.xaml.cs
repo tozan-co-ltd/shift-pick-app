@@ -17,7 +17,7 @@ public partial class RegisterStoreInPage : ContentPage
     private ObservableCollection<ProductDemo> _itemsNotDelete;
     private ObservableCollection<ProductDemo> _itemsHistory;
     private readonly LocalDbService _dbService;
-    private ScanAndSound _scanAndSound;
+    private Setting.HandySetting _handySetting;
     private bool _IsScanPageActive = false;
     public RegisterStoreInPage()
 	{
@@ -78,8 +78,8 @@ public partial class RegisterStoreInPage : ContentPage
             if (_IsScanPageActive)
             {
                 // サウンドのパスを取得する
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _scanAndSound);
+                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
+                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
 
                 string clipboardContent = Clipboard.GetTextAsync().Result;
                 if (clipboardContent != string.Empty)
@@ -172,7 +172,7 @@ public partial class RegisterStoreInPage : ContentPage
             if (_items.Count() > 0)
             {
                 // サウンドのパスを取得する
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
+                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
 
                 // OKサウン
                 SoundPlayer.PlaySound(resultOkSound);
@@ -184,7 +184,7 @@ public partial class RegisterStoreInPage : ContentPage
             else
             {
                 // サウンドのパスを取得する
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _scanAndSound);
+                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
                 // エラーサウンド
                 SoundPlayer.PlaySound(resultErrorSound);
                 await Application.Current.MainPage.DisplayAlert("お知らせ", "データがありません", "OK");

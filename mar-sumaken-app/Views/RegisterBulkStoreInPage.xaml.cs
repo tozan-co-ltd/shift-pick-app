@@ -15,7 +15,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
     private ObservableCollection<ProductDemo> _itemsNotDelete;
     private ObservableCollection<ProductDemo> _itemsHistory;
     private readonly LocalDbService _dbService;
-    private ScanAndSound _scanAndSound;
+    private Setting.HandySetting _handySetting;
     private bool _IsScanPageActive = false;
     string productNumValue = string.Empty;
     string uniformNumValue = string.Empty;
@@ -82,8 +82,8 @@ public partial class RegisterBulkStoreInPage : ContentPage
             if (_IsScanPageActive)
             {
                 // サウンドのパスを取得する
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _scanAndSound);
+                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
+                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
 
                 clipboardContent = Clipboard.GetTextAsync().Result;
                 if (clipboardContent != string.Empty)
@@ -167,8 +167,8 @@ public partial class RegisterBulkStoreInPage : ContentPage
         try
         {
             // サウンドのパスを取得する
-            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
-            string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _scanAndSound);
+            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
+            string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
 
             if (enteredNumberLabel.Text.Length > 3)
             {
@@ -301,7 +301,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
             if (_items.Count() > 0)
             {
                 // サウンドのパスを取得す
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
+                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
 
                 // OKサウンド
                 SoundPlayer.PlaySound(resultOkSound);
@@ -313,7 +313,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
             else
             {
                 // サウンドのパスを取得す
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _scanAndSound);
+                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
                 // エラーサウンド
                 SoundPlayer.PlaySound(resultErrorSound);
                 await Application.Current.MainPage.DisplayAlert("お知らせ", "データがありません", "OK");

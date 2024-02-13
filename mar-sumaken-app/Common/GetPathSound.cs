@@ -16,12 +16,12 @@ namespace mar_sumaken_app.Common
         /// OKサウンドパスを取得
         /// </summary>
         /// <param name="_dbService">LocalDbService</param>
-        /// <param name="scanAndSound">ScanAndSound</param>
-        public static async Task<string> GetPathOkSoundAsync(LocalDbService _dbService, ScanAndSound scanAndSound)
+        /// <param name="handySetting">Setting.HandySetting</param>
+        public static async Task<string> GetPathOkSoundAsync(LocalDbService _dbService, Setting.HandySetting handySetting)
         {
-            var scanAndSoundList = await _dbService.GetScanAndSound();
-            scanAndSound = scanAndSoundList.Last();
-            string okSoundNumber = new string(scanAndSound.OkSound.Where(char.IsDigit).ToArray());
+            var scanAndSoundList = await _dbService.GetSetting();
+            handySetting = scanAndSoundList.Last();
+            string okSoundNumber = new string(handySetting.ScanOkSound.Where(char.IsDigit).ToArray());
 
             // get path of sound
             string resultOkSound = "ScanOkeySound/ScanOkeySound" + okSoundNumber + ".mp3";
@@ -33,12 +33,13 @@ namespace mar_sumaken_app.Common
         /// エラーサウンドパスを取得
         /// </summary>
         /// <param name="_dbService">LocalDbService</param>
-        /// <param name="scanAndSound">ScanAndSound</param>
-        public static async Task<string> GetPathErrorSoundAsync(LocalDbService _dbService, ScanAndSound scanAndSound)
+        /// <param name="handySetting">Setting.HandySetting</param>
+        public static async Task<string> GetPathErrorSoundAsync(LocalDbService _dbService, Setting.HandySetting handySetting)
         {
-            var scanAndSoundList = await _dbService.GetScanAndSound();
-            scanAndSound = scanAndSoundList.Last();
-            string errorSoundNumber = new string(scanAndSound.ErrorSound.Where(char.IsDigit).ToArray());
+            var scanAndSoundList = await _dbService.GetSetting();
+
+            handySetting = scanAndSoundList.Last();
+            string errorSoundNumber = new string(handySetting.ScanErrorSound.Where(char.IsDigit).ToArray());
 
             // get path of sound
             string resultErrorSound = "ScanErrorSound/ScanErrorSound" + errorSoundNumber + ".mp3";

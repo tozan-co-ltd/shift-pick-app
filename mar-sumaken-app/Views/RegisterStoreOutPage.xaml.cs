@@ -21,7 +21,7 @@ public partial class RegisterStoreOutPage : ContentPage
     public string selectedTrip = string.Empty;
     public string chosedPlace = string.Empty;
     private readonly LocalDbService _dbService;
-    private ScanAndSound _scanAndSound;
+    private Setting.HandySetting _handySetting;
     public RegisterStoreOutPage(string currentDate, string selectedTrip, ObservableCollection<ProductDemo> itemsData, string place)
     {
 		InitializeComponent();
@@ -291,7 +291,7 @@ public partial class RegisterStoreOutPage : ContentPage
         try
         {
             // サウンドのパスを取得する
-            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _scanAndSound);
+            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
             // OKサウンド
             SoundPlayer.PlaySound(resultOkSound);
             await Application.Current.MainPage.DisplayAlert("完了", "データ登録が完了しました", "OK");

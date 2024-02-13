@@ -34,6 +34,7 @@ public partial class LoginPage : ContentPage
         if (settings.Count() > 0 && settings.Last() != null)
         {
             _handySetting = settings.Last();
+            appVersion.Text = "ver"+GetAppVersion();
             txtLoginId.Text = _handySetting.LoginID;
             companyCode = _handySetting.CompanyCode;
             companyPassword = _handySetting.CompanyPassword;

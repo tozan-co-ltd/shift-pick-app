@@ -86,50 +86,58 @@ public partial class HandySettingPage : ContentPage
     /// </summary>
     private async void OnRegisterButtonClicked(object sender, EventArgs e)
     {
-        var settingApiRequestBody = new Setting.SettingPostBody();
-
-        companyCode = txtCompanyCode.Text;
-        companyPassword = txtCompanyPassword.Text;
-        loginID = txtLoginId.Text;
-        settingApiRequestBody.CompanyCode = companyCode == null ? "" : companyCode.Trim();
-        settingApiRequestBody.CompanyPassword = companyPassword == null ? "" : companyPassword.Trim();
-        settingApiRequestBody.LoginID = loginID == null ? "" : loginID.Trim();
-
-        if (txtUrlApi == "" || settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "" || settingApiRequestBody.LoginID == "")
+        try
         {
-            await DisplayAlert("警告", "未入力項目があります。", "OK");
-            return;
-        }
+            var settingApiRequestBody = new Setting.SettingPostBody();
 
-        var jsonDataSend = JsonConvert.SerializeObject(settingApiRequestBody);
-        // APIを接続
-        var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "Setting");
-        if (response.success)
-        {
-            await _dbService.Create(new Setting.HandySetting
+            companyCode = txtCompanyCode.Text;
+            companyPassword = txtCompanyPassword.Text;
+            loginID = txtLoginId.Text;
+            settingApiRequestBody.CompanyCode = companyCode == null ? "" : companyCode.Trim();
+            settingApiRequestBody.CompanyPassword = companyPassword == null ? "" : companyPassword.Trim();
+            settingApiRequestBody.LoginID = loginID == null ? "" : loginID.Trim();
+
+            if (txtUrlApi == "" || settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "" || settingApiRequestBody.LoginID == "")
             {
-                HandyApiUrl = txtUrlApi,
-                CompanyCode = settingApiRequestBody.CompanyCode,
-                CompanyPassword = settingApiRequestBody.CompanyPassword,
-                LoginID = settingApiRequestBody.LoginID,
-                ScanMode = (string)scanMode.SelectedItem,
-                ScanOkSound = (string)scanOkSound.SelectedItem,
-                ScanErrorSound = (string)scanErrorSound.SelectedItem
-            });
+                await DisplayAlert("警告", "未入力項目があります。", "OK");
+                return;
+            }
 
-            // サウンドのパスを取得する
-            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
-            // OKサウンド
-            SoundPlayer.PlaySound(resultOkSound);
-            await DisplayAlert("完了", "登録が完了しました。", "OK");
-            Application.Current.MainPage = new LoadingPage();
-            await Task.Delay(100);
-            Application.Current.MainPage = new LoginPage();
+            var jsonDataSend = JsonConvert.SerializeObject(settingApiRequestBody);
+            // APIを接続
+            var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "Setting");
+            if (response.success)
+            {
+                await _dbService.Create(new Setting.HandySetting
+                {
+                    HandyApiUrl = txtUrlApi,
+                    CompanyCode = settingApiRequestBody.CompanyCode,
+                    CompanyPassword = settingApiRequestBody.CompanyPassword,
+                    LoginID = settingApiRequestBody.LoginID,
+                    ScanMode = (string)scanMode.SelectedItem,
+                    ScanOkSound = (string)scanOkSound.SelectedItem,
+                    ScanErrorSound = (string)scanErrorSound.SelectedItem
+                });
+
+                // サウンドのパスを取得する
+                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
+                // OKサウンド
+                SoundPlayer.PlaySound(resultOkSound);
+                await DisplayAlert("完了", "登録が完了しました。", "OK");
+                Application.Current.MainPage = new LoadingPage();
+                await Task.Delay(100);
+                Application.Current.MainPage = new LoginPage();
+            }
+            else
+            {
+                await DisplayAlert("警告", response.content, "OK");
+                return;
+            }
         }
-        else
+        catch (Exception)
         {
-            await DisplayAlert("警告", response.content, "OK");
-            return;
+
+            throw;
         }
     }
 

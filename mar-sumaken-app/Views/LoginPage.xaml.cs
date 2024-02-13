@@ -22,13 +22,13 @@ public partial class LoginPage : ContentPage
         companyPassword = string.Empty;
         AppVersion = 0;
         // ログインIDの設定
-        SetLoginId();
+        SetLoginPage();
      }
 
     /// <summary>
     /// ログインIDの設定
     /// </summary>
-    private async void SetLoginId()
+    private async void SetLoginPage()
     {
         var settings = await _dbService.GetSetting();
         if (settings.Count() > 0 && settings.Last() != null)
@@ -40,9 +40,7 @@ public partial class LoginPage : ContentPage
             _handyApiUrl = _handySetting.HandyApiUrl;
         }
         else
-        {
             txtLoginId.Text = string.Empty;
-        }
     }
 
     /// <summary>
@@ -53,28 +51,39 @@ public partial class LoginPage : ContentPage
     {
         try
         {
+            var settings = await _dbService.GetSetting();
             string loginId = txtLoginId.Text;
             var a = IsNotHalfWidthAlphanumeric(loginId);
-            if (string.IsNullOrEmpty(loginId) || IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length && loginId.Length > 12))
-            {
+            if (string.IsNullOrEmpty(loginId) || IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length && loginId.Length > 12) || settings.Count() == 0)
                 loginError.Text = "「設定」から会社コードを登録してください";
-            }
             else
             {
+                var loginUserSqlLite = new Login.LoginUserSqlLite();
                 if (Decimal.TryParse(GetAppVersion(), out decimal appVersion)) // アプリのバージョンをチェックとAPIを呼び出し
                 {
                     AppVersion = appVersion;
-                    var loginRequestBody = new LoginModel.LoginRequestBody();
-                    loginRequestBody.LoginID = loginId;
-                    loginRequestBody.CompanyCode = _handySetting.CompanyCode;
-                    loginRequestBody.CompanyPassword = _handySetting.CompanyPassword;
-                    loginRequestBody.HandyAppVersion = Convert.ToDecimal(AppVersion);
+                    var loginRequestBody = new
+                    {
+                        LoginID = loginId,
+                        CompanyCode = _handySetting.CompanyCode,
+                        CompanyPassword = _handySetting.CompanyPassword,
+                        HandyAppVersion = Convert.ToDecimal(AppVersion)
+                    };
                     try
                     {
                         var jsonDataSend = JsonConvert.SerializeObject(loginRequestBody);
+                        // APIにリクエストを送る
                         var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "Login");
                         if (response.success)
                         {
+                            // APIからコンテンツを取得
+                            var contentFromApi = JsonConvert.DeserializeObject<Login.LoginResponseApi>(response.content);
+                            loginUserSqlLite.CompanyCode = _handySetting.CompanyCode;
+                            loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
+                            loginUserSqlLite.LoginID = contentFromApi.User.LoginID;
+                            loginUserSqlLite.UserName = contentFromApi.User.UserName;
+                            //　ローカルDBに保存
+                            await _dbService.SavLoginAsync(loginUserSqlLite);
                             Application.Current.MainPage = new LoadingPage();
                             await Task.Delay(100);
                             Application.Current.MainPage = new MenuPage();
@@ -82,7 +91,7 @@ public partial class LoginPage : ContentPage
                         else
                             await DisplayAlert("警告", response.content, "OK");
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         throw;
                     }

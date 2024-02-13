@@ -43,11 +43,17 @@ namespace mar_sumaken_app.Models
             [Column("CompanyCode")]
             public string CompanyCode { get; set; }
 
+            [Column("CompanyName")]
+            public string CompanyName { get; set; }
+
             [Column("CompanyPassword")]
             public string CompanyPassword { get; set; }
 
             [Column("LoginID")]
             public string LoginID { get; set; }
+
+            [Column("UserName")]
+            public string UserName { get; set; }
 
             [Column("ScanMode")]
             public string ScanMode { get; set; }

@@ -14,6 +14,7 @@ public partial class LoginPage : ContentPage
     public string? companyCode;
     public string? companyPassword;
     public decimal AppVersion;
+    int numberMenu = 10; // メニュー数
     public LoginPage()
     {
         InitializeComponent();
@@ -60,6 +61,7 @@ public partial class LoginPage : ContentPage
             else
             {
                 var loginUserSqlLite = new Login.LoginUserSqlLite();
+                var handyPages = new HandyMenu[numberMenu];
                 if (Decimal.TryParse(GetAppVersion(), out decimal appVersion)) // アプリのバージョンをチェックとAPIを呼び出し
                 {
                     AppVersion = appVersion;
@@ -83,8 +85,17 @@ public partial class LoginPage : ContentPage
                             loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
                             loginUserSqlLite.LoginID = contentFromApi.User.LoginID;
                             loginUserSqlLite.UserName = contentFromApi.User.UserName;
+
+                            
+                            handyPages = contentFromApi.HandyMenu;
+                            await _dbService.ALLDeleteMenuAsync();
                             //　ローカルDBに保存
                             await _dbService.SavLoginAsync(loginUserSqlLite);
+                            foreach (var page in handyPages)
+                            {
+                                await _dbService.SavMenuAsync(page);
+                            }
+
                             Application.Current.MainPage = new LoadingPage();
                             await Task.Delay(100);
                             Application.Current.MainPage = new MenuPage();

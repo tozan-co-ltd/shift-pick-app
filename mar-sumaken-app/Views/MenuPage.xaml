@@ -71,9 +71,9 @@
                                     <DataTemplate>
                                         <ViewCell>
                                             <StackLayout Orientation="Horizontal" Padding="30,0,0,0" Background="#fff">
-                                                <Label Text="{Binding Id}" VerticalOptions="CenterAndExpand" FontSize="26"/>
+                                                <Label Text="{Binding SortNumber}" VerticalOptions="CenterAndExpand" FontSize="26"/>
                                                 <Label Text="." VerticalOptions="CenterAndExpand" FontSize="26"/>
-                                                <Label Text="{Binding Title}" VerticalOptions="CenterAndExpand" Margin="20,0,0,0"  FontSize="26"/>
+                                                <Label Text="{Binding HandyMenuName}" VerticalOptions="CenterAndExpand" Margin="20,0,0,0"  FontSize="26"/>
                                             </StackLayout>
                                         </ViewCell>
                                     </DataTemplate>

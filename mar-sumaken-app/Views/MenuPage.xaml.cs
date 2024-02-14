@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
@@ -5,7 +6,6 @@ using mar_sumaken_app.Services;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Xaml;
 using Plugin.Maui.Audio;
-using MenuItem = mar_sumaken_app.Models.MenuItem;
 
 namespace mar_sumaken_app.Views;
 
@@ -13,6 +13,7 @@ public partial class MenuPage : FlyoutPage
 {
     private readonly LocalDbService _dbService;
     private Login.LoginUserSqlLite _loginUserSqlLite;
+    private List<HandyMenu> listHandyMenu;
     bool isItemTapped = false;
     public MenuPage()
 	{
@@ -20,15 +21,6 @@ public partial class MenuPage : FlyoutPage
         _dbService = new LocalDbService();
         // メニューの設定
         SetMenuPage();
-
-        // メニュー一覧
-        myListView.ItemsSource = new ObservableCollection<MenuItem>
-        {
-            new MenuItem {Id=1, Title = "入庫" },
-            new MenuItem {Id=2, Title = "まとめ入庫" },
-            new MenuItem {Id = 3,  Title = "出庫" },
-        };
-
         //　メニューのアイテムをタップ
         myListView.ItemTapped += OnItemTapped;
     }
@@ -40,6 +32,11 @@ public partial class MenuPage : FlyoutPage
     {
         try
         {
+            // メニュー一覧を取得
+            listHandyMenu = await _dbService.GetMenuAsync();
+            myListView.ItemsSource = listHandyMenu;
+
+            // ユーザー情報を取得
             var loginUsers = await _dbService.GetLoginAsync();
             _loginUserSqlLite = loginUsers.Last();
             companyCode.Text = _loginUserSqlLite.CompanyCode;
@@ -47,9 +44,9 @@ public partial class MenuPage : FlyoutPage
             userName.Text = _loginUserSqlLite.UserName;
             companyName.Text = _loginUserSqlLite.CompanyName;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            await DisplayAlert("エラー", ex.Message, "閉じる");
         }
     }
 
@@ -91,12 +88,12 @@ public partial class MenuPage : FlyoutPage
     {
         try
         {
-            if (!isItemTapped && (e.Item is MenuItem pageName))
+            if (!isItemTapped && (e.Item is HandyMenu pageName))
             {
                 isItemTapped = true;
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                await PerformNavigation(pageName.Title);
+                await PerformNavigation(pageName.HandyMenuName);
                 isItemTapped = false;
             }
         }
@@ -116,11 +113,11 @@ public partial class MenuPage : FlyoutPage
     {
         try
         {
-            if (title == "入庫")
+            if (title == Const.C_REGISTER_STORE_IN_PAGE)
                 Application.Current.MainPage = new RegisterStoreInPage();
-            else if (title == "まとめ入庫")
+            else if (title == Const.C_REGISTER_BULK_STORE_IN_PAGE)
                 Application.Current.MainPage = new RegisterBulkStoreInPage();
-            else if (title == "出庫")
+            else if (title == Const.C_SEARCH_SHIPPING_INSTRUCTION_IN_PAGE)
                 Application.Current.MainPage = new SearchShippingInstructionListPage();
         }
         catch (Exception)

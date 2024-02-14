@@ -20,6 +20,8 @@ namespace mar_sumaken_app.Services
             {
                 //ログインデータテーブル
                 _connection.CreateTableAsync<Login.LoginUserSqlLite>().Wait();
+                // メニューデータテーブル
+                _connection.CreateTableAsync<HandyMenu>().Wait();
                 //設定データテーブル
                 _connection.CreateTableAsync<Setting.HandySetting>().Wait();
             }
@@ -29,7 +31,7 @@ namespace mar_sumaken_app.Services
             }
         }
 
-        #region Settingテーブル操作
+        #region 設定テーブル操作
         /// <summary>
         /// スキャンとサウンドを取得
         /// </summary>
@@ -73,7 +75,7 @@ namespace mar_sumaken_app.Services
 
 
 
-        #region Loginテーブル操作
+        #region ログインテーブル操作
         /// <summary>
         /// 作成
         /// </summary>
@@ -97,6 +99,34 @@ namespace mar_sumaken_app.Services
         {
             await _connection.DeleteAllAsync<Login.LoginUserSqlLite>();
             return await _connection.InsertAsync(login);
+        }
+        #endregion
+
+
+        #region メニューテーブル操作
+        /// <summary>
+        /// メニュー一覧を取得
+        /// </summary>
+        public Task<List<HandyMenu>> GetMenuAsync()
+        {
+            return _connection.Table<HandyMenu>().OrderBy(x => x.SortNumber)
+                            .ToListAsync();
+        }
+
+        /// <summary>
+        /// メニューを保存
+        /// </summary>
+        async public Task<int> SavMenuAsync(HandyMenu menu0)
+        {
+            return await _connection.InsertAsync(menu0);
+        }
+
+        /// <summary>
+        /// 古いメニューデータを消す
+        /// </summary>
+        public async Task<int> ALLDeleteMenuAsync()
+        {
+            return await _connection.DeleteAllAsync<HandyMenu>();
         }
         #endregion
     }

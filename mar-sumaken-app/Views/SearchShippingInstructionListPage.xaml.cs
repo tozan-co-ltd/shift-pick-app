@@ -9,12 +9,16 @@ namespace mar_sumaken_app.Views;
 public partial class SearchShippingInstructionListPage : ContentPage
 {
     bool isItemTapped = false;
-    ObservableCollection<string> items = new ObservableCollection<string> { "E5", "T5" };
+    List<string> receiverList = new List<string> { "会社名1", "会社名2" };
+    ObservableCollection<string> placeList = new ObservableCollection<string> { "E5", "T5" };
     string selectedTripOption = "1"; // デフォルトでは、便は 1 です
     public SearchShippingInstructionListPage()
 	{
 		InitializeComponent();
-        place.ItemsSource = items;
+        receiver.ItemsSource = receiverList;
+        receiver.SelectedItem = "会社名1";
+
+        place.ItemsSource = placeList;
         place.SelectedItem = "E5";
         datePicker.Date = CustomDatePicker.SetDisplayDatePicker();
     }
@@ -38,6 +42,14 @@ public partial class SearchShippingInstructionListPage : ContentPage
     private void OnPlaceChanged(object sender, EventArgs e)
     {
         place.SelectedItem = (string)place.SelectedItem;
+    }
+
+    /// <summary>
+    /// 納入会社名を変更するのを処理
+    /// </summary>
+    private void OnReceiverChanged(object sender, EventArgs e)
+    {
+        receiver.SelectedItem = (string)receiver.SelectedItem;
     }
 
     /// <summary>
@@ -74,4 +86,5 @@ public partial class SearchShippingInstructionListPage : ContentPage
             return;
         }
     }
+
 }

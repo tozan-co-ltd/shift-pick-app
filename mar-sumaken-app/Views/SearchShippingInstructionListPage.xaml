@@ -53,7 +53,14 @@
                 <Label Text="出荷指示リスト検索" FontSize="18" HorizontalOptions="Center"/>
                 <Frame CornerRadius="0"  BorderColor="Transparent">
 
-                    <StackLayout Spacing="5" VerticalOptions="End" >
+                    <StackLayout Spacing="5" VerticalOptions="End">
+                        <Label Text="納入先" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start"  Margin="0" FontSize="16"/>
+                        <Frame Padding="0" BackgroundColor="#f2f2f2" BorderColor="Transparent" CornerRadius="0">
+                            <StackLayout  Margin="0" Padding="10, 0, 10,0" BackgroundColor="#f2f2f2">
+                                <Picker x:Name="receiver" SelectedIndexChanged="OnReceiverChanged" VerticalOptions="CenterAndExpand" FontSize="15" FontAttributes="Bold" Title="納入先"/>
+                            </StackLayout>
+                        </Frame>
+                        
                         <Label Text="納入指示日" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start"  Margin="0,5,0,0" FontSize="16"/>
                         <Frame Padding="5,0,5,0" BackgroundColor="#f2f2f2"  Margin="0,0,0,5" BorderColor="Transparent"  CornerRadius="0">
                             <DatePicker x:Name="datePicker" FontSize="16" HorizontalOptions="FillAndExpand" FontAttributes="Bold" Format="yyyy/MM/dd"/>
@@ -67,8 +74,7 @@
                         </Frame>
 
                         <Label Text="便" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start" FontSize="16" Margin="0,5,0,0"/>
-
-                        <FlexLayout Direction="Row" JustifyContent="SpaceBetween" Margin="0,0,0,30" Padding="0">
+                        <FlexLayout Direction="Row" JustifyContent="SpaceBetween" Margin="0,0,0,15" Padding="0">
                             <Button Text="1" x:Name="trip1" Clicked="OnTripButtonClicked" BackgroundColor="#008577" TextColor="White" Style="{StaticResource TripButtonStyle}" />
                             <Button Text="2" x:Name="trip2" Clicked="OnTripButtonClicked" BackgroundColor="Gray" TextColor="White" Style="{StaticResource TripButtonStyle}"/>
                             <Button Text="3" x:Name="trip3" Clicked="OnTripButtonClicked" BackgroundColor="Gray" TextColor="White" Style="{StaticResource TripButtonStyle}"/>

@@ -61,13 +61,13 @@
 
                         <StackLayout Spacing="5" VerticalOptions="End"  Margin="0, 10, 0, 0">
                             <Label Text="ログインID" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start"  Margin="0,10,0,0" FontSize="20"/>
-                            <Frame Padding="10,0,10,0" CornerRadius="10" BackgroundColor="#f2f2f2"  Margin="0,0,0,20">
+                            <Frame Padding="10,0,10,0" CornerRadius="10" BackgroundColor="#f2f2f2" Margin="0,0,0,10">
                                 <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal" VerticalOptions="CenterAndExpand">
                                     <Entry x:Name="txtLoginId" FontSize="26" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Center" HorizontalOptions="FillAndExpand" IsTextPredictionEnabled="False"/>
                                 </StackLayout>
                             </Frame>
-                            <Label x:Name="loginError" FontSize="15" TextColor="Red"/>
-                            <StackLayout Spacing="20" Margin="0">
+                            <Label x:Name="loginError" FontSize="15" TextColor="Red" HorizontalOptions="Center" Margin="0,0,0,20"/>
+                            <StackLayout Spacing="20" Margin="0, 0, 0, 10">
                                 <StackLayout>
                                     <Button Visual="Material" Text="ログイン"  BackgroundColor="#FD5A00" Clicked="OnLoginClicked" FontSize="28" FontAttributes="Bold"/>
                                 </StackLayout>

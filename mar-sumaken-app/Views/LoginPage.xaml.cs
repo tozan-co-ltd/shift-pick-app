@@ -56,10 +56,13 @@ public partial class LoginPage : ContentPage
             var settings = await _dbService.GetSetting();
             string loginId = txtLoginId.Text;
             var a = IsNotHalfWidthAlphanumeric(loginId);
-            if (string.IsNullOrEmpty(loginId) || IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length && loginId.Length > 12) || settings.Count() == 0)
+            if (string.IsNullOrEmpty(loginId) || settings.Count() == 0)
                 loginError.Text = "「設定」から会社コードを登録してください";
+            else if(IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length && loginId.Length > 12))
+                loginError.Text = "E2000 ログインIDが正しくありません。";
             else
             {
+                loginError.Text = string.Empty;
                 var loginUserSqlLite = new Login.LoginUserSqlLite();
                 var handyPages = new HandyMenu[numberMenu];
                 if (Decimal.TryParse(GetAppVersion(), out decimal appVersion)) // アプリのバージョンをチェックとAPIを呼び出し
@@ -72,8 +75,7 @@ public partial class LoginPage : ContentPage
                         CompanyPassword = _handySetting.CompanyPassword,
                         HandyAppVersion = Convert.ToDecimal(AppVersion)
                     };
-                    try
-                    {
+         
                         var jsonDataSend = JsonConvert.SerializeObject(loginRequestBody);
                         // APIにリクエストを送る
                         var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "Login");
@@ -90,11 +92,9 @@ public partial class LoginPage : ContentPage
                             handyPages = contentFromApi.HandyMenu;
                             await _dbService.ALLDeleteMenuAsync();
                             //　ローカルDBに保存
-                            await _dbService.SavLoginAsync(loginUserSqlLite);
+                            await _dbService.SaveLoginAsync(loginUserSqlLite);
                             foreach (var page in handyPages)
-                            {
                                 await _dbService.SavMenuAsync(page);
-                            }
 
                             Application.Current.MainPage = new LoadingPage();
                             await Task.Delay(100);
@@ -102,16 +102,10 @@ public partial class LoginPage : ContentPage
                         }
                         else
                             await DisplayAlert("警告", response.content, "OK");
-                    }
-                    catch (Exception ex)
-                    {
-                        throw;
-                    }
                 }
                 else
                     await DisplayAlert("警告", "アプリバージョンの取得に失敗しました。", "OK");
 
-                return;
             }
         }
         catch (Exception ex)

@@ -64,8 +64,13 @@ public partial class RegisterBulkStoreInPage : ContentPage
         if (!isItemTapped)
         {
             isItemTapped = true;
-            bool result = await Application.Current.MainPage.DisplayAlert("確認", "読み取ったデータは削除さ   れますが、戻ってよろしいですか。", "OK", "キャンセル");
-            if (result)
+            if (_items.Count() > 0)
+            {
+                bool result = await Application.Current.MainPage.DisplayAlert("確認", "読み取ったデータは削除されますが、戻ってよろしいですか。", "OK", "キャンセル");
+                if (result)
+                    Application.Current.MainPage = new MenuPage();
+            }
+            else
                 Application.Current.MainPage = new MenuPage();
 
             isItemTapped = false;

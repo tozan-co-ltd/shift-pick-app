@@ -89,12 +89,13 @@ public partial class HandySettingPage : ContentPage
             settingApiRequestBody.CompanyCode = companyCode == null ? "" : companyCode.Trim();
             settingApiRequestBody.CompanyPassword = companyPassword == null ? "" : companyPassword.Trim();
             settingApiRequestBody.LoginID = loginID == null ? "" : loginID.Trim();
-
+            // ログイン前の条件をチェックします.
             if ( string.IsNullOrWhiteSpace(txtUrl.Text) || settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "" || settingApiRequestBody.LoginID == "")
             {
                 await DisplayAlert("警告", "未入力項目があります。", "OK");
                 return;
             }
+            // urlAPI
             string txtUrlApi = txtUrl.Text;
 
             var jsonDataSend = JsonConvert.SerializeObject(settingApiRequestBody);

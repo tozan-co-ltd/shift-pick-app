@@ -21,7 +21,7 @@ public partial class RegisterStoreOutPage : ContentPage
     public string selectedTrip = string.Empty;
     public string chosedPlace = string.Empty;
     private readonly LocalDbService _dbService;
-    private Setting.HandySetting _handySetting;
+    private HandySettingModel.HandySetting _handySetting;
     public RegisterStoreOutPage(string currentDate, string selectedTrip, ObservableCollection<ProductDemo> itemsData, string place)
     {
 		InitializeComponent();

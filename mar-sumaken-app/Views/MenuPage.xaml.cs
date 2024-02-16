@@ -12,8 +12,8 @@ namespace mar_sumaken_app.Views;
 public partial class MenuPage : FlyoutPage
 {
     private readonly LocalDbService _dbService;
-    private Login.LoginUserSqlLite _loginUserSqlLite;
-    private List<HandyMenu> listHandyMenu;
+    private LoginModel.LoginUserSqlLite _loginUserSqlLite;
+    private List<M_HandyMenuModel> listHandyMenu;
     bool isItemTapped = false;
     public MenuPage()
 	{
@@ -45,7 +45,7 @@ public partial class MenuPage : FlyoutPage
             companyCode.Text = _loginUserSqlLite.CompanyCode;
             loginId.Text = _loginUserSqlLite.LoginID;
             userName.Text = _loginUserSqlLite.UserName;
-            companyName.Text = _loginUserSqlLite.CompanyName;
+            depoName.Text = _loginUserSqlLite.DepoName;
         }
         catch (Exception ex)
         {
@@ -91,7 +91,7 @@ public partial class MenuPage : FlyoutPage
     {
         try
         {
-            if (!isItemTapped && (e.Item is HandyMenu pageName))
+            if (!isItemTapped && (e.Item is M_HandyMenuModel pageName))
             {
                 isItemTapped = true;
                 Application.Current.MainPage = new LoadingPage();

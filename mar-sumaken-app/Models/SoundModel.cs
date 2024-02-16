@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace mar_sumaken_app.Models
 {
-    public class Sound
+    public class SoundModel
     {
         /// <summary>
         /// サウンドOKリストを取得
         /// </summary>
-        public List<Sound> SoundOkeyList
+        public List<SoundModel> SoundOkeyList
         {
             get
             {
-                var soundList = new List<Sound>();
+                var soundList = new List<SoundModel>();
 
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 string folderName = string.Format("{0}.Resources.Raw.ScanOkeySound", executingAssembly.GetName().Name.Replace("-", "_"));
@@ -24,7 +24,7 @@ namespace mar_sumaken_app.Models
 
                 for (int i = 0; i < soundOkeyList.Count(); ++i)
                 {
-                    Sound sound1 = new Sound
+                    SoundModel sound1 = new SoundModel
                     {
                         DisplayName = "OK" + (i + 1).ToString(),
                         Item = soundOkeyList[i].ToString()
@@ -40,11 +40,11 @@ namespace mar_sumaken_app.Models
         /// <summary>
         /// サウンドエラーリストを取得
         /// </summary>
-        public List<Sound> SoundErrorList
+        public List<SoundModel> SoundErrorList
         {
             get
             {
-                var soundList = new List<Sound>();
+                var soundList = new List<SoundModel>();
 
                 var executingAssembly = Assembly.GetExecutingAssembly();
                 string folderName = string.Format("{0}.Resources.Raw.ScanErrorSound", executingAssembly.GetName().Name.Replace("-", "_"));
@@ -54,7 +54,7 @@ namespace mar_sumaken_app.Models
 
                 for (int i = 0; i < soundErrorList.Count(); ++i)
                 {
-                    Sound sound1 = new Sound
+                    SoundModel sound1 = new SoundModel
                     {
                         DisplayName = "Error" + (i + 1).ToString(),
                         Item = soundErrorList[i].ToString()

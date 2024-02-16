@@ -17,7 +17,7 @@ namespace mar_sumaken_app.Common
         /// </summary>
         /// <param name="_dbService">LocalDbService</param>
         /// <param name="handySetting">Setting.HandySetting</param>
-        public static async Task<string> GetPathOkSoundAsync(LocalDbService _dbService, Setting.HandySetting handySetting)
+        public static async Task<string> GetPathOkSoundAsync(LocalDbService _dbService, HandySettingModel.HandySetting handySetting)
         {
             var scanAndSoundList = await _dbService.GetSetting();
             handySetting = scanAndSoundList.Last();
@@ -34,7 +34,7 @@ namespace mar_sumaken_app.Common
         /// </summary>
         /// <param name="_dbService">LocalDbService</param>
         /// <param name="handySetting">Setting.HandySetting</param>
-        public static async Task<string> GetPathErrorSoundAsync(LocalDbService _dbService, Setting.HandySetting handySetting)
+        public static async Task<string> GetPathErrorSoundAsync(LocalDbService _dbService, HandySettingModel.HandySetting handySetting)
         {
             var scanAndSoundList = await _dbService.GetSetting();
 

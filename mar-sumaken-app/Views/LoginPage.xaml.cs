@@ -10,7 +10,7 @@ namespace mar_sumaken_app.Views;
 public partial class LoginPage : ContentPage
 {
     private readonly LocalDbService _dbService;
-    private Setting.HandySetting _handySetting;
+    private HandySettingModel.HandySetting _handySetting;
     private string? _handyApiUrl;
     public string? companyCode;
     public string? companyPassword;
@@ -21,9 +21,6 @@ public partial class LoginPage : ContentPage
     {
         InitializeComponent();
         _dbService = new LocalDbService();
-        companyCode = string.Empty;
-        companyPassword = string.Empty;
-        AppVersion = 0;
         // ログインIDの設定
         SetLoginPage();
      }
@@ -33,7 +30,11 @@ public partial class LoginPage : ContentPage
     /// </summary>
     private async void SetLoginPage()
     {
+        companyCode = string.Empty;
+        companyPassword = string.Empty;
+        AppVersion = 0;
         var settings = await _dbService.GetSetting();
+
         if (settings.Count() > 0 && settings.Last() != null)
         {
             _handySetting = settings.Last();
@@ -70,8 +71,8 @@ public partial class LoginPage : ContentPage
                     else
                     {
                         loginError.Text = string.Empty;
-                        var loginUserSqlLite = new Login.LoginUserSqlLite();
-                        var handyPages = new HandyMenu[Const.C_NUMBER_OF_MENU];
+                        var loginUserSqlLite = new LoginModel.LoginUserSqlLite();
+                        var handyPages = new M_HandyMenuModel[Const.C_NUMBER_OF_MENU];
                         if (Decimal.TryParse(GetAppVersion(), out decimal appVersion)) // アプリのバージョンをチェックとAPIを呼び出し
                         {
                             AppVersion = appVersion;
@@ -89,12 +90,14 @@ public partial class LoginPage : ContentPage
                             if (response.success)
                             {
                                 // APIからコンテンツを取得
-                                var contentFromApi = JsonConvert.DeserializeObject<Login.LoginResponseApi>(response.content);
+                                var contentFromApi = JsonConvert.DeserializeObject<LoginModel.LoginResponseBody>(response.content);
                                 loginUserSqlLite.CompanyCode = _handySetting.CompanyCode;
                                 loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
+                                loginUserSqlLite.CompanyPassword = _handySetting.CompanyPassword;
                                 loginUserSqlLite.LoginID = contentFromApi.User.LoginID;
                                 loginUserSqlLite.UserName = contentFromApi.User.UserName;
-
+                                loginUserSqlLite.DepoID = contentFromApi.Depo.DepoID;
+                                loginUserSqlLite.DepoName = contentFromApi.Depo.DepoName;
 
                                 handyPages = contentFromApi.HandyMenu;
                                 await _dbService.ALLDeleteMenuAsync();

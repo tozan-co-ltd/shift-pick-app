@@ -3,18 +3,19 @@ using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
 using ProductDemo = mar_sumaken_app.Models.ProductDemo;
 using Newtonsoft.Json;
+using static mar_sumaken_app.Models.ShipmentScheduleModel;
 
 namespace mar_sumaken_app.Views;
 
 public partial class DisplayShippingInstructionListPage : ContentPage
 {
-    private ObservableCollection<ProductDemo> _items;
+    private List<D_ShipmentSchedule> _items;
     private int _itemsPerPage = 10;
     public int currentPage = 1;
     public string currentDate = string.Empty;
     public string slectedTrip = string.Empty;
     public string selectedPlace = string.Empty;
-    public DisplayShippingInstructionListPage(DateTime selectedDate, string selectedOption, string place)
+    public DisplayShippingInstructionListPage(DateTime selectedDate, string selectedOption, string place, List<D_ShipmentSchedule> shipmentScheduleList)
 	{
 		InitializeComponent();
         selectedDateLabel.Text = $"{selectedDate.ToString("yyyy/MM/dd")}";
@@ -23,34 +24,14 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         slectedTrip = $"{selectedOption}";
         selectedPlaceLabel.Text = $"{place}";
         selectedPlace = $"{place}";
-        
-        _items = new ObservableCollection<ProductDemo>();
-        // sample data
-        for (int i = 1; i <= 25; i++)
-        {
-            ProductDemo productDemo = new ProductDemo
-            {
-                Id= i,
-                //No = $"{i}",
-                product_num = $"24240{i}",
-                uniform_num = $"69{i}",
-                contain_num = $"2{i}",
-                box_num = i
-            };
 
-            _items.Add(productDemo);
-        }
+        _items = new List<D_ShipmentSchedule>();
 
         // 箱数降順
-        _items = new ObservableCollection<ProductDemo>(_items.OrderByDescending(p => p.box_num));
+        _items = new List<D_ShipmentSchedule>(shipmentScheduleList.OrderByDescending(p => p.NumberOfBoxes));
         // No昇順
         for (int i = 0; i < _items.Count; i++)
-        {
-            _items[i].No = $"{i+1}";
-        }
-
-        // APIからデータを取得
-        //_items = GetDataFromApi(_items);
+            _items[i].No = i+1;
     }
 
     /// <summary>
@@ -96,15 +77,15 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     /// <summary>
     /// APIからデータを取得
     /// </summary>
-    public static async Task<ObservableCollection<ProductDemo>> GetDataFromApi()
+    public static async Task<List<ProductDemo>> GetDataFromApi()
     {
         try
         {
-            var productDemo = new ObservableCollection<ProductDemo>();
+            var productDemo = new List<ProductDemo>();
             var client = new HttpClient();
             var response = await client.GetAsync("https://localhost:7297/GetListProduct");
             var jsonResult = await response.Content.ReadAsStringAsync();
-            productDemo = JsonConvert.DeserializeObject<ObservableCollection<ProductDemo>>(jsonResult);
+            productDemo = JsonConvert.DeserializeObject<List<ProductDemo>>(jsonResult);
 
             return productDemo;
         }

@@ -6,13 +6,15 @@ using System;
 using System.Collections.ObjectModel;
 
 namespace mar_sumaken_app.Views;
-using ProductDemo = mar_sumaken_app.Models.ProductDemo;
+
+using static mar_sumaken_app.Models.ShipmentScheduleModel;
 
 public partial class RegisterStoreOutPage : ContentPage
 {
     public DateTime selectedDate;
-    private ObservableCollection<ProductDemo> _items;
-    private ObservableCollection<ProductDemo> _itemsHistory;
+    private List<D_ShipmentSchedule> _items;
+    private List<D_ShipmentSchedule> dShipmentSchedules;
+    private List<D_ShipmentSchedule> _itemsHistory;
     public string chosedTrip = string.Empty;
     private int _itemsPerPage = 10;
     public int currentPage = 1;
@@ -22,7 +24,7 @@ public partial class RegisterStoreOutPage : ContentPage
     public string chosedPlace = string.Empty;
     private readonly LocalDbService _dbService;
     private HandySettingModel.HandySetting _handySetting;
-    public RegisterStoreOutPage(string currentDate, string selectedTrip, ObservableCollection<ProductDemo> itemsData, string place)
+    public RegisterStoreOutPage(string currentDate, string selectedTrip, List<D_ShipmentSchedule> dShipmentScheduleList, string place)
     {
 		InitializeComponent();
         selectedDateLabel.Text = $"{currentDate}";
@@ -33,25 +35,26 @@ public partial class RegisterStoreOutPage : ContentPage
         selectedPlaceLabel.Text = $"{place}";
         shippingListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
+        dShipmentSchedules = dShipmentScheduleList;
         _dbService = new LocalDbService();
 
         UpdateProgressBar();
 
-        ShowShippingList(itemsData);
+        ShowShippingList(dShipmentSchedules);
 
-        ShowHistoryList(itemsData);
+        ShowHistoryList(dShipmentSchedules);
     }
 
     /// <summary>
     /// 出荷指示リスト表示のデータを表示
     /// </summary>
-    /// <param name="itemsData">ObservableCollection<ProductDemo></param>
-    private async void ShowShippingList(ObservableCollection<ProductDemo> itemsData)
+    /// <param name="dShipmentSchedules">List<D_ShipmentSchedule></param>
+    private async void ShowShippingList(List<D_ShipmentSchedule> dShipmentSchedules)
     {
         try
         {
             // 出荷指示リスト表示
-            _items = itemsData;
+            _items = dShipmentSchedules;
             collectionView = DisplayItems();
 
             if (_items.Count() % _itemsPerPage == 0)
@@ -77,13 +80,13 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <summary>
     /// 履歴一覧表示のデータを表示
     /// </summary>
-    /// <param name="itemsData">ObservableCollection<ProductDemo></param>
-    private async void ShowHistoryList(ObservableCollection<ProductDemo> itemsData)
+    /// <param name="dShipmentSchedules">List<D_ShipmentSchedule></param>
+    private async void ShowHistoryList(List<D_ShipmentSchedule> dShipmentSchedules)
     {
         try
         {
             // 履歴一覧表示
-            _itemsHistory = itemsData;
+            _itemsHistory = dShipmentSchedules;
             collectionViewHistory = DisplayItemsHistory();
 
             if (_items.Count() % _itemsPerPage == 0)
@@ -151,7 +154,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDate, chosedTrip, chosedPlace);
+        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDate, chosedTrip, chosedPlace, dShipmentSchedules);
     }
 
     /// <summary>

@@ -114,10 +114,11 @@ public partial class SearchShippingInstructionListPage : ContentPage
             {
                 // APIからコンテンツを取得
                 var contentFromApi = JsonConvert.DeserializeObject<ShipmentScheduleModel.ShipmentScheduelResponseBody>(response.content);
+                var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList;
 
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDate, selectedTripOption, (string)place.SelectedItem);
+                Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDate, selectedTripOption, (string)place.SelectedItem, shipmentScheduleList);
             }
             else
                 await DisplayAlert("エラー", response.content, "OK");

@@ -95,11 +95,11 @@
                                                 <StackLayout>
                                                     <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="1" Padding="0, 5, 0, 5">
                                                         <Label Text="{Binding No}" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                                        <Label Text="{Binding product_num}" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                                        <Label Text="{Binding uniform_num}" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                                        <Label Text="{Binding contain_num}" Grid.Column="3" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                                        <Label Text="{Binding box_num}" Grid.Column="4" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                                        <Label Text="{Binding box_num}" Grid.Column="5" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding DeliveryProductNumber}" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding DeliveryProductAbbreviation}" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding LotQuantity}" Grid.Column="3" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding NumberOfBoxes}" Grid.Column="4" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding NumberOfBoxesRemaining}" Grid.Column="5" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                                     </Grid>
                                                     <Grid Padding="0" VerticalOptions="Center" >
                                                         <Grid.RowDefinitions>

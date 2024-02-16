@@ -95,10 +95,18 @@ namespace mar_sumaken_app.Services
         /// <summary>
         /// ログインユーザーを保存
         /// </summary>
-        public async Task<int> SavLoginAsync(Login.LoginUserSqlLite login)
+        public async Task<int> SaveLoginAsync(Login.LoginUserSqlLite login)
         {
             await _connection.DeleteAllAsync<Login.LoginUserSqlLite>();
             return await _connection.InsertAsync(login);
+        }
+
+        /// <summary>
+        /// 削除
+        /// </summary>
+        public async Task DeleteUserLogin(Login.LoginUserSqlLite loginUserSqlLite)
+        {
+            await _connection.DeleteAsync(loginUserSqlLite);
         }
         #endregion
 

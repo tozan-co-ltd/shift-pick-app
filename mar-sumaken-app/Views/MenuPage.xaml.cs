@@ -34,7 +34,10 @@ public partial class MenuPage : FlyoutPage
         {
             // メニュー一覧を取得
             listHandyMenu = await _dbService.GetMenuAsync();
-            myListView.ItemsSource = listHandyMenu;
+            if (listHandyMenu.Count > 0)
+                myListView.ItemsSource = listHandyMenu;
+            else
+                await DisplayAlert("エラー", "E2000 メニューが登録されていません。", "閉じる");
 
             // ユーザー情報を取得
             var loginUsers = await _dbService.GetLoginAsync();
@@ -131,6 +134,9 @@ public partial class MenuPage : FlyoutPage
     /// </summary>
     private async void OnLogoutClicked(object sender, EventArgs e)
     {
+        // ログインユーザーのSQLiteのデータ削除
+        await _dbService.DeleteUserLogin(_loginUserSqlLite);
+
         Application.Current.MainPage = new LoadingPage();
         await Task.Delay(200);
         Application.Current.MainPage = new LoginPage();

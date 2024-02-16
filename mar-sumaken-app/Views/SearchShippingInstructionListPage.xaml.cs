@@ -15,6 +15,15 @@ public partial class SearchShippingInstructionListPage : ContentPage
     public SearchShippingInstructionListPage()
 	{
 		InitializeComponent();
+        // 出荷指示リスト検索設定
+        SetSearchShippingInstruction();
+    }
+
+    /// <summary>
+    /// 出荷指示リスト検索設定
+    /// </summary>
+    private void SetSearchShippingInstruction()
+    {
         receiver.ItemsSource = receiverList;
         receiver.SelectedItem = "会社名1";
 

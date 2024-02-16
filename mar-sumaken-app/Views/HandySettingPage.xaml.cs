@@ -69,7 +69,7 @@ public partial class HandySettingPage : ContentPage
     /// </summary>
     private async void OnBackButtonClicked(object sender, EventArgs e)
     {
-        var result = await Application.Current.MainPage.DisplayAlert("警告", "入力内容は破棄されます\n戻ってよろしいですか？", "OK", "キャンセル");
+        var result = await Application.Current.MainPage.DisplayAlert("エラー", "入力内容は破棄されます\n戻ってよろしいですか？", "OK", "キャンセル");
         if (result)
             Application.Current.MainPage = new LoginPage();
     }
@@ -92,7 +92,7 @@ public partial class HandySettingPage : ContentPage
             // ログイン前の条件をチェックします.
             if ( string.IsNullOrWhiteSpace(txtUrl.Text) || settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "" || settingApiRequestBody.LoginID == "")
             {
-                await DisplayAlert("警告", "未入力項目があります。", "OK");
+                await DisplayAlert("エラー", "未入力項目があります。", "OK");
                 return;
             }
             // urlAPI
@@ -125,13 +125,13 @@ public partial class HandySettingPage : ContentPage
             }
             else
             {
-                await DisplayAlert("警告", "接続先URLにアクセスできません", "OK");
+                await DisplayAlert("エラー", "接続先URLにアクセスできません", "OK");
                 return;
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("警告", ex.Message, "OK");
+            await DisplayAlert("エラー", ex.Message, "OK");
             throw;
         }
     }
@@ -150,7 +150,7 @@ public partial class HandySettingPage : ContentPage
         scanErrorSound.SelectedItem = scanErrorSound.SelectedItem.ToString();
 
         //  サウンドのパスを取得する
-        string resultErrorSound = "ScanErrorSound/ScanErrorSound" + errorSoundNumber + ".mp3";
+        string resultErrorSound = Const.C_SOUND_ERROR_FOLDER + errorSoundNumber + ".mp3";
         SoundPlayer.PlaySound(resultErrorSound);
     }
 
@@ -168,7 +168,7 @@ public partial class HandySettingPage : ContentPage
         scanOkSound.SelectedItem = scanOkSound.SelectedItem.ToString();
 
         //  サウンドのパスを取得する
-        string resultOkSound = "ScanOkeySound/ScanOkeySound" + okSoundNumber + ".mp3";
+        string resultOkSound = Const.C_SOUND_OK_FOLDER + okSoundNumber + ".mp3";
         SoundPlayer.PlaySound(resultOkSound);
     }
 

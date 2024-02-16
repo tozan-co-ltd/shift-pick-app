@@ -41,14 +41,11 @@
         </StackLayout>
         <Frame CornerRadius="0" BorderColor="Transparent" Background="#f2f2f2" Margin="0" Padding="10">
             <StackLayout HorizontalOptions="Center">
-                <Label 
-                Text="出庫"
-                FontSize="20"
-                />
+                <Label Text="出庫" FontSize="20" />
             </StackLayout>
         </Frame>
 
-        <Frame BorderColor="Transparent">
+        <Frame BorderColor="Transparent" Margin="0" Padding="10, 10, 10, 0">
             <StackLayout>
                 <Label Text="出荷指示リスト検索" FontSize="18" HorizontalOptions="Center"/>
                 <Frame CornerRadius="0"  BorderColor="Transparent">
@@ -74,7 +71,7 @@
                         </Frame>
 
                         <Label Text="便" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start" FontSize="16" Margin="0,5,0,0"/>
-                        <FlexLayout Direction="Row" JustifyContent="SpaceBetween" Margin="0,0,0,15" Padding="0">
+                        <FlexLayout Direction="Row" JustifyContent="SpaceBetween" Margin="0,0,0,18" Padding="0">
                             <Button Text="1" x:Name="trip1" Clicked="OnTripButtonClicked" BackgroundColor="#008577" TextColor="White" Style="{StaticResource TripButtonStyle}" />
                             <Button Text="2" x:Name="trip2" Clicked="OnTripButtonClicked" BackgroundColor="Gray" TextColor="White" Style="{StaticResource TripButtonStyle}"/>
                             <Button Text="3" x:Name="trip3" Clicked="OnTripButtonClicked" BackgroundColor="Gray" TextColor="White" Style="{StaticResource TripButtonStyle}"/>

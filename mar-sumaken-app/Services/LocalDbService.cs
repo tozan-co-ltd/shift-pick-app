@@ -19,11 +19,11 @@ namespace mar_sumaken_app.Services
             try
             {
                 //ログインデータテーブル
-                _connection.CreateTableAsync<Login.LoginUserSqlLite>().Wait();
+                _connection.CreateTableAsync<LoginModel.LoginUserSqlLite>().Wait();
                 // メニューデータテーブル
-                _connection.CreateTableAsync<HandyMenu>().Wait();
+                _connection.CreateTableAsync<M_HandyMenuModel>().Wait();
                 //設定データテーブル
-                _connection.CreateTableAsync<Setting.HandySetting>().Wait();
+                _connection.CreateTableAsync<HandySettingModel.HandySetting>().Wait();
             }
             catch (Exception ex)
             {
@@ -35,23 +35,23 @@ namespace mar_sumaken_app.Services
         /// <summary>
         /// スキャンとサウンドを取得
         /// </summary>
-        public async Task<List<Setting.HandySetting>> GetSetting()
+        public async Task<List<HandySettingModel.HandySetting>> GetSetting()
         {
-            return await _connection.Table<Setting.HandySetting>().ToListAsync();
+            return await _connection.Table<HandySettingModel.HandySetting>().ToListAsync();
         }
 
         /// <summary>
         /// スキャンとサウンドを取得
         /// </summary>
-        public async Task<Setting.HandySetting> GetByCompanyID(int Id)
+        public async Task<HandySettingModel.HandySetting> GetByCompanyID(int Id)
         {
-            return await _connection.Table<Setting.HandySetting>().Where(x => x.Id == Id).FirstOrDefaultAsync();
+            return await _connection.Table<HandySettingModel.HandySetting>().Where(x => x.Id == Id).FirstOrDefaultAsync();
         }
 
         /// <summary>
         /// 作成
         /// </summary>
-        public async Task Create(Setting.HandySetting handySetting)
+        public async Task Create(HandySettingModel.HandySetting handySetting)
         {
             await _connection.InsertAsync(handySetting);
         }
@@ -59,7 +59,7 @@ namespace mar_sumaken_app.Services
         /// <summary>
         /// 更新
         /// </summary>
-        public async Task Update(Setting.HandySetting handySetting)
+        public async Task Update(HandySettingModel.HandySetting handySetting)
         {
             await _connection.UpdateAsync(handySetting);
         }
@@ -67,7 +67,7 @@ namespace mar_sumaken_app.Services
         /// <summary>
         /// 削除
         /// </summary>
-        public async Task Delete(Setting.HandySetting handySetting)
+        public async Task Delete(HandySettingModel.HandySetting handySetting)
         {
             await _connection.DeleteAsync(handySetting);
         }
@@ -79,7 +79,7 @@ namespace mar_sumaken_app.Services
         /// <summary>
         /// 作成
         /// </summary>
-        public async Task Create(Login.LoginUserSqlLite loginUserSqlLite)
+        public async Task Create(LoginModel.LoginUserSqlLite loginUserSqlLite)
         {
             await _connection.InsertAsync(loginUserSqlLite);
         }
@@ -87,24 +87,24 @@ namespace mar_sumaken_app.Services
         /// <summary>
         /// ログインの非同期を取得する
         /// </summary>
-        public async Task<List<Login.LoginUserSqlLite>> GetLoginAsync()
+        public async Task<List<LoginModel.LoginUserSqlLite>> GetLoginAsync()
         {
-            return await _connection.Table<Login.LoginUserSqlLite>().ToListAsync();
+            return await _connection.Table<LoginModel.LoginUserSqlLite>().ToListAsync();
         }
 
         /// <summary>
         /// ログインユーザーを保存
         /// </summary>
-        public async Task<int> SaveLoginAsync(Login.LoginUserSqlLite login)
+        public async Task<int> SaveLoginAsync(LoginModel.LoginUserSqlLite login)
         {
-            await _connection.DeleteAllAsync<Login.LoginUserSqlLite>();
+            await _connection.DeleteAllAsync<LoginModel.LoginUserSqlLite>();
             return await _connection.InsertAsync(login);
         }
 
         /// <summary>
         /// 削除
         /// </summary>
-        public async Task DeleteUserLogin(Login.LoginUserSqlLite loginUserSqlLite)
+        public async Task DeleteUserLogin(LoginModel.LoginUserSqlLite loginUserSqlLite)
         {
             await _connection.DeleteAsync(loginUserSqlLite);
         }
@@ -115,16 +115,16 @@ namespace mar_sumaken_app.Services
         /// <summary>
         /// メニュー一覧を取得
         /// </summary>
-        public Task<List<HandyMenu>> GetMenuAsync()
+        public Task<List<M_HandyMenuModel>> GetMenuAsync()
         {
-            return _connection.Table<HandyMenu>().OrderBy(x => x.SortNumber)
+            return _connection.Table<M_HandyMenuModel>().OrderBy(x => x.SortNumber)
                             .ToListAsync();
         }
 
         /// <summary>
         /// メニューを保存
         /// </summary>
-        async public Task<int> SavMenuAsync(HandyMenu menu0)
+        async public Task<int> SavMenuAsync(M_HandyMenuModel menu0)
         {
             return await _connection.InsertAsync(menu0);
         }
@@ -134,7 +134,7 @@ namespace mar_sumaken_app.Services
         /// </summary>
         public async Task<int> ALLDeleteMenuAsync()
         {
-            return await _connection.DeleteAllAsync<HandyMenu>();
+            return await _connection.DeleteAllAsync<M_HandyMenuModel>();
         }
         #endregion
     }

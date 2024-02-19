@@ -8,15 +8,23 @@ using System.Threading.Tasks;
 
 namespace mar_sumaken_app.Models
 {
-    public class Setting
+    public class HandySettingModel
     {
         public class SettingPostBody 
         {
+            /// <summary>
+            /// 会社コード
+            /// </summary>
             [Required]
             public string CompanyCode { get; set; } = string.Empty;
+            /// <summary>
+            /// 会社パスワード
+            /// </summary>
             [Required]
             public string CompanyPassword { get; set; } = string.Empty;
-            [Required]
+            /// <summary>
+            /// ログインID(Requiredは不要)
+            /// </summary>
             public string LoginID { get; set; } = string.Empty;
         }
 

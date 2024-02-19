@@ -10,20 +10,17 @@ namespace mar_sumaken_app.Views;
 public partial class LoginPage : ContentPage
 {
     private readonly LocalDbService _dbService;
-    private Setting.HandySetting _handySetting;
+    private HandySettingModel.HandySetting _handySetting;
     private string? _handyApiUrl;
     public string? companyCode;
     public string? companyPassword;
     public decimal AppVersion;
-    bool hasOnLoginClick = false; // ログインタップ
+    bool hasOnLoginClick = false; // ログインクリック
 
     public LoginPage()
     {
         InitializeComponent();
         _dbService = new LocalDbService();
-        companyCode = string.Empty;
-        companyPassword = string.Empty;
-        AppVersion = 0;
         // ログインIDの設定
         SetLoginPage();
      }
@@ -33,7 +30,11 @@ public partial class LoginPage : ContentPage
     /// </summary>
     private async void SetLoginPage()
     {
+        companyCode = string.Empty;
+        companyPassword = string.Empty;
+        AppVersion = 0;
         var settings = await _dbService.GetSetting();
+
         if (settings.Count() > 0 && settings.Last() != null)
         {
             _handySetting = settings.Last();
@@ -55,69 +56,73 @@ public partial class LoginPage : ContentPage
     {
         try
         {
-            if (!hasOnLoginClick) 
+            if (hasOnLoginClick)
+                return;
+
+            if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
-                if (NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
+                await Application.Current.MainPage.DisplayAlert("エラー", "E3003 ネットワークが利用できません。", "OK");
+                return;
+            }
+
+            hasOnLoginClick = true;
+            var settings = await _dbService.GetSetting();
+            string loginId = txtLoginId.Text;
+            var a = IsNotHalfWidthAlphanumeric(loginId);
+            if (string.IsNullOrEmpty(loginId) || settings.Count() == 0)
+                loginError.Text = "「設定」から会社コードを登録してください";
+            else if (IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length && loginId.Length > 12))
+                loginError.Text = "E2000 ログインIDが正しくありません。";
+            else
+            {
+                loginError.Text = string.Empty;
+                var loginUserSqlLite = new LoginModel.LoginUserSqlLite();
+                var handyPages = new M_HandyMenuModel[Const.C_NUMBER_OF_MENU];
+                if (Decimal.TryParse(GetAppVersion(), out decimal appVersion)) // アプリのバージョンをチェックとAPIを呼び出し
                 {
-                    hasOnLoginClick = true;
-                    var settings = await _dbService.GetSetting();
-                    string loginId = txtLoginId.Text;
-                    var a = IsNotHalfWidthAlphanumeric(loginId);
-                    if (string.IsNullOrEmpty(loginId) || settings.Count() == 0)
-                        loginError.Text = "「設定」から会社コードを登録してください";
-                    else if (IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length && loginId.Length > 12))
-                        loginError.Text = "E2000 ログインIDが正しくありません。";
-                    else
+                    AppVersion = appVersion;
+                    var loginRequestBody = new
                     {
-                        loginError.Text = string.Empty;
-                        var loginUserSqlLite = new Login.LoginUserSqlLite();
-                        var handyPages = new HandyMenu[Const.C_NUMBER_OF_MENU];
-                        if (Decimal.TryParse(GetAppVersion(), out decimal appVersion)) // アプリのバージョンをチェックとAPIを呼び出し
-                        {
-                            AppVersion = appVersion;
-                            var loginRequestBody = new
-                            {
-                                LoginID = loginId,
-                                CompanyCode = _handySetting.CompanyCode,
-                                CompanyPassword = _handySetting.CompanyPassword,
-                                HandyAppVersion = Convert.ToDecimal(AppVersion)
-                            };
+                        LoginID = loginId,
+                        CompanyCode = _handySetting.CompanyCode,
+                        CompanyPassword = _handySetting.CompanyPassword,
+                        HandyAppVersion = Convert.ToDecimal(AppVersion)
+                    };
 
-                            var jsonDataSend = JsonConvert.SerializeObject(loginRequestBody);
-                            // APIにリクエストを送る
-                            var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "Login");
-                            if (response.success)
-                            {
-                                // APIからコンテンツを取得
-                                var contentFromApi = JsonConvert.DeserializeObject<Login.LoginResponseApi>(response.content);
-                                loginUserSqlLite.CompanyCode = _handySetting.CompanyCode;
-                                loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
-                                loginUserSqlLite.LoginID = contentFromApi.User.LoginID;
-                                loginUserSqlLite.UserName = contentFromApi.User.UserName;
+                    var jsonDataSend = JsonConvert.SerializeObject(loginRequestBody);
+                    // APIにリクエストを送る
+                    var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "Login");
+                    if (response.success)
+                    {
+                        // APIからコンテンツを取得
+                        var contentFromApi = JsonConvert.DeserializeObject<LoginModel.LoginResponseBody>(response.content);
+                        loginUserSqlLite.CompanyCode = _handySetting.CompanyCode;
+                        loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
+                        loginUserSqlLite.CompanyPassword = _handySetting.CompanyPassword;
+                        loginUserSqlLite.LoginID = contentFromApi.User.LoginID;
+                        loginUserSqlLite.UserName = contentFromApi.User.UserName;
+                        loginUserSqlLite.DepoID = contentFromApi.Depo.DepoID;
+                        loginUserSqlLite.DepoName = contentFromApi.Depo.DepoName;
 
+                        handyPages = contentFromApi.HandyMenu;
+                        await _dbService.ALLDeleteMenuAsync();
+                        //　ローカルDBに保存
+                        await _dbService.SaveLoginAsync(loginUserSqlLite);
+                        foreach (var page in handyPages)
+                            await _dbService.SavMenuAsync(page);
 
-                                handyPages = contentFromApi.HandyMenu;
-                                await _dbService.ALLDeleteMenuAsync();
-                                //　ローカルDBに保存
-                                await _dbService.SaveLoginAsync(loginUserSqlLite);
-                                foreach (var page in handyPages)
-                                    await _dbService.SavMenuAsync(page);
-
-                                Application.Current.MainPage = new LoadingPage();
-                                await Task.Delay(100);
-                                Application.Current.MainPage = new MenuPage();
-                            }
-                            else
-                                await DisplayAlert("エラー", response.content, "OK");
-                        }
-                        else
-                            await DisplayAlert("エラー", "アプリバージョンの取得に失敗しました。", "OK");
+                        Application.Current.MainPage = new LoadingPage();
+                        await Task.Delay(100);
+                        Application.Current.MainPage = new MenuPage();
                     }
-                    hasOnLoginClick = false;
+                    else
+                        await DisplayAlert("エラー", response.content, "OK");
                 }
                 else
-                    await Application.Current.MainPage.DisplayAlert("エラー", "E3003 ネットワークが利用できません。", "OK");
+                    await DisplayAlert("エラー", "アプリバージョンの取得に失敗しました。", "OK");
             }
+
+            hasOnLoginClick = false;
         }
         catch (Exception ex)
         {

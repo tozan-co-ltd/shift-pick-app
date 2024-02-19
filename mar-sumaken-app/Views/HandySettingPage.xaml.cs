@@ -14,12 +14,14 @@ public partial class HandySettingPage : ContentPage
     List<string> okSoundNameList = new List<string>();
     List<string> errorSsoundNameList = new List<string>();
     private readonly LocalDbService _dbService;
-    private Setting.HandySetting _handySetting;
+    private HandySettingModel.HandySetting _handySetting;
     private bool _isChangedOkSound = true;
     private bool _isChangedErrorSound = true;
     public string companyCode = string.Empty;
     public string companyPassword = string.Empty;
     public string loginID = string.Empty;
+    bool hasRegiterClick = false; // 登録クリック
+
     public HandySettingPage()
 	{
         InitializeComponent();
@@ -38,7 +40,7 @@ public partial class HandySettingPage : ContentPage
         scanMode.ItemsSource = scanModeList;
 
         // サウンドピッカーの設定
-        Sound sound = new Sound();
+        SoundModel sound = new SoundModel();
         okSoundNameList = sound.SoundOkeyList.Select(sound => sound.DisplayName).ToList();
         scanOkSound.ItemsSource = okSoundNameList;
         errorSsoundNameList = sound.SoundErrorList.Select(sound => sound.DisplayName).ToList();
@@ -81,7 +83,11 @@ public partial class HandySettingPage : ContentPage
     {
         try
         {
-            var settingApiRequestBody = new Setting.SettingPostBody();
+            if (hasRegiterClick)
+                return;
+
+            hasRegiterClick = true;
+            var settingApiRequestBody = new HandySettingModel.SettingPostBody();
 
             companyCode = txtCompanyCode.Text;
             companyPassword = txtCompanyPassword.Text;
@@ -103,7 +109,7 @@ public partial class HandySettingPage : ContentPage
             var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "Setting");
             if (response.success)
             {
-                await _dbService.Create(new Setting.HandySetting
+                await _dbService.Create(new HandySettingModel.HandySetting
                 {
                     HandyApiUrl = txtUrlApi,
                     CompanyCode = settingApiRequestBody.CompanyCode,
@@ -128,6 +134,8 @@ public partial class HandySettingPage : ContentPage
                 await DisplayAlert("エラー", "接続先URLにアクセスできません", "OK");
                 return;
             }
+
+            hasRegiterClick = false;
         }
         catch (Exception ex)
         {

@@ -1,6 +1,9 @@
 using mar_sumaken_app.Common;
+using mar_sumaken_app.Models;
+using mar_sumaken_app.Services;
 using mar_sumaken_app.ViewModels;
 using Microsoft.Maui.Controls;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -12,9 +15,13 @@ public partial class SearchShippingInstructionListPage : ContentPage
     List<string> receiverList = new List<string> { "会社名1", "会社名2" };
     ObservableCollection<string> placeList = new ObservableCollection<string> { "E5", "T5" };
     string selectedTripOption = "1"; // デフォルトでは、便は 1 です
+    private readonly LocalDbService _dbService;
+    bool hasOnSearchClick = false; // 検索クリック
+
     public SearchShippingInstructionListPage()
 	{
 		InitializeComponent();
+        _dbService = new LocalDbService();
         // 出荷指示リスト検索設定
         SetSearchShippingInstruction();
     }
@@ -83,11 +90,52 @@ public partial class SearchShippingInstructionListPage : ContentPage
     {
         try
         {
+            if (hasOnSearchClick)
+                return;
+
+            if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
+            {
+                await Application.Current.MainPage.DisplayAlert("エラー", "E3003 ネットワークが利用できません。", "OK");
+                return;
+            }
+
+            hasOnSearchClick = true;
+            // ユーザー情報を取得
+            var loginUsers = await _dbService.GetLoginAsync();
+            var loginUserSqlLite = loginUsers.Last();
             DateTime selectedDate = datePicker.Date;
 
-            Application.Current.MainPage = new LoadingPage();
-            await Task.Delay(200);
-            Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDate, selectedTripOption, (string)place.SelectedItem);
+            var shipmentScheduleSqlLite = new ShipmentScheduleModel.ShipmentScheduleRequestBody();
+
+            var shipmentScheduleRequestBody = new
+            {
+                CompanyID = 4,
+                CompanyCode = loginUserSqlLite.CompanyCode,
+                CompanyPassword = loginUserSqlLite.CompanyPassword,
+                DepoID = loginUserSqlLite.DepoID,
+                DeliveryDate = selectedDate,
+                DeliveryTimeClass = selectedTripOption,
+                DeliveryLocation = (string)place.SelectedItem,selectedTripOption
+            };
+
+            var jsonDataSend = JsonConvert.SerializeObject(shipmentScheduleRequestBody);
+
+            // APIにリクエストを送る
+            var response = await App.API.PostMethod(jsonDataSend, "https://wbtzn/sumaken-api-MRq2xg5_test/api/", "ShipmentSchedule/Find");
+            if (response.success)
+            {
+                // APIからコンテンツを取得
+                var contentFromApi = JsonConvert.DeserializeObject<ShipmentScheduleModel.ShipmentScheduelResponseBody>(response.content);
+                var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList;
+
+                Application.Current.MainPage = new LoadingPage();
+                await Task.Delay(200);
+                Application.Current.MainPage = new DisplayShippingInstructionListPage((string)receiver.SelectedItem,selectedDate, selectedTripOption, (string)place.SelectedItem, shipmentScheduleList);
+            }
+            else
+                await DisplayAlert("エラー", response.content, "OK");
+
+            hasOnSearchClick = false;
         }
         catch (Exception ex)
         {
@@ -95,5 +143,4 @@ public partial class SearchShippingInstructionListPage : ContentPage
             return;
         }
     }
-
 }

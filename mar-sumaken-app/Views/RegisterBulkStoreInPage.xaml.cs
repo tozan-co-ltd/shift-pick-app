@@ -15,7 +15,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
     private ObservableCollection<ProductDemo> _itemsNotDelete;
     private ObservableCollection<ProductDemo> _itemsHistory;
     private readonly LocalDbService _dbService;
-    private Setting.HandySetting _handySetting;
+    private HandySettingModel.HandySetting _handySetting;
     private bool _IsScanPageActive = false;
     string productNumValue = string.Empty;
     string uniformNumValue = string.Empty;

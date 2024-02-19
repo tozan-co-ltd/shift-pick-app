@@ -43,6 +43,8 @@ public partial class LoginPage : ContentPage
             companyCode = _handySetting.CompanyCode;
             companyPassword = _handySetting.CompanyPassword;
             _handyApiUrl = _handySetting.HandyApiUrl;
+            if (string.IsNullOrWhiteSpace(companyCode) && string.IsNullOrWhiteSpace(companyPassword))
+                await Application.Current.MainPage.DisplayAlert("エラー", "E2000 「設定」から会社コードを登録してください。", "OK");
         }
         else
             txtLoginId.Text = string.Empty;
@@ -62,6 +64,7 @@ public partial class LoginPage : ContentPage
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
                 await Application.Current.MainPage.DisplayAlert("エラー", "E3003 ネットワークが利用できません。", "OK");
+                hasOnLoginClick = false;
                 return;
             }
 
@@ -69,10 +72,10 @@ public partial class LoginPage : ContentPage
             var settings = await _dbService.GetSetting();
             string loginId = txtLoginId.Text;
             var a = IsNotHalfWidthAlphanumeric(loginId);
-            if (string.IsNullOrEmpty(loginId) || settings.Count() == 0)
-                loginError.Text = "「設定」から会社コードを登録してください";
-            else if (IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length && loginId.Length > 12))
-                loginError.Text = "E2000 ログインIDが正しくありません。";
+           if (IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length || loginId.Length > 12)) // ログインIDンチェック
+                await Application.Current.MainPage.DisplayAlert("エラー", "E2000 ログインIDが正しくありません。", "OK");
+            else if (string.IsNullOrWhiteSpace(GetAppVersion())) // アプリバージョンチェック
+                await Application.Current.MainPage.DisplayAlert("エラー", "E2000 アプリバージョンの取得に失敗しました。", "OK");
             else
             {
                 loginError.Text = string.Empty;
@@ -105,6 +108,7 @@ public partial class LoginPage : ContentPage
                         loginUserSqlLite.DepoName = contentFromApi.Depo.DepoName;
 
                         handyPages = contentFromApi.HandyMenu;
+                        //　ローカルDBに古いメニューを消す
                         await _dbService.ALLDeleteMenuAsync();
                         //　ローカルDBに保存
                         await _dbService.SaveLoginAsync(loginUserSqlLite);
@@ -119,7 +123,7 @@ public partial class LoginPage : ContentPage
                         await DisplayAlert("エラー", response.content, "OK");
                 }
                 else
-                    await DisplayAlert("エラー", "アプリバージョンの取得に失敗しました。", "OK");
+                    await DisplayAlert("エラー", "E2000 アプリバージョンの取得に失敗しました。", "OK");
             }
 
             hasOnLoginClick = false;

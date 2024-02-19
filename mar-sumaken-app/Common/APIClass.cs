@@ -32,6 +32,10 @@ namespace mar_sumaken_app.Common
                 string responseContent = response.Content.ReadAsStringAsync().Result;
                 return (response.IsSuccessStatusCode, responseContent);
             }
+            catch (TaskCanceledException)
+            {
+                return (false, "E2000 接続がタイムアウトしました。再度お試しください。");
+            }
             catch (Exception ex)
             {
                 var w32ex = ex as Win32Exception;
@@ -39,13 +43,13 @@ namespace mar_sumaken_app.Common
                 {
                     w32ex = ex.InnerException as Win32Exception;
                     if (ex.Message != null)
-                        return (false, "接続先URLにアクセスできません");
+                        return (false, "E2000 接続先URLにアクセスできません");
                 }
                 if (w32ex != null)
                 {
                     int code = w32ex.ErrorCode;
                     if (code == 10060)
-                        return (false, "接続先URLにアクセスできません");
+                        return (false, "E2000 接続先URLにアクセスできません");
                     else
                         throw;
                 }
@@ -80,6 +84,10 @@ namespace mar_sumaken_app.Common
                 string responseContent = response.Content.ReadAsStringAsync().Result;
                 return (response.IsSuccessStatusCode, responseContent);
             }
+            catch (TaskCanceledException)
+            {
+                return (false, "E2000 接続がタイムアウトしました。再度お試しください。");
+            }
             catch (Exception ex)
             {
                 var w32ex = ex as Win32Exception;
@@ -87,16 +95,17 @@ namespace mar_sumaken_app.Common
                 {
                     w32ex = ex.InnerException as Win32Exception;
                     if(ex.Message != null)
-                        return (false, "接続先URLにアクセスできません");
+                        return (false, "E2000 接続先URLにアクセスできません");
                 }
                 if (w32ex != null)
                 {
                     int code = w32ex.ErrorCode;
                     if (code == 10060 || code == 10065)
-                        return (false, "接続先URLにアクセスできません");
+                        return (false, "E2000 接続先URLにアクセスできません");
                     else
                         throw;
                 }
+
 
                 throw;
             }

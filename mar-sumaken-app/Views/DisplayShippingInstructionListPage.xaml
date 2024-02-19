@@ -33,26 +33,26 @@
                 <StackLayout HorizontalOptions="Center" Margin="0" Padding="0">
                     <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
                         <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
-                            <Label Text="納入名:" FontSize="16" TextColor="#fff"/>
-                            <Label x:Name="selectedReceiverLable" FontSize="16" TextColor="#fff" Margin="0, 0, 10, 0"/>
+                            <Label Text="納入名:" FontSize="14" TextColor="#fff"/>
+                            <Label x:Name="selectedReceiverLable" FontSize="14" TextColor="#fff" Margin="0"/>
                         </FlexLayout>
                     </Frame>
                     
-                    <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
+                    <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 3, 0, 0">
                         <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
-                            <Label Text="納入指示日:" FontSize="16" TextColor="#fff"/>
-                            <Label x:Name="selectedDateLabel" FontSize="16" TextColor="#fff" Margin="0, 0, 10, 0"/>
-                            <Label Text="納場:" FontSize="16" TextColor="#fff"/>
-                            <Label x:Name="selectedPlaceLabel" FontSize="16" TextColor="#fff" />
+                            <Label Text="納入指示日:" FontSize="14" TextColor="#fff"/>
+                            <Label x:Name="selectedDateLabel" FontSize="14" TextColor="#fff" Margin="0, 0, 8, 0"/>
+                            <Label Text="納場:" FontSize="14" TextColor="#fff"/>
+                            <Label x:Name="selectedPlaceLabel" FontSize="14" TextColor="#fff" />
                         </FlexLayout>
                     </Frame>
 
-                    <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5">
+                    <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0">
                         <FlexLayout Direction="Row" JustifyContent="Center" Padding="0" Margin="0">
-                            <Label Text ="便:" FontSize="16"  TextColor="#fff" Margin="0"/>
-                            <Label x:Name="selectedTripLabel" FontSize="16"  TextColor="#fff"  Margin="0, 0, 10, 0"/>
-                            <Label Text ="納番:" FontSize="16" TextColor="#fff" />
-                            <Label Text ="Y1670" FontSize="16" TextColor="#fff" />
+                            <Label Text ="便:" FontSize="14"  TextColor="#fff" Margin="0"/>
+                            <Label x:Name="selectedTripLabel" FontSize="14"  TextColor="#fff" Margin="0, 0, 8, 0"/>
+                            <Label Text ="納番:" FontSize="14" TextColor="#fff" />
+                            <Label Text ="Y1670" FontSize="14" TextColor="#fff" />
                         </FlexLayout>
                     </Frame>
                 </StackLayout>
@@ -73,8 +73,8 @@
                             <Label Text="箱数" Grid.Row="0" Grid.Column="4" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                             <Label Text="残り" Grid.Row="0" Grid.Column="5" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                         </Grid>
-                        <CollectionView x:Name="collectionView" Grid.Row="1">
-                                <CollectionView.ItemTemplate>
+                        <CollectionView x:Name="collectionView" Grid.Row="1" BackgroundColor="#f2f2f2">
+                            <CollectionView.ItemTemplate>
                                     <DataTemplate>
                                     <StackLayout>
                                         <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="1" Padding="0, 5, 0, 5">

@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace mar_sumaken_app.Views;
 
@@ -71,7 +72,7 @@ public partial class HandySettingPage : ContentPage
     /// </summary>
     private async void OnBackButtonClicked(object sender, EventArgs e)
     {
-        var result = await Application.Current.MainPage.DisplayAlert("エラー", "入力内容は破棄されます\n戻ってよろしいですか？", "OK", "キャンセル");
+        var result = await DisplayAlert("エラー", "入力内容は破棄されます\n戻ってよろしいですか？", "OK", "キャンセル");
         if (result)
             Application.Current.MainPage = new LoginPage();
     }
@@ -86,6 +87,13 @@ public partial class HandySettingPage : ContentPage
             if (hasRegiterClick)
                 return;
 
+            if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
+            {
+                await DisplayAlert("エラー", "E3003 ネットワークが利用できません。", "OK");
+                hasRegiterClick = false;
+                return;
+            }
+
             hasRegiterClick = true;
             var settingApiRequestBody = new HandySettingModel.SettingPostBody();
 
@@ -95,15 +103,28 @@ public partial class HandySettingPage : ContentPage
             settingApiRequestBody.CompanyCode = companyCode == null ? "" : companyCode.Trim();
             settingApiRequestBody.CompanyPassword = companyPassword == null ? "" : companyPassword.Trim();
             settingApiRequestBody.LoginID = loginID == null ? "" : loginID.Trim();
-            // ログイン前の条件をチェックします.
-            if ( string.IsNullOrWhiteSpace(txtUrl.Text) || settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "" || settingApiRequestBody.LoginID == "")
+             // urlAPI
+            string txtUrlApi = txtUrl.Text;
+            //保存前の条件をチェックします.
+            bool isValidUrl = Uri.TryCreate(txtUrlApi, UriKind.Absolute, out Uri result);// urlフォーマット
+            if (!isValidUrl)
             {
-                await DisplayAlert("エラー", "未入力項目があります。", "OK");
+                await DisplayAlert("エラー", "E2000 接続先URLにアクセスできません。正しいURLを入力してください。", "OK");
+                hasRegiterClick = false;
                 return;
             }
-            // urlAPI
-            string txtUrlApi = txtUrl.Text;
-
+            if (string.IsNullOrWhiteSpace(txtUrlApi)){
+                await DisplayAlert("エラー", "E2000 接続先を入力してください。", "OK");
+                hasRegiterClick = false;
+                return;
+            }
+            if ( settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "" || settingApiRequestBody.LoginID == "")
+            {
+                await DisplayAlert("エラー", "E2000 会社コード・会社パスワードはセットで入力してください。", "OK");
+                hasRegiterClick = false;
+                return;
+            }
+            
             var jsonDataSend = JsonConvert.SerializeObject(settingApiRequestBody);
             // APIを接続
             var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "Setting");
@@ -131,7 +152,8 @@ public partial class HandySettingPage : ContentPage
             }
             else
             {
-                await DisplayAlert("エラー", "接続先URLにアクセスできません", "OK");
+                await DisplayAlert("エラー", "E2000 接続先URLにアクセスできません", "OK");
+                hasRegiterClick = false;
                 return;
             }
 

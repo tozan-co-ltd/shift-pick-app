@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="mar_sumaken_app.Views.RegisterStoreOutPage"
              NavigationPage.HasNavigationBar="False"
-             Background="#f2f2f2">
+             Background="#fff">
 
     <ContentPage.Resources>
         <!--ラベル:アプリ名-->
@@ -29,32 +29,32 @@
                 </StackLayout>
             </Frame>
 
-            <Frame BorderColor="Transparent" Margin="0" Padding="0" >
+            <Frame BorderColor="Transparent" Margin="0" Padding="0">
                 <StackLayout HorizontalOptions="Center">
                     <Frame BorderColor="Transparent" Margin="0" Padding="0" BackgroundColor="#FD5A00">
                         <StackLayout HorizontalOptions="Center" Margin="0" Padding="0">
                             <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
                                 <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
-                                    <Label Text="納入名:" FontSize="16" TextColor="#fff"/>
-                                    <Label x:Name="selectedReceiverLable" FontSize="16" TextColor="#fff" Margin="0, 0, 10, 0"/>
+                                    <Label Text="納入名:" FontSize="14" TextColor="#fff"/>
+                                    <Label x:Name="selectedReceiverLable" FontSize="14" TextColor="#fff" Margin="0"/>
                                 </FlexLayout>
                             </Frame>
 
-                            <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
+                            <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 3, 0, 0">
                                 <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
-                                    <Label Text="納入指示日:" FontSize="16" TextColor="#fff"/>
-                                    <Label x:Name="selectedDateLabel" FontSize="16" TextColor="#fff" Margin="0, 0, 10, 0"/>
-                                    <Label Text="納場:" FontSize="16" TextColor="#fff"/>
-                                    <Label x:Name="selectedPlaceLabel" FontSize="16" TextColor="#fff" />
+                                    <Label Text="納入指示日:" FontSize="14" TextColor="#fff"/>
+                                    <Label x:Name="selectedDateLabel" FontSize="14" TextColor="#fff" Margin="0, 0, 8, 0"/>
+                                    <Label Text="納場:" FontSize="14" TextColor="#fff"/>
+                                    <Label x:Name="selectedPlaceLabel" FontSize="14" TextColor="#fff" />
                                 </FlexLayout>
                             </Frame>
 
-                            <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5">
+                            <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0">
                                 <FlexLayout Direction="Row" JustifyContent="Center" Padding="0" Margin="0">
-                                    <Label Text ="便:" FontSize="16"  TextColor="#fff" Margin="0"/>
-                                    <Label x:Name="selectedTripLabel" FontSize="16"  TextColor="#fff"  Margin="0, 0, 10, 0"/>
-                                    <Label Text ="納番:" FontSize="16" TextColor="#fff" />
-                                    <Label Text ="Y1670" FontSize="16" TextColor="#fff" />
+                                    <Label Text ="便:" FontSize="14"  TextColor="#fff" Margin="0"/>
+                                    <Label x:Name="selectedTripLabel" FontSize="14"  TextColor="#fff" Margin="0, 0, 8, 0"/>
+                                    <Label Text ="納番:" FontSize="14" TextColor="#fff" />
+                                    <Label Text ="Y1670" FontSize="14" TextColor="#fff" />
                                 </FlexLayout>
                             </Frame>
                         </StackLayout>
@@ -71,7 +71,7 @@
                         <Grid RowDefinitions="30, *, *" Padding="8, 10, 8, 0" RowSpacing="5" >
                             <Grid ColumnDefinitions="60, *, 50" Grid.Row="0">
                                 <Label Text="全体進捗" Grid.Row="0" Grid.Column="0" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" TextColor="Gray"/>
-                                <Label x:Name="progressBarValueLabel" Text="150/300" Grid.Row="0" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="16" TextColor="#0D2C54" FontAttributes="Bold"/>
+                                <Label x:Name="progressBarValueLabel" Grid.Row="0" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="16" TextColor="#0D2C54" FontAttributes="Bold"/>
                                 <Label x:Name="completeLabel" Grid.Row="0" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="18" TextColor="#0D2C54" FontAttributes="Bold"/>
                             </Grid>
                         </Grid>
@@ -86,8 +86,8 @@
 
                     <StackLayout x:Name="shippingList"  Margin="0">
                         <Frame Padding="0" Margin="0" HasShadow="False">
-                            <StackLayout HorizontalOptions="Center" >
-                                <Grid RowDefinitions="40, *" Padding="5, 5, 5, 0" ColumnSpacing="5" >
+                            <StackLayout HorizontalOptions="Center">
+                                <Grid RowDefinitions="40, *" Padding="5, 5, 5, 0" ColumnSpacing="5">
                                     <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="0" BackgroundColor="#008080">
                                         <Label Text="No." Grid.Row="0" Grid.Column="0" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                         <Label Text="品番" Grid.Row="0" Grid.Column="1"  TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
@@ -96,7 +96,7 @@
                                         <Label Text="箱数" Grid.Row="0" Grid.Column="4" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                         <Label Text="残り" Grid.Row="0" Grid.Column="5" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                     </Grid>
-                                    <CollectionView x:Name="collectionView" Grid.Row="1">
+                                    <CollectionView x:Name="collectionView" Grid.Row="1" BackgroundColor="#f2f2f2">
                                         <CollectionView.ItemTemplate>
                                             <DataTemplate>
                                                 <StackLayout>
@@ -124,30 +124,24 @@
                                 </Grid>
                             </StackLayout>
                         </Frame>
-                        <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
-                            <Button FontFamily="FontAwesome6Solid" Text="&#xf048;" Clicked="OnPreviousClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
-                            <Label x:Name="pageNumber" VerticalOptions="CenterAndExpand" TextColor="#008080"/>
-                            <Label x:Name="totalPage" VerticalOptions="CenterAndExpand" />
-                            <Button FontFamily="FontAwesome6Solid" Text="&#xf051;" Clicked="OnNextClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
-                        </StackLayout>
                     </StackLayout>
 
                     <StackLayout x:Name="historyList" IsVisible="False" Padding="0" Margin="0">
                         <Frame Padding="0" Margin="0" HasShadow="False">
                             <StackLayout HorizontalOptions="Center">
-                                <Grid RowDefinitions="40, *"  RowSpacing="5" ColumnSpacing="5"  Padding="5, 5, 5, 0">
-                                    <Grid ColumnDefinitions="40, 75, 60, 50, 120" Grid.Row="0" BackgroundColor="#FD5A00"  Padding="0" >
+                                <Grid RowDefinitions="40, *" Padding="5, 5, 5, 0" ColumnSpacing="5">
+                                    <Grid ColumnDefinitions="40, 75, 60, 50, 120" Grid.Row="0" BackgroundColor="#FD5A00" Padding="0" Margin="0">
                                         <Label Text="No." Grid.Row="0" Grid.Column="0" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="14"/>
                                         <Label Text="品番" Grid.Row="0" Grid.Column="1"  TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="14"/>
                                         <Label Text="背番号" Grid.Row="0" Grid.Column="2" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="14"/>
                                         <Label Text="収容数" Grid.Row="0" Grid.Column="3" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="14"/>
                                         <Label Text="スキャン数/箱数" Grid.Row="0" Grid.Column="4" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="14"/>
                                     </Grid>
-                                    <CollectionView x:Name="collectionViewHistory" Grid.Row="1">
+                                    <CollectionView x:Name="collectionViewHistory" Grid.Row="1" BackgroundColor="#f2f2f2">
                                         <CollectionView.ItemTemplate>
                                             <DataTemplate>
                                                 <StackLayout>
-                                                    <Grid ColumnDefinitions="40, 75, 60, 50, 120" Grid.Row="1" Padding="0, 5, 0, 5">
+                                                    <Grid ColumnDefinitions="40, 75, 60, 50, 120" Grid.Row="1" Padding="0, 5, 0, 5" Margin="0">
                                                         <Label Text="{Binding No}" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                                         <Label Text="{Binding DeliveryProductNumber}" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                                         <Label Text="{Binding DeliveryProductAbbreviation}" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
@@ -170,12 +164,6 @@
                                 </Grid>
                             </StackLayout>
                         </Frame>
-                        <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
-                            <Button FontFamily="FontAwesome6Solid" Text="&#xf048;" Clicked="HistoryOnPreviousClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
-                            <Label x:Name="historyPageNumber" VerticalOptions="CenterAndExpand" TextColor="#FD5A00"/>
-                            <Label x:Name="totalHistoryPage" VerticalOptions="CenterAndExpand" />
-                            <Button FontFamily="FontAwesome6Solid" Text="&#xf051;" Clicked="HistoryOnNextClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
-                        </StackLayout>
                     </StackLayout>
                 </StackLayout>
             </Frame>

@@ -12,55 +12,51 @@ using static mar_sumaken_app.Models.ShipmentScheduleModel;
 public partial class RegisterStoreOutPage : ContentPage
 {
     public DateTime selectedDate;
-    private List<D_ShipmentSchedule> _items;
-    private List<D_ShipmentSchedule> dShipmentSchedules;
-    private List<D_ShipmentSchedule> _itemsHistory;
-    public string chosedTrip = string.Empty;
+    private List<D_ShipmentSchedule> _dShipmentScheduleList;
+    private List<D_ShipmentSchedule> _dShipmentScheduleHistoryList;
+    public List<D_ShipmentSchedule> lstDShipmentSchedules;
     private int _itemsPerPage = 10;
     public int currentPage = 1;
     public int currentHistoryPage = 1;
     public string currentDate = string.Empty; 
-    public string selectedTrip = string.Empty;
-    public string chosedPlace = string.Empty;
     private readonly LocalDbService _dbService;
     private HandySettingModel.HandySetting _handySetting;
-    public RegisterStoreOutPage(string currentDate, string selectedTrip, List<D_ShipmentSchedule> dShipmentScheduleList, string place)
+    public RegisterStoreOutPage(string receiver, string currentDate, string selectedTrip, string place, List<D_ShipmentSchedule> dShipmentScheduleListSearch)
     {
-		InitializeComponent();
+        InitializeComponent();
+        selectedReceiverLable.Text = $"{receiver}";
         selectedDateLabel.Text = $"{currentDate}";
         selectedTripLabel.Text = $"{selectedTrip}";
         selectedDate = DateTime.Parse(currentDate);
-        chosedPlace = $"{place}";
-        chosedTrip = $"{selectedTrip}";
         selectedPlaceLabel.Text = $"{place}";
         shippingListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
-        dShipmentSchedules = dShipmentScheduleList;
+        lstDShipmentSchedules = dShipmentScheduleListSearch;
         _dbService = new LocalDbService();
 
         UpdateProgressBar();
 
-        ShowShippingList(dShipmentSchedules);
+        ShowShippingList(lstDShipmentSchedules);
 
-        ShowHistoryList(dShipmentSchedules);
+        ShowHistoryList(lstDShipmentSchedules);
     }
 
     /// <summary>
     /// 出荷指示リスト表示のデータを表示
     /// </summary>
-    /// <param name="dShipmentSchedules">List<D_ShipmentSchedule></param>
-    private async void ShowShippingList(List<D_ShipmentSchedule> dShipmentSchedules)
+    /// <param name="lstDShipmentSchedules">List<D_ShipmentSchedule></param>
+    private async void ShowShippingList(List<D_ShipmentSchedule> lstDShipmentSchedules)
     {
         try
         {
             // 出荷指示リスト表示
-            _items = dShipmentSchedules;
+            _dShipmentScheduleList = lstDShipmentSchedules;
             collectionView = DisplayItems();
 
-            if (_items.Count() % _itemsPerPage == 0)
-                totalPage.Text = "/" + (_items.Count() / _itemsPerPage).ToString();
+            if (_dShipmentScheduleList.Count() % _itemsPerPage == 0)
+                totalPage.Text = "/" + (_dShipmentScheduleList.Count() / _itemsPerPage).ToString();
             else
-                totalPage.Text = "/" + ((_items.Count() / _itemsPerPage) + 1).ToString();
+                totalPage.Text = "/" + ((_dShipmentScheduleList.Count() / _itemsPerPage) + 1).ToString();
 
             pageNumber.Text = currentPage.ToString();
 
@@ -80,19 +76,19 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <summary>
     /// 履歴一覧表示のデータを表示
     /// </summary>
-    /// <param name="dShipmentSchedules">List<D_ShipmentSchedule></param>
-    private async void ShowHistoryList(List<D_ShipmentSchedule> dShipmentSchedules)
+    /// <param name="lstDShipmentSchedules">List<D_ShipmentSchedule></param>
+    private async void ShowHistoryList(List<D_ShipmentSchedule> lstDShipmentSchedules)
     {
         try
         {
             // 履歴一覧表示
-            _itemsHistory = dShipmentSchedules;
+            _dShipmentScheduleHistoryList = lstDShipmentSchedules;
             collectionViewHistory = DisplayItemsHistory();
 
-            if (_items.Count() % _itemsPerPage == 0)
-                totalHistoryPage.Text = "/" + (_itemsHistory.Count() / _itemsPerPage).ToString();
+            if (_dShipmentScheduleList.Count() % _itemsPerPage == 0)
+                totalHistoryPage.Text = "/" + (_dShipmentScheduleHistoryList.Count() / _itemsPerPage).ToString();
             else
-                totalHistoryPage.Text = "/" + ((_itemsHistory.Count() / _itemsPerPage) + 1).ToString();
+                totalHistoryPage.Text = "/" + ((_dShipmentScheduleHistoryList.Count() / _itemsPerPage) + 1).ToString();
 
             historyPageNumber.Text = currentHistoryPage.ToString();
 
@@ -118,7 +114,7 @@ public partial class RegisterStoreOutPage : ContentPage
         {
             var startIndex = (currentPage - 1) * _itemsPerPage;
             var endIndex = startIndex + _itemsPerPage;
-            var pageItems = _items.Skip(startIndex).Take(_itemsPerPage);
+            var pageItems = _dShipmentScheduleList.Skip(startIndex).Take(_itemsPerPage);
 
             collectionView.ItemsSource = pageItems;
             return collectionView;
@@ -138,7 +134,7 @@ public partial class RegisterStoreOutPage : ContentPage
         {
             var startIndex = (currentHistoryPage - 1) * _itemsPerPage;
             var endIndex = startIndex + _itemsPerPage;
-            var pageItems = _items.Skip(startIndex).Take(_itemsPerPage);
+            var pageItems = _dShipmentScheduleList.Skip(startIndex).Take(_itemsPerPage);
 
             collectionViewHistory.ItemsSource = pageItems;
             return collectionViewHistory;
@@ -154,7 +150,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDate, chosedTrip, chosedPlace, dShipmentSchedules);
+        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, lstDShipmentSchedules);
     }
 
     /// <summary>
@@ -209,7 +205,7 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
-            var totalPages = (int)Math.Ceiling((double)_items.Count / _itemsPerPage);
+            var totalPages = (int)Math.Ceiling((double)_dShipmentScheduleList.Count / _itemsPerPage);
             if (currentPage < totalPages)
             {
                 currentPage++;
@@ -250,7 +246,7 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
-            var totalPages = (int)Math.Ceiling((double)_itemsHistory.Count / _itemsPerPage);
+            var totalPages = (int)Math.Ceiling((double)_dShipmentScheduleHistoryList.Count / _itemsPerPage);
             if (currentHistoryPage < totalPages)
             {
                 currentHistoryPage++;

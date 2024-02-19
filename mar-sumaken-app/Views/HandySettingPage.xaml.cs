@@ -20,6 +20,8 @@ public partial class HandySettingPage : ContentPage
     public string companyCode = string.Empty;
     public string companyPassword = string.Empty;
     public string loginID = string.Empty;
+    bool hasRegiterClick = false; // 登録クリック
+
     public HandySettingPage()
 	{
         InitializeComponent();
@@ -81,6 +83,10 @@ public partial class HandySettingPage : ContentPage
     {
         try
         {
+            if (hasRegiterClick)
+                return;
+
+            hasRegiterClick = true;
             var settingApiRequestBody = new HandySettingModel.SettingPostBody();
 
             companyCode = txtCompanyCode.Text;
@@ -128,6 +134,8 @@ public partial class HandySettingPage : ContentPage
                 await DisplayAlert("エラー", "接続先URLにアクセスできません", "OK");
                 return;
             }
+
+            hasRegiterClick = false;
         }
         catch (Exception ex)
         {

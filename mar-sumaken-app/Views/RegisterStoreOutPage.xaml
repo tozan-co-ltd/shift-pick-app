@@ -35,6 +35,13 @@
                         <StackLayout HorizontalOptions="Center" Margin="0" Padding="0">
                             <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
                                 <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
+                                    <Label Text="納入名:" FontSize="16" TextColor="#fff"/>
+                                    <Label x:Name="selectedReceiverLable" FontSize="16" TextColor="#fff" Margin="0, 0, 10, 0"/>
+                                </FlexLayout>
+                            </Frame>
+
+                            <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
+                                <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
                                     <Label Text="納入指示日:" FontSize="16" TextColor="#fff"/>
                                     <Label x:Name="selectedDateLabel" FontSize="16" TextColor="#fff" Margin="0, 0, 10, 0"/>
                                     <Label Text="納場:" FontSize="16" TextColor="#fff"/>
@@ -142,10 +149,10 @@
                                                 <StackLayout>
                                                     <Grid ColumnDefinitions="40, 75, 60, 50, 120" Grid.Row="1" Padding="0, 5, 0, 5">
                                                         <Label Text="{Binding No}" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                                        <Label Text="{Binding product_num}" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                                        <Label Text="{Binding uniform_num}" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                                        <Label Text="{Binding contain_num}" Grid.Column="3" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                                        <Label Text="{Binding box_num}" Grid.Column="4" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding DeliveryProductNumber}" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding DeliveryProductAbbreviation}" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding LotQuantity}" Grid.Column="3" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding NumberOfBoxes}" Grid.Column="4" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                                     </Grid>
                                                     <Grid Padding="0" VerticalOptions="Center" >
                                                         <Grid.RowDefinitions>

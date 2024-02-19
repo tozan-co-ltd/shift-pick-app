@@ -9,29 +9,29 @@ namespace mar_sumaken_app.Views;
 
 public partial class DisplayShippingInstructionListPage : ContentPage
 {
-    private List<D_ShipmentSchedule> _items;
+    private List<D_ShipmentSchedule> lstDShipmentSchedules;
     private int _itemsPerPage = 10;
     public int currentPage = 1;
     public string currentDate = string.Empty;
     public string slectedTrip = string.Empty;
     public string selectedPlace = string.Empty;
-    public DisplayShippingInstructionListPage(DateTime selectedDate, string selectedOption, string place, List<D_ShipmentSchedule> shipmentScheduleList)
+    public string selectedReceiver = string.Empty;
+    public DisplayShippingInstructionListPage(string receiver, DateTime selectedDate, string selectedOption, string place, List<D_ShipmentSchedule> shipmentScheduleList)
 	{
 		InitializeComponent();
+        selectedReceiverLable.Text = $"{receiver}";
         selectedDateLabel.Text = $"{selectedDate.ToString("yyyy/MM/dd")}";
         selectedTripLabel.Text = $"{selectedOption}";
         currentDate = $"{selectedDate.ToShortDateString()}";
-        slectedTrip = $"{selectedOption}";
         selectedPlaceLabel.Text = $"{place}";
-        selectedPlace = $"{place}";
 
-        _items = new List<D_ShipmentSchedule>();
+        lstDShipmentSchedules = new List<D_ShipmentSchedule>();
 
         // 箱数降順
-        _items = new List<D_ShipmentSchedule>(shipmentScheduleList.OrderByDescending(p => p.NumberOfBoxes));
+        lstDShipmentSchedules = new List<D_ShipmentSchedule>(shipmentScheduleList.OrderByDescending(p => p.NumberOfBoxes));
         // No昇順
-        for (int i = 0; i < _items.Count; i++)
-            _items[i].No = i+1;
+        for (int i = 0; i < lstDShipmentSchedules.Count; i++)
+            lstDShipmentSchedules[i].No = i+1;
     }
 
     /// <summary>
@@ -51,11 +51,10 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     {
         try
         {
-            //_items = await GetDataFromApi();
-            if (_items.Count() % _itemsPerPage == 0)
-                totalPage.Text = "/" + (_items.Count() / _itemsPerPage).ToString();
+            if (lstDShipmentSchedules.Count() % _itemsPerPage == 0)
+                totalPage.Text = "/" + (lstDShipmentSchedules.Count() / _itemsPerPage).ToString();
             else
-                totalPage.Text = "/" + ((_items.Count() / _itemsPerPage) + 1).ToString();
+                totalPage.Text = "/" + ((lstDShipmentSchedules.Count() / _itemsPerPage) + 1).ToString();
 
             pageNumber.Text = currentPage.ToString();
 
@@ -74,26 +73,6 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         }
     }
 
-    /// <summary>
-    /// APIからデータを取得
-    /// </summary>
-    public static async Task<List<ProductDemo>> GetDataFromApi()
-    {
-        try
-        {
-            var productDemo = new List<ProductDemo>();
-            var client = new HttpClient();
-            var response = await client.GetAsync("https://localhost:7297/GetListProduct");
-            var jsonResult = await response.Content.ReadAsStringAsync();
-            productDemo = JsonConvert.DeserializeObject<List<ProductDemo>>(jsonResult);
-
-            return productDemo;
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-    }
 
     /// <summary>
     /// コレクションビューに表示データを追加
@@ -104,7 +83,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         {
             var startIndex = (currentPage - 1) * _itemsPerPage;
             var endIndex = startIndex + _itemsPerPage;
-            var pageItems = _items.Skip(startIndex).Take(_itemsPerPage);
+            var pageItems = lstDShipmentSchedules.Skip(startIndex).Take(_itemsPerPage);
 
             collectionView.ItemsSource = pageItems;
             return collectionView;
@@ -133,7 +112,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     /// </summary>
     private void OnNextClicked(object sender, EventArgs e)
     {
-        var totalPages = (int)Math.Ceiling((double)_items.Count / _itemsPerPage);
+        var totalPages = (int)Math.Ceiling((double)lstDShipmentSchedules.Count / _itemsPerPage);
         if (currentPage < totalPages)
         {
             currentPage++;
@@ -159,7 +138,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         {
             Application.Current.MainPage = new LoadingPage();
             await Task.Delay(200);
-            Application.Current.MainPage = new RegisterStoreOutPage(currentDate, slectedTrip, _items, selectedPlace);
+            Application.Current.MainPage = new RegisterStoreOutPage((string)selectedReceiverLable.Text, selectedDateLabel.Text, selectedTripLabel.Text, selectedPlaceLabel.Text, lstDShipmentSchedules);
         }
         catch (Exception ex)
         {

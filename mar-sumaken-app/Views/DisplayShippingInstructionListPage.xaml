@@ -33,6 +33,13 @@
                 <StackLayout HorizontalOptions="Center" Margin="0" Padding="0">
                     <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
                         <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
+                            <Label Text="納入名:" FontSize="16" TextColor="#fff"/>
+                            <Label x:Name="selectedReceiverLable" FontSize="16" TextColor="#fff" Margin="0, 0, 10, 0"/>
+                        </FlexLayout>
+                    </Frame>
+                    
+                    <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
+                        <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
                             <Label Text="納入指示日:" FontSize="16" TextColor="#fff"/>
                             <Label x:Name="selectedDateLabel" FontSize="16" TextColor="#fff" Margin="0, 0, 10, 0"/>
                             <Label Text="納場:" FontSize="16" TextColor="#fff"/>

@@ -16,6 +16,8 @@ public partial class SearchShippingInstructionListPage : ContentPage
     ObservableCollection<string> placeList = new ObservableCollection<string> { "E5", "T5" };
     string selectedTripOption = "1"; // デフォルトでは、便は 1 です
     private readonly LocalDbService _dbService;
+    bool hasOnSearchClick = false; // 検索クリック
+
     public SearchShippingInstructionListPage()
 	{
 		InitializeComponent();
@@ -88,6 +90,16 @@ public partial class SearchShippingInstructionListPage : ContentPage
     {
         try
         {
+            if (hasOnSearchClick)
+                return;
+
+            if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
+            {
+                await Application.Current.MainPage.DisplayAlert("エラー", "E3003 ネットワークが利用できません。", "OK");
+                return;
+            }
+
+            hasOnSearchClick = true;
             // ユーザー情報を取得
             var loginUsers = await _dbService.GetLoginAsync();
             var loginUserSqlLite = loginUsers.Last();
@@ -103,7 +115,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
                 DepoID = loginUserSqlLite.DepoID,
                 DeliveryDate = selectedDate,
                 DeliveryTimeClass = selectedTripOption,
-                DeliveryLocation = (string)place.SelectedItem,
+                DeliveryLocation = (string)place.SelectedItem,selectedTripOption
             };
 
             var jsonDataSend = JsonConvert.SerializeObject(shipmentScheduleRequestBody);
@@ -118,10 +130,12 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDate, selectedTripOption, (string)place.SelectedItem, shipmentScheduleList);
+                Application.Current.MainPage = new DisplayShippingInstructionListPage((string)receiver.SelectedItem,selectedDate, selectedTripOption, (string)place.SelectedItem, shipmentScheduleList);
             }
             else
                 await DisplayAlert("エラー", response.content, "OK");
+
+            hasOnSearchClick = false;
         }
         catch (Exception ex)
         {
@@ -129,5 +143,4 @@ public partial class SearchShippingInstructionListPage : ContentPage
             return;
         }
     }
-
 }

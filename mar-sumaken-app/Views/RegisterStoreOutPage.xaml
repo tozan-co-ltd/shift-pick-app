@@ -62,8 +62,9 @@
                     <StackLayout Padding="10" Margin="0">
                         <Label FontFamily="FontAwesome6Solid" Style="{StaticResource LabelTitleStyle}" Text="①納入先 &#xf061; ➁仕入先かんばんの順で読み取ってください" Margin="0" Padding="0,0,2,0"/>
                         <FlexLayout Direction="Row" JustifyContent="SpaceBetween" Margin="0, 10, 0, 0" BackgroundColor="#f2f2f2">
-                            <Label FontAttributes="Bold" Text="①2424030" FontSize="16" Padding="12"/>
-                            <Label FontAttributes="Bold" Text="➁スキャンOK" FontSize="16" Padding="12"/>
+                            <Label x:Name="productNumberLabel" FontAttributes="Bold" FontSize="16" Padding="12"/>
+                            <Label x:Name="statusScanLabel" FontAttributes="Bold" FontSize="16" Padding="12"/>
+                            <Label x:Name="scanTextResult" FontAttributes="Bold" FontSize="16" Padding="12" IsVisible="False" HorizontalOptions="Start"/>
                         </FlexLayout>
                     </StackLayout>
 
@@ -87,7 +88,8 @@
                     <StackLayout x:Name="shippingList"  Margin="0">
                         <Frame Padding="0" Margin="0" HasShadow="False">
                             <StackLayout HorizontalOptions="Center">
-                                <Grid RowDefinitions="40, *" Padding="5, 5, 5, 0" ColumnSpacing="5">
+                                <Label x:Name="emptyLabel" Text="未検品の出荷指示がないためスキャンできません。" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" Margin="0, 60, 0, 0" TextColor="Gray" IsVisible="False"/>
+                                <Grid RowDefinitions="40, *" Padding="5, 5, 5, 0" ColumnSpacing="5" x:Name="shippingListTable">
                                     <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="0" BackgroundColor="#008080">
                                         <Label Text="No." Grid.Row="0" Grid.Column="0" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                         <Label Text="品番" Grid.Row="0" Grid.Column="1"  TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
@@ -119,6 +121,7 @@
                                                     </Grid>
                                                 </StackLayout>
                                             </DataTemplate>
+
                                         </CollectionView.ItemTemplate>
                                     </CollectionView>
                                 </Grid>
@@ -146,7 +149,7 @@
                                                         <Label Text="{Binding DeliveryProductNumber}" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                                         <Label Text="{Binding DeliveryProductAbbreviation}" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                                         <Label Text="{Binding LotQuantity}" Grid.Column="3" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                                        <Label Text="{Binding NumberOfBoxes}" Grid.Column="4" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                        <Label Text="{Binding NumScanAndNumBoxRemaining}" Grid.Column="4" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
                                                     </Grid>
                                                     <Grid Padding="0" VerticalOptions="Center" >
                                                         <Grid.RowDefinitions>

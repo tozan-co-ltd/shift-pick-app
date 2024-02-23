@@ -187,6 +187,11 @@ namespace mar_sumaken_app.Models
             /// 残箱数
             /// </summary>
             public int NumberOfBoxesRemaining { get; set; }
+
+            /// <summary>
+            /// 残箱数
+            /// </summary>
+            public string NumScanAndNumBoxRemaining { get; set; }
         }
 
         public class ShipmentScheduelResponseBody

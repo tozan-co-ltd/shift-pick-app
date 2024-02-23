@@ -5,6 +5,7 @@ using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Xaml;
+using Newtonsoft.Json;
 using Plugin.Maui.Audio;
 
 namespace mar_sumaken_app.Views;
@@ -15,6 +16,7 @@ public partial class MenuPage : FlyoutPage
     private LoginModel.LoginUserSqlLite _loginUserSqlLite;
     private List<M_HandyMenuModel> listHandyMenu;
     bool isItemTapped = false;
+    public List<LoginModel.LoginUserSqlLite> loginUsers;
     public MenuPage()
 	{
 		InitializeComponent();
@@ -37,10 +39,10 @@ public partial class MenuPage : FlyoutPage
             if (listHandyMenu.Count > 0)
                 myListView.ItemsSource = listHandyMenu;
             else
-                await DisplayAlert("エラー", "E2000 メニューが登録されていません。", "閉じる");
+                await DisplayAlert("エラー", "E2000: メニューが登録されていません。", "閉じる");
 
             // ユーザー情報を取得
-            var loginUsers = await _dbService.GetLoginAsync();
+            loginUsers = await _dbService.GetLoginAsync();
             _loginUserSqlLite = loginUsers.Last();
             companyCode.Text = _loginUserSqlLite.CompanyCode;
             loginId.Text = _loginUserSqlLite.LoginID;
@@ -121,12 +123,46 @@ public partial class MenuPage : FlyoutPage
             else if (title == Const.C_REGISTER_BULK_STORE_IN_PAGE)
                 Application.Current.MainPage = new RegisterBulkStoreInPage();
             else if (title == Const.C_SEARCH_SHIPPING_INSTRUCTION_IN_PAGE)
-                Application.Current.MainPage = new SearchShippingInstructionListPage();
+            {
+                var listCompanyResult = await GetListCompanyFromApi();
+                if (listCompanyResult.success) 
+                    Application.Current.MainPage = new SearchShippingInstructionListPage(listCompanyResult.mCompanySqlLite);
+            }
         }
         catch (Exception)
         {
             throw;
         }
+    }
+
+    public async Task<(List<M_CompanyModel> mCompanySqlLite, bool success)> GetListCompanyFromApi()
+    {
+        var mCompanySqlLite = new List<M_CompanyModel>();
+        var mCompanyPostBody = new
+        {
+            CompanyCode = _loginUserSqlLite.CompanyCode,
+            CompanyPassword = _loginUserSqlLite.CompanyPassword,
+        };
+        var jsonDataSend = JsonConvert.SerializeObject(mCompanyPostBody);
+        if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
+        {
+            await DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
+            Application.Current.MainPage = new MenuPage();
+            return (mCompanySqlLite, false);
+        }
+        // APIからメニュー一覧を取得
+        var response = await App.API.PostMethod(jsonDataSend, "https://wbtzn/sumaken-api-MRq2xg5_test/api/", "M_Company/FetchDelivery");
+        if (response.success)
+            // APIからコンテンツを取得
+            mCompanySqlLite = JsonConvert.DeserializeObject<List<M_CompanyModel>>(response.content);
+        else
+        {
+            await DisplayAlert("エラー", "E2000: 接続先URLにアクセスできません。", "OK");
+            Application.Current.MainPage = new MenuPage();
+            return (mCompanySqlLite, false);
+        }
+
+        return (mCompanySqlLite, true);
     }
 
     /// <summary>

@@ -11,7 +11,7 @@ namespace mar_sumaken_app.Views;
 
 public partial class HandySettingPage : ContentPage
 {
-    List<string> scanModeList = new List<string> { "ハンディリーダー", "カメラ" };
+    List<string> scanModeList = new List<string> { "ハンディリーダー"};
     List<string> okSoundNameList = new List<string>();
     List<string> errorSsoundNameList = new List<string>();
     private readonly LocalDbService _dbService;
@@ -27,6 +27,12 @@ public partial class HandySettingPage : ContentPage
 	{
         InitializeComponent();
         _dbService = new LocalDbService();
+
+#if DEBUG
+      txtUrl.Text  = "https://wbtzn/sumaken-api-MRq2xg5_test/api/"; // デバッグ用
+#else
+     txtUrl.Text = "https://www.tozan.co.jp/sumaken-api-MRq2xg5/api/"; // 東山本番環境用
+#endif
 
         // フィールドの設定
         SetHandySetting();
@@ -72,9 +78,7 @@ public partial class HandySettingPage : ContentPage
     /// </summary>
     private async void OnBackButtonClicked(object sender, EventArgs e)
     {
-        var result = await DisplayAlert("エラー", "入力内容は破棄されます\n戻ってよろしいですか？", "OK", "キャンセル");
-        if (result)
-            Application.Current.MainPage = new LoginPage();
+         Application.Current.MainPage = new LoginPage();
     }
 
     /// <summary>
@@ -89,7 +93,7 @@ public partial class HandySettingPage : ContentPage
 
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
-                await DisplayAlert("エラー", "E3003 ネットワークが利用できません。", "OK");
+                await DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
                 hasRegiterClick = false;
                 return;
             }
@@ -107,20 +111,22 @@ public partial class HandySettingPage : ContentPage
             string txtUrlApi = txtUrl.Text;
             //保存前の条件をチェックします.
             bool isValidUrl = Uri.TryCreate(txtUrlApi, UriKind.Absolute, out Uri result);// urlフォーマット
+            if (string.IsNullOrWhiteSpace(txtUrlApi))
+            {
+                await DisplayAlert("エラー", "E2000: 接続先を入力してください。", "OK");
+                hasRegiterClick = false;
+                return;
+            }
             if (!isValidUrl)
             {
-                await DisplayAlert("エラー", "E2000 接続先URLにアクセスできません。正しいURLを入力してください。", "OK");
+                await DisplayAlert("エラー", "E2000: 接続先URLにアクセスできません。正しいURLを入力してください。", "OK");
                 hasRegiterClick = false;
                 return;
             }
-            if (string.IsNullOrWhiteSpace(txtUrlApi)){
-                await DisplayAlert("エラー", "E2000 接続先を入力してください。", "OK");
-                hasRegiterClick = false;
-                return;
-            }
-            if ( settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "" || settingApiRequestBody.LoginID == "")
+       
+            if ( settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "")
             {
-                await DisplayAlert("エラー", "E2000 会社コード・会社パスワードはセットで入力してください。", "OK");
+                await DisplayAlert("エラー", "E2000: 会社コード・会社パスワードはセットで入力してください。", "OK");
                 hasRegiterClick = false;
                 return;
             }
@@ -150,9 +156,15 @@ public partial class HandySettingPage : ContentPage
                 await Task.Delay(100);
                 Application.Current.MainPage = new LoginPage();
             }
+            else if (response.content.Contains("<!DOCTYPE html>"))
+            {
+                await DisplayAlert("エラー", "E2000: 接続先URLにアクセスできません", "OK");
+                hasRegiterClick = false;
+                return;
+            }
             else
             {
-                await DisplayAlert("エラー", "E2000 接続先URLにアクセスできません", "OK");
+                await DisplayAlert("エラー", response.content, "OK");
                 hasRegiterClick = false;
                 return;
             }

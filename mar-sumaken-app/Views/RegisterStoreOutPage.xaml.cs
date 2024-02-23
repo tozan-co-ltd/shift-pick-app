@@ -1,4 +1,3 @@
-using Java.Util;
 using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
@@ -18,7 +17,8 @@ public partial class RegisterStoreOutPage : ContentPage
     public string currentDate = string.Empty; 
     private readonly LocalDbService _dbService;
     private HandySettingModel.HandySetting _handySetting;
-    public RegisterStoreOutPage(string receiver, string currentDate, string selectedTrip, string place, List<D_ShipmentSchedule> dShipmentScheduleListSearch)
+    List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    public RegisterStoreOutPage(string receiver, string currentDate, string selectedTrip, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch)
     {
         InitializeComponent();
         selectedReceiverLable.Text = $"{receiver}";
@@ -29,6 +29,8 @@ public partial class RegisterStoreOutPage : ContentPage
         shippingListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
         lstDShipmentSchedules = dShipmentScheduleListSearch;
+        listMCompany = mCompanySqlLite;
+
         _dbService = new LocalDbService();
         // 進捗を数える
         int sumProgressBar = dShipmentScheduleListSearch.Sum(obj => obj.NumberOfBoxesRemaining);
@@ -42,7 +44,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, lstDShipmentSchedules);
+        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules);
     }
 
     /// <summary>

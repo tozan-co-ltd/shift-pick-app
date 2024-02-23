@@ -1,8 +1,8 @@
 using mar_sumaken_app.Common;
-using mar_sumaken_app.Interface;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
 using Newtonsoft.Json;
+using System.Data.SqlTypes;
 using System.Text.RegularExpressions;
 
 namespace mar_sumaken_app.Views;
@@ -33,21 +33,24 @@ public partial class LoginPage : ContentPage
         companyCode = string.Empty;
         companyPassword = string.Empty;
         AppVersion = 0;
-        var settings = await _dbService.GetSetting();
+        appVersion.Text = "ver" + AppInfo.VersionString;
+        if (Decimal.TryParse(AppInfo.VersionString, out decimal appVer)) // アプリのバージョンをチェックとAPIを呼び出し
+            AppVersion = appVer;
 
+        var settings = await _dbService.GetSetting();
         if (settings.Count() > 0 && settings.Last() != null)
         {
             _handySetting = settings.Last();
-            appVersion.Text = "ver"+GetAppVersion();
             txtLoginId.Text = _handySetting.LoginID;
             companyCode = _handySetting.CompanyCode;
             companyPassword = _handySetting.CompanyPassword;
             _handyApiUrl = _handySetting.HandyApiUrl;
-            if (string.IsNullOrWhiteSpace(companyCode) && string.IsNullOrWhiteSpace(companyPassword))
-                await Application.Current.MainPage.DisplayAlert("エラー", "E2000 「設定」から会社コードを登録してください。", "OK");
         }
         else
             txtLoginId.Text = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(companyCode) && string.IsNullOrWhiteSpace(companyPassword))
+            await Application.Current.MainPage.DisplayAlert("エラー", "「設定」から会社コードを登録してください。", "OK");
     }
 
     /// <summary>
@@ -63,7 +66,7 @@ public partial class LoginPage : ContentPage
 
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
-                await Application.Current.MainPage.DisplayAlert("エラー", "E3003 ネットワークが利用できません。", "OK");
+                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
                 hasOnLoginClick = false;
                 return;
             }
@@ -73,18 +76,22 @@ public partial class LoginPage : ContentPage
             string loginId = txtLoginId.Text;
             var a = IsNotHalfWidthAlphanumeric(loginId);
            if (IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length || loginId.Length > 12)) // ログインIDンチェック
-                await Application.Current.MainPage.DisplayAlert("エラー", "E2000 ログインIDが正しくありません。", "OK");
-            else if (string.IsNullOrWhiteSpace(GetAppVersion())) // アプリバージョンチェック
-                await Application.Current.MainPage.DisplayAlert("エラー", "E2000 アプリバージョンの取得に失敗しました。", "OK");
+                await Application.Current.MainPage.DisplayAlert("エラー", "E2000: ログインIDが正しくありません。", "OK");
+            else if (string.IsNullOrWhiteSpace(AppInfo.VersionString)) // アプリバージョンチェック
+                await Application.Current.MainPage.DisplayAlert("エラー", "E2000: 使用ハンディメニューが登録されていません。", "OK");
             else
             {
                 loginError.Text = string.Empty;
                 var loginUserSqlLite = new LoginModel.LoginUserSqlLite();
                 var handyPages = new M_HandyMenuModel[Const.C_NUMBER_OF_MENU];
-                if (Decimal.TryParse(GetAppVersion(), out decimal appVersion)) // アプリのバージョンをチェックとAPIを呼び出し
+                if (!Decimal.TryParse(AppInfo.VersionString, out decimal appVer)) // アプリのバージョンをチェックとAPIを呼び出し
                 {
-                    AppVersion = appVersion;
-                    var loginRequestBody = new
+                    await DisplayAlert("エラー", "E2000: 使用ハンディメニューが登録されていません。", "OK");
+                    hasOnLoginClick = false;
+                    return;
+                }
+
+                var loginRequestBody = new
                     {
                         LoginID = loginId,
                         CompanyCode = _handySetting.CompanyCode,
@@ -92,38 +99,35 @@ public partial class LoginPage : ContentPage
                         HandyAppVersion = Convert.ToDecimal(AppVersion)
                     };
 
-                    var jsonDataSend = JsonConvert.SerializeObject(loginRequestBody);
-                    // APIにリクエストを送る
-                    var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "Login");
-                    if (response.success)
-                    {
-                        // APIからコンテンツを取得
-                        var contentFromApi = JsonConvert.DeserializeObject<LoginModel.LoginResponseBody>(response.content);
-                        loginUserSqlLite.CompanyCode = _handySetting.CompanyCode;
-                        loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
-                        loginUserSqlLite.CompanyPassword = _handySetting.CompanyPassword;
-                        loginUserSqlLite.LoginID = contentFromApi.User.LoginID;
-                        loginUserSqlLite.UserName = contentFromApi.User.UserName;
-                        loginUserSqlLite.DepoID = contentFromApi.Depo.DepoID;
-                        loginUserSqlLite.DepoName = contentFromApi.Depo.DepoName;
+                var jsonDataSend = JsonConvert.SerializeObject(loginRequestBody);
+                // APIにリクエストを送る
+                var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "Login");
+                if (response.success)
+                {
+                    // APIからコンテンツを取得
+                    var contentFromApi = JsonConvert.DeserializeObject<LoginModel.LoginResponseBody>(response.content);
+                    loginUserSqlLite.CompanyCode = _handySetting.CompanyCode;
+                    loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
+                    loginUserSqlLite.CompanyPassword = _handySetting.CompanyPassword;
+                    loginUserSqlLite.LoginID = contentFromApi.User.LoginID;
+                    loginUserSqlLite.UserName = contentFromApi.User.UserName;
+                    loginUserSqlLite.DepoID = contentFromApi.Depo.DepoID;
+                    loginUserSqlLite.DepoName = contentFromApi.Depo.DepoName;
 
-                        handyPages = contentFromApi.HandyMenu;
-                        //　ローカルDBに古いメニューを消す
-                        await _dbService.ALLDeleteMenuAsync();
-                        //　ローカルDBに保存
-                        await _dbService.SaveLoginAsync(loginUserSqlLite);
-                        foreach (var page in handyPages)
-                            await _dbService.SavMenuAsync(page);
+                    handyPages = contentFromApi.HandyMenu;
+                    //　ローカルDBに古いメニューを消す
+                    await _dbService.ALLDeleteMenuAsync();
+                    //　ローカルDBに保存
+                    await _dbService.SaveLoginAsync(loginUserSqlLite);
+                    foreach (var page in handyPages)
+                        await _dbService.SavMenuAsync(page);
 
-                        Application.Current.MainPage = new LoadingPage();
-                        await Task.Delay(100);
-                        Application.Current.MainPage = new MenuPage();
-                    }
-                    else
-                        await DisplayAlert("エラー", response.content, "OK");
+                    Application.Current.MainPage = new LoadingPage();
+                    await Task.Delay(100);
+                    Application.Current.MainPage = new MenuPage();
                 }
                 else
-                    await DisplayAlert("エラー", "E2000 アプリバージョンの取得に失敗しました。", "OK");
+                    await DisplayAlert("エラー", "E2000:" +response.content, "OK");
             }
 
             hasOnLoginClick = false;
@@ -133,28 +137,6 @@ public partial class LoginPage : ContentPage
             await DisplayAlert("エラー", ex.Message, "閉じる");
             return;
         }
-    }
-
-    /// <summary>
-    /// アプリのバージョンを取得する
-    /// </summary>
-    /// <returns>アプリのバージョン</returns>
-    private string GetAppVersion()
-    {
-        var version = "";
-        try
-        {
-            if (Device.RuntimePlatform == Device.Android)
-                version = AppInfo.VersionString;
-            else if (Device.RuntimePlatform == Device.iOS)
-                version = DependencyService.Get<IAssemblyService>().GetVersionName();
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-
-        return version;
     }
 
     /// <summary>
@@ -174,8 +156,6 @@ public partial class LoginPage : ContentPage
     /// <returns>設定画面</returns>
     private async void OnSettingClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new LoadingPage();
-        await Task.Delay(100);
         Application.Current.MainPage = new HandySettingPage();
     }
 }

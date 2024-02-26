@@ -17,6 +17,9 @@ public partial class LoginPage : ContentPage
     public decimal AppVersion;
     bool hasOnLoginClick = false; // ログインクリック
 
+    /// <summary>
+    /// ログイン画面表示
+    /// </summary>
     public LoginPage()
     {
         InitializeComponent();
@@ -32,11 +35,14 @@ public partial class LoginPage : ContentPage
     {
         companyCode = string.Empty;
         companyPassword = string.Empty;
+
+        // アプリのバージョン取得
         AppVersion = 0;
         appVersion.Text = "ver" + AppInfo.VersionString;
-        if (Decimal.TryParse(AppInfo.VersionString, out decimal appVer)) // アプリのバージョンをチェックとAPIを呼び出し
+        if (Decimal.TryParse(AppInfo.VersionString, out decimal appVer))
             AppVersion = appVer;
 
+        // ローカルDBのハンディ設定情報取得
         var settings = await _dbService.GetSetting();
         if (settings.Count() > 0 && settings.Last() != null)
         {
@@ -49,22 +55,25 @@ public partial class LoginPage : ContentPage
         else
             txtLoginId.Text = string.Empty;
 
+        // 会社コード・会社パスワードが設定されていない場合はエラー
         if (string.IsNullOrWhiteSpace(companyCode) && string.IsNullOrWhiteSpace(companyPassword))
             await Application.Current.MainPage.DisplayAlert("エラー", "「設定」から会社コードを登録してください。", "OK");
     }
 
     /// <summary>
-    /// ログインボタンを押す
+    /// ログインボタン押下
     /// </summary>
     /// <returns>メニュー画面</returns>
     private async void OnLoginClicked(object sender, EventArgs e)
     {
         try
         {
+            // 連続タップ制御
             if (hasOnLoginClick)
                 return;
 
-            if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
+            // ネットワーク接続チェック
+            if (!NetworkCheck.CheckNetworkConnection())
             {
                 await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
                 hasOnLoginClick = false;
@@ -72,10 +81,13 @@ public partial class LoginPage : ContentPage
             }
 
             hasOnLoginClick = true;
+
+            // ローカルDBのハンディ設定情報取得
             var settings = await _dbService.GetSetting();
             string loginId = txtLoginId.Text;
-            var a = IsNotHalfWidthAlphanumeric(loginId);
-           if (IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length || loginId.Length > 12)) // ログインIDンチェック
+
+            // ログインIDチェック
+            if (IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length || loginId.Length > 12))
                 await Application.Current.MainPage.DisplayAlert("エラー", "E2000: ログインIDが正しくありません。", "OK");
             else if (string.IsNullOrWhiteSpace(AppInfo.VersionString)) // アプリバージョンチェック
                 await Application.Current.MainPage.DisplayAlert("エラー", "E2000: 使用ハンディメニューが登録されていません。", "OK");
@@ -84,7 +96,9 @@ public partial class LoginPage : ContentPage
                 loginError.Text = string.Empty;
                 var loginUserSqlLite = new LoginModel.LoginUserSqlLite();
                 var handyPages = new M_HandyMenuModel[Const.C_NUMBER_OF_MENU];
-                if (!Decimal.TryParse(AppInfo.VersionString, out decimal appVer)) // アプリのバージョンをチェックとAPIを呼び出し
+
+                // アプリのバージョンチェック
+                if (!Decimal.TryParse(AppInfo.VersionString, out decimal appVer))
                 {
                     await DisplayAlert("エラー", "E2000: 使用ハンディメニューが登録されていません。", "OK");
                     hasOnLoginClick = false;
@@ -92,15 +106,15 @@ public partial class LoginPage : ContentPage
                 }
 
                 var loginRequestBody = new
-                    {
-                        LoginID = loginId,
-                        CompanyCode = _handySetting.CompanyCode,
-                        CompanyPassword = _handySetting.CompanyPassword,
-                        HandyAppVersion = Convert.ToDecimal(AppVersion)
-                    };
+                {
+                    LoginID = loginId,
+                    CompanyCode = _handySetting.CompanyCode,
+                    CompanyPassword = _handySetting.CompanyPassword,
+                    HandyAppVersion = Convert.ToDecimal(AppVersion)
+                };
 
+                // API接続
                 var jsonDataSend = JsonConvert.SerializeObject(loginRequestBody);
-                // APIにリクエストを送る
                 var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "Login");
                 if (response.success)
                 {
@@ -114,27 +128,30 @@ public partial class LoginPage : ContentPage
                     loginUserSqlLite.DepoID = contentFromApi.Depo.DepoID;
                     loginUserSqlLite.DepoName = contentFromApi.Depo.DepoName;
 
+                    // メニュー作成
                     handyPages = contentFromApi.HandyMenu;
-                    //　ローカルDBに古いメニューを消す
+                    // ローカルDBの古いメニューを削除
                     await _dbService.ALLDeleteMenuAsync();
-                    //　ローカルDBに保存
+
+                    // ローカルDBに保存
                     await _dbService.SaveLoginAsync(loginUserSqlLite);
                     foreach (var page in handyPages)
-                        await _dbService.SavMenuAsync(page);
+                        await _dbService.SaveMenuAsync(page);
 
+                    // メニュー画面表示
                     Application.Current.MainPage = new LoadingPage();
                     await Task.Delay(100);
                     Application.Current.MainPage = new MenuPage();
                 }
                 else
-                    await DisplayAlert("エラー", "E2000:" +response.content, "OK");
+                    await DisplayAlert("エラー", response.content, "OK");
             }
 
             hasOnLoginClick = false;
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", ex.Message, "閉じる");
+            await DisplayAlert("エラー", ex.Message, "OK");
             return;
         }
     }
@@ -151,9 +168,9 @@ public partial class LoginPage : ContentPage
     }
 
     /// <summary>
-    /// 設定
+    /// ハンディ設定画面表示
     /// </summary>
-    /// <returns>設定画面</returns>
+    /// <returns>ハンディ設定画面</returns>
     private async void OnSettingClicked(object sender, EventArgs e)
     {
         Application.Current.MainPage = new HandySettingPage();

@@ -17,13 +17,17 @@ public partial class MenuPage : FlyoutPage
     private List<M_HandyMenuModel> listHandyMenu;
     bool isItemTapped = false;
     public List<LoginModel.LoginUserSqlLite> loginUsers;
+
+    /// <summary>
+    /// メニュー画面表示
+    /// </summary>
     public MenuPage()
 	{
 		InitializeComponent();
         _dbService = new LocalDbService();
         // メニューの設定
         SetMenuPage();
-        //　メニューのアイテムをタップ
+        // メニューのアイテムをタップ
         myListView.ItemTapped += OnItemTapped;
     }
 
@@ -41,7 +45,7 @@ public partial class MenuPage : FlyoutPage
             else
                 await DisplayAlert("エラー", "E2000: メニューが登録されていません。", "閉じる");
 
-            // ユーザー情報を取得
+            // ローカルDBのユーザー情報取得
             loginUsers = await _dbService.GetLoginAsync();
             _loginUserSqlLite = loginUsers.Last();
             companyCode.Text = _loginUserSqlLite.CompanyCode;
@@ -56,7 +60,7 @@ public partial class MenuPage : FlyoutPage
     }
 
     /// <summary>
-    /// 画面をが開いたらイベントをサブスクライブします
+    /// 画面をが開いたらイベントをサブスクライブ
     /// </summary>
     protected override void OnAppearing()
     {
@@ -66,7 +70,7 @@ public partial class MenuPage : FlyoutPage
     }
 
     /// <summary>
-    /// ページが表示されない場合はイベントの購読を解除する
+    /// ページが表示されない場合はイベントの読み込みを解除
     /// </summary>
     protected override void OnDisappearing()
     {
@@ -87,7 +91,7 @@ public partial class MenuPage : FlyoutPage
     }
 
     /// <summary>
-    /// アイテムがタップされた時、対応するページに移動
+    /// メニュー名押下時
     /// </summary>
     private async void OnItemTapped(object sender, ItemTappedEventArgs e)
     {
@@ -104,7 +108,7 @@ public partial class MenuPage : FlyoutPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", ex.Message, "閉じる");
+            await DisplayAlert("エラー", ex.Message, "OK");
             return;
         }
     }
@@ -118,12 +122,18 @@ public partial class MenuPage : FlyoutPage
     {
         try
         {
+            // 入庫
             if (title == Const.C_REGISTER_STORE_IN_PAGE)
                 Application.Current.MainPage = new RegisterStoreInPage();
+
+            // まとめ入庫
             else if (title == Const.C_REGISTER_BULK_STORE_IN_PAGE)
                 Application.Current.MainPage = new RegisterBulkStoreInPage();
+
+            // 出庫
             else if (title == Const.C_SEARCH_SHIPPING_INSTRUCTION_IN_PAGE)
             {
+                // API接続
                 var listCompanyResult = await GetListCompanyFromApi();
                 if (listCompanyResult.success) 
                     Application.Current.MainPage = new SearchShippingInstructionListPage(listCompanyResult.mCompanySqlLite);
@@ -135,6 +145,10 @@ public partial class MenuPage : FlyoutPage
         }
     }
 
+    /// <summary>
+    /// 出荷指示リスト検索画面用の納入先リスト取得
+    /// </summary>
+    /// <returns>納入先リスト</returns>
     public async Task<(List<M_CompanyModel> mCompanySqlLite, bool success)> GetListCompanyFromApi()
     {
         var mCompanySqlLite = new List<M_CompanyModel>();
@@ -144,35 +158,40 @@ public partial class MenuPage : FlyoutPage
             CompanyPassword = _loginUserSqlLite.CompanyPassword,
         };
         var jsonDataSend = JsonConvert.SerializeObject(mCompanyPostBody);
-        if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
+
+        // ネットワーク接続チェック
+        if (!NetworkCheck.CheckNetworkConnection())
         {
             await DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
             Application.Current.MainPage = new MenuPage();
             return (mCompanySqlLite, false);
         }
-        // APIからメニュー一覧を取得
+
+        // API接続
         var response = await App.API.PostMethod(jsonDataSend, "https://wbtzn/sumaken-api-MRq2xg5_test/api/", "M_Company/FetchDelivery");
         if (response.success)
+        { 
             // APIからコンテンツを取得
             mCompanySqlLite = JsonConvert.DeserializeObject<List<M_CompanyModel>>(response.content);
+            return (mCompanySqlLite, true);
+        }
         else
         {
             await DisplayAlert("エラー", "E2000: 接続先URLにアクセスできません。", "OK");
             Application.Current.MainPage = new MenuPage();
             return (mCompanySqlLite, false);
         }
-
-        return (mCompanySqlLite, true);
     }
 
     /// <summary>
-    /// ログアウト
+    /// ログアウトボタン押下
     /// </summary>
     private async void OnLogoutClicked(object sender, EventArgs e)
     {
-        // ログインユーザーのSQLiteのデータ削除
+        // ログインユーザーのローカルDBのデータ削除
         await _dbService.DeleteUserLogin(_loginUserSqlLite);
 
+        // ログイン画面表示
         Application.Current.MainPage = new LoadingPage();
         await Task.Delay(200);
         Application.Current.MainPage = new LoginPage();

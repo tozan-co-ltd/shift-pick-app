@@ -23,15 +23,20 @@ public partial class HandySettingPage : ContentPage
     public string loginID = string.Empty;
     bool hasRegiterClick = false; // 登録クリック
 
+    /// <summary>
+    /// ハンディ設定画面表示
+    /// </summary>
     public HandySettingPage()
 	{
         InitializeComponent();
         _dbService = new LocalDbService();
 
 #if DEBUG
-      txtUrl.Text  = "https://wbtzn/sumaken-api-MRq2xg5_test/api/"; // デバッグ用
+        // 開発環境(デバッグ用)
+        txtUrl.Text  = "https://wbtzn/sumaken-api-MRq2xg5_test/api/";
 #else
-     txtUrl.Text = "https://www.tozan.co.jp/sumaken-api-MRq2xg5/api/"; // 東山本番環境用
+        // 本番環境
+        txtUrl.Text = "https://www.tozan.co.jp/sumaken-api-MRq2xg5/api/";
 #endif
 
         // フィールドの設定
@@ -53,6 +58,7 @@ public partial class HandySettingPage : ContentPage
         errorSsoundNameList = sound.SoundErrorList.Select(sound => sound.DisplayName).ToList();
         scanErrorSound.ItemsSource = errorSsoundNameList;
 
+        // ローカルDBのハンディ設定情報取得
         var settings = await _dbService.GetSetting();
         if (settings.Count() > 0 && settings.Last() != null)
         {
@@ -74,7 +80,7 @@ public partial class HandySettingPage : ContentPage
      }
 
     /// <summary>
-    /// 戻る
+    /// 戻るボタン押下
     /// </summary>
     private async void OnBackButtonClicked(object sender, EventArgs e)
     {
@@ -82,16 +88,18 @@ public partial class HandySettingPage : ContentPage
     }
 
     /// <summary>
-    /// 登録
+    /// 保存ボタン押下
     /// </summary>
     private async void OnRegisterButtonClicked(object sender, EventArgs e)
     {
         try
         {
+            // 連続タップ制御
             if (hasRegiterClick)
                 return;
 
-            if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
+            // ネットワーク接続チェック
+            if (!NetworkCheck.CheckNetworkConnection())
             {
                 await DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
                 hasRegiterClick = false;
@@ -99,18 +107,18 @@ public partial class HandySettingPage : ContentPage
             }
 
             hasRegiterClick = true;
-            var settingApiRequestBody = new HandySettingModel.SettingPostBody();
 
+            var settingApiRequestBody = new HandySettingModel.SettingPostBody();
             companyCode = txtCompanyCode.Text;
             companyPassword = txtCompanyPassword.Text;
             loginID = txtLoginId.Text;
             settingApiRequestBody.CompanyCode = companyCode == null ? "" : companyCode.Trim();
             settingApiRequestBody.CompanyPassword = companyPassword == null ? "" : companyPassword.Trim();
             settingApiRequestBody.LoginID = loginID == null ? "" : loginID.Trim();
-             // urlAPI
             string txtUrlApi = txtUrl.Text;
-            //保存前の条件をチェックします.
-            bool isValidUrl = Uri.TryCreate(txtUrlApi, UriKind.Absolute, out Uri result);// urlフォーマット
+            
+            // 入力値チェック
+            bool isValidUrl = Uri.TryCreate(txtUrlApi, UriKind.Absolute, out Uri result);
             if (string.IsNullOrWhiteSpace(txtUrlApi))
             {
                 await DisplayAlert("エラー", "E2000: 接続先を入力してください。", "OK");
@@ -124,15 +132,15 @@ public partial class HandySettingPage : ContentPage
                 return;
             }
        
-            if ( settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "")
+            if (settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "")
             {
                 await DisplayAlert("エラー", "E2000: 会社コード・会社パスワードはセットで入力してください。", "OK");
                 hasRegiterClick = false;
                 return;
             }
-            
+
+            // API接続
             var jsonDataSend = JsonConvert.SerializeObject(settingApiRequestBody);
-            // APIを接続
             var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "Setting");
             if (response.success)
             {
@@ -147,11 +155,13 @@ public partial class HandySettingPage : ContentPage
                     ScanErrorSound = (string)scanErrorSound.SelectedItem
                 });
 
-                // サウンドのパスを取得する
+                // 保存したOKサウンドのパスを取得する
                 string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
-                // OKサウンド
+                // OKサウンドを鳴らす
                 SoundPlayer.PlaySound(resultOkSound);
                 await DisplayAlert("完了", "登録が完了しました。", "OK");
+
+                // ログイン画面表示
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(100);
                 Application.Current.MainPage = new LoginPage();
@@ -179,7 +189,7 @@ public partial class HandySettingPage : ContentPage
     }
 
     /// <summary>
-    /// スキャンエラーサウンドが変更
+    /// スキャンエラーサウンド変更
     /// </summary>
     private void OnScanErrorSoundChanged(object sender, EventArgs e)
     { 
@@ -197,7 +207,7 @@ public partial class HandySettingPage : ContentPage
     }
 
     /// <summary>
-    /// スキャンエラーサウンドが変更
+    /// スキャンエラーサウンド変更
     /// </summary>
     private void OnScanOkSoundChanged(object sender, EventArgs e)
     {
@@ -215,7 +225,7 @@ public partial class HandySettingPage : ContentPage
     }
 
     /// <summary>
-    /// スキャンモデルが変更
+    /// スキャンモデル変更
     /// </summary>
     private void OnScanModelChanged(object sender, EventArgs e)
     {

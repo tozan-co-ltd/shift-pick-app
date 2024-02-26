@@ -18,11 +18,11 @@ namespace mar_sumaken_app.Services
             _connection = new SQLiteAsyncConnection(Path.Combine(FileSystem.AppDataDirectory, DB_NAME));
             try
             {
-                //ログインデータテーブル
+                // ログインデータテーブル
                 _connection.CreateTableAsync<LoginModel.LoginUserSqlLite>().Wait();
                 // メニューデータテーブル
                 _connection.CreateTableAsync<M_HandyMenuModel>().Wait();
-                //設定データテーブル
+                // 設定データテーブル
                 _connection.CreateTableAsync<HandySettingModel.HandySetting>().Wait();
             }
             catch (Exception ex)
@@ -31,7 +31,7 @@ namespace mar_sumaken_app.Services
             }
         }
 
-        #region 設定テーブル操作
+        #region ハンディ設定テーブル操作
         /// <summary>
         /// スキャンとサウンドを取得
         /// </summary>
@@ -124,7 +124,7 @@ namespace mar_sumaken_app.Services
         /// <summary>
         /// メニューを保存
         /// </summary>
-        async public Task<int> SavMenuAsync(M_HandyMenuModel menu0)
+        async public Task<int> SaveMenuAsync(M_HandyMenuModel menu0)
         {
             return await _connection.InsertAsync(menu0);
         }

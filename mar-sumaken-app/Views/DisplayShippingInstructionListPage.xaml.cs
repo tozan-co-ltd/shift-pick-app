@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using ProductDemo = mar_sumaken_app.Models.ProductDemo;
 using Newtonsoft.Json;
 using static mar_sumaken_app.Models.ShipmentScheduleModel;
+using mar_sumaken_app.Models;
 
 namespace mar_sumaken_app.Views;
 
@@ -16,7 +17,9 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     public string slectedTrip = string.Empty;
     public string selectedPlace = string.Empty;
     public string selectedReceiver = string.Empty;
-    public DisplayShippingInstructionListPage(string receiver, DateTime selectedDate, string selectedOption, string place, List<D_ShipmentSchedule> shipmentScheduleList)
+    List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+
+    public DisplayShippingInstructionListPage(string receiver, DateTime selectedDate, string selectedOption, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList)
 	{
 		InitializeComponent();
         selectedReceiverLable.Text = $"{receiver}";
@@ -24,7 +27,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         selectedTripLabel.Text = $"{selectedOption}";
         currentDate = $"{selectedDate.ToShortDateString()}";
         selectedPlaceLabel.Text = $"{place}";
-
+        listMCompany = mCompanySqlLite;
         lstDShipmentSchedules = new List<D_ShipmentSchedule>();
 
         // 箱数降順
@@ -126,7 +129,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new SearchShippingInstructionListPage();
+        Application.Current.MainPage = new SearchShippingInstructionListPage(listMCompany);
     }
 
     /// <summary>
@@ -138,7 +141,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         {
             Application.Current.MainPage = new LoadingPage();
             await Task.Delay(200);
-            Application.Current.MainPage = new RegisterStoreOutPage((string)selectedReceiverLable.Text, selectedDateLabel.Text, selectedTripLabel.Text, selectedPlaceLabel.Text, lstDShipmentSchedules);
+            Application.Current.MainPage = new RegisterStoreOutPage((string)selectedReceiverLable.Text, selectedDateLabel.Text, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules);
         }
         catch (Exception ex)
         {

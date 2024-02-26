@@ -132,7 +132,7 @@ public partial class HandySettingPage : ContentPage
                 return;
             }
        
-            if (settingApiRequestBody.CompanyCode == "" || settingApiRequestBody.CompanyPassword == "")
+            if (string.IsNullOrWhiteSpace(settingApiRequestBody.CompanyCode) || string.IsNullOrWhiteSpace(settingApiRequestBody.CompanyPassword))
             {
                 await DisplayAlert("エラー", "E2000: 会社コード・会社パスワードはセットで入力してください。", "OK");
                 hasRegiterClick = false;
@@ -141,7 +141,7 @@ public partial class HandySettingPage : ContentPage
 
             // API接続
             var jsonDataSend = JsonConvert.SerializeObject(settingApiRequestBody);
-            var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "Setting");
+            var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "HandySetting/Validate");
             if (response.success)
             {
                 await _dbService.Create(new HandySettingModel.HandySetting

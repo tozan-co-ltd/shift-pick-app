@@ -46,9 +46,9 @@ namespace mar_sumaken_app.Models
         public class LoginResponseBody
         {
             public string CompanyName { get; set; }
-            public M_UserModel User { get; set; }
-            public M_DepoModel Depo { get; set; }
-            public M_HandyMenuModel[] HandyMenu { get; set; }
+            public M_UserModel M_User { get; set; }
+            public M_DepoModel M_Depo { get; set; }
+            public List<M_HandyMenuModel> M_HandyMenuList { get; set; }
         }
     }
 }

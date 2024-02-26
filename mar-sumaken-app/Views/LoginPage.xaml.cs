@@ -39,8 +39,10 @@ public partial class LoginPage : ContentPage
         // アプリのバージョン取得
         AppVersion = 0;
         appVersion.Text = "ver" + AppInfo.VersionString;
-        if (Decimal.TryParse(AppInfo.VersionString, out decimal appVer))
+        if (Decimal.TryParse(AppInfo.VersionString, out decimal appVer))  // アプリバージョンチェック
             AppVersion = appVer;
+        else
+            await Application.Current.MainPage.DisplayAlert("エラー", "E2000: 使用ハンディメニューが登録されていません。", "OK");
 
         // ローカルDBのハンディ設定情報取得
         var settings = await _dbService.GetSetting();
@@ -57,7 +59,7 @@ public partial class LoginPage : ContentPage
 
         // 会社コード・会社パスワードが設定されていない場合はエラー
         if (string.IsNullOrWhiteSpace(companyCode) && string.IsNullOrWhiteSpace(companyPassword))
-            await Application.Current.MainPage.DisplayAlert("エラー", "「設定」から会社コードを登録してください。", "OK");
+            loginError.Text = "「設定」から会社コードを登録してください。";
     }
 
     /// <summary>
@@ -68,6 +70,15 @@ public partial class LoginPage : ContentPage
     {
         try
         {
+            // ローカルDBのハンディ設定情報取得
+            var settings = await _dbService.GetSetting();
+            if (settings.Count() == 0)
+            {
+                await Application.Current.MainPage.DisplayAlert("エラー", "「設定」から会社コードを登録してください。", "OK");
+                hasOnLoginClick = false;
+                return;
+            }
+
             // 連続タップ制御
             if (hasOnLoginClick)
                 return;
@@ -81,30 +92,16 @@ public partial class LoginPage : ContentPage
             }
 
             hasOnLoginClick = true;
-
-            // ローカルDBのハンディ設定情報取得
-            var settings = await _dbService.GetSetting();
             string loginId = txtLoginId.Text;
 
             // ログインIDチェック
             if (IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length || loginId.Length > 12))
                 await Application.Current.MainPage.DisplayAlert("エラー", "E2000: ログインIDが正しくありません。", "OK");
-            else if (string.IsNullOrWhiteSpace(AppInfo.VersionString)) // アプリバージョンチェック
-                await Application.Current.MainPage.DisplayAlert("エラー", "E2000: 使用ハンディメニューが登録されていません。", "OK");
             else
             {
                 loginError.Text = string.Empty;
                 var loginUserSqlLite = new LoginModel.LoginUserSqlLite();
-                var handyPages = new M_HandyMenuModel[Const.C_NUMBER_OF_MENU];
-
-                // アプリのバージョンチェック
-                if (!Decimal.TryParse(AppInfo.VersionString, out decimal appVer))
-                {
-                    await DisplayAlert("エラー", "E2000: 使用ハンディメニューが登録されていません。", "OK");
-                    hasOnLoginClick = false;
-                    return;
-                }
-
+                var handyPages = new List<M_HandyMenuModel>();
                 var loginRequestBody = new
                 {
                     LoginID = loginId,
@@ -118,21 +115,22 @@ public partial class LoginPage : ContentPage
                 var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "Login");
                 if (response.success)
                 {
+                    //エラーメッセージを消す
+                    loginError.Text = string.Empty;  
                     // APIからコンテンツを取得
                     var contentFromApi = JsonConvert.DeserializeObject<LoginModel.LoginResponseBody>(response.content);
                     loginUserSqlLite.CompanyCode = _handySetting.CompanyCode;
                     loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
                     loginUserSqlLite.CompanyPassword = _handySetting.CompanyPassword;
-                    loginUserSqlLite.LoginID = contentFromApi.User.LoginID;
-                    loginUserSqlLite.UserName = contentFromApi.User.UserName;
-                    loginUserSqlLite.DepoID = contentFromApi.Depo.DepoID;
-                    loginUserSqlLite.DepoName = contentFromApi.Depo.DepoName;
+                    loginUserSqlLite.LoginID = contentFromApi.M_User.LoginID;
+                    loginUserSqlLite.UserName = contentFromApi.M_User.UserName;
+                    loginUserSqlLite.DepoID = contentFromApi.M_Depo.DepoID;
+                    loginUserSqlLite.DepoName = contentFromApi.M_Depo.DepoName;
 
                     // メニュー作成
-                    handyPages = contentFromApi.HandyMenu;
+                    handyPages = contentFromApi.M_HandyMenuList;
                     // ローカルDBの古いメニューを削除
                     await _dbService.ALLDeleteMenuAsync();
-
                     // ローカルDBに保存
                     await _dbService.SaveLoginAsync(loginUserSqlLite);
                     foreach (var page in handyPages)
@@ -152,6 +150,7 @@ public partial class LoginPage : ContentPage
         catch (Exception ex)
         {
             await DisplayAlert("エラー", ex.Message, "OK");
+            hasOnLoginClick = false;
             return;
         }
     }

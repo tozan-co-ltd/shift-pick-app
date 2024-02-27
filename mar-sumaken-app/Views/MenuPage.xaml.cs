@@ -96,7 +96,7 @@ public partial class MenuPage : FlyoutPage
                 isItemTapped = true;
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                await PerformNavigation(pageName.HandyMenuName);
+                await PerformNavigation(pageName.HandyMenuName, pageName.HandyMenuID);
                 isItemTapped = false;
             }
         }
@@ -112,12 +112,12 @@ public partial class MenuPage : FlyoutPage
     /// </summary>
     /// <param name="title">string</param>
     /// <returns>対応画面</returns>
-    private async Task PerformNavigation(string title)
+    private async Task PerformNavigation(string title, int handyMenuID)
     {
         try
         {
             if (title == Const.C_REGISTER_STORE_IN_PAGE)
-                Application.Current.MainPage = new RegisterStoreInPage();
+                Application.Current.MainPage = new RegisterStoreInPage(handyMenuID);
             else if (title == Const.C_REGISTER_BULK_STORE_IN_PAGE)
                 Application.Current.MainPage = new RegisterBulkStoreInPage();
             else if (title == Const.C_SEARCH_SHIPPING_INSTRUCTION_IN_PAGE)

@@ -1,7 +1,7 @@
 using mar_sumaken_app.ViewModels;
 using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
-using ProductDemo = mar_sumaken_app.Models.ProductDemo;
+using ProductDemo = mar_sumaken_app.Models.D_ReceiveModel;
 using Newtonsoft.Json;
 using static mar_sumaken_app.Models.ShipmentScheduleModel;
 

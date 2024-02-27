@@ -11,15 +11,15 @@ public partial class RegisterBulkStoreInPage : ContentPage
 {
     int count = 0;
     bool isItemTapped = false;
-    private ObservableCollection<ProductDemo> _items;
-    private ObservableCollection<ProductDemo> _itemsNotDelete;
-    private ObservableCollection<ProductDemo> _itemsHistory;
+    private ObservableCollection<D_ReceiveModel> _items;
+    private ObservableCollection<D_ReceiveModel> _itemsNotDelete;
+    private ObservableCollection<D_ReceiveModel> _itemsHistory;
     private readonly LocalDbService _dbService;
     private HandySettingModel.HandySetting _handySetting;
     private bool _IsScanPageActive = false;
-    string productNumValue = string.Empty;
-    string uniformNumValue = string.Empty;
-    string keyValue = string.Empty;
+    string supplierProductNumber = string.Empty;
+    int numberOfBoxes = 0;
+    string lotNumber = string.Empty;
     string resString = string.Empty;
     string clipboardContent = string.Empty;
     public RegisterBulkStoreInPage()
@@ -27,9 +27,9 @@ public partial class RegisterBulkStoreInPage : ContentPage
         InitializeComponent();
         Clipboard.ClipboardContentChanged += OnClipboardContentChanged;
         _dbService = new LocalDbService();
-        _items = new ObservableCollection<ProductDemo>();
-        _itemsNotDelete = new ObservableCollection<ProductDemo>();
-        _itemsHistory = new ObservableCollection<ProductDemo>();
+        _items = new ObservableCollection<D_ReceiveModel>();
+        _itemsNotDelete = new ObservableCollection<D_ReceiveModel>();
+        _itemsHistory = new ObservableCollection<D_ReceiveModel>();
         CounterBtn.Text = $"{count}";
         numberOfBoxListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
@@ -89,45 +89,35 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 // サウンドのパスを取得する
                 string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
                 string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
-
                 clipboardContent = Clipboard.GetTextAsync().Result;
-                if (clipboardContent != string.Empty)
+                if (clipboardContent.Trim().IndexOf("11") != -1)
                 {
-                    string[] substrings = clipboardContent.Split(' ');
-                    if (substrings.Length > 3)
-                    {
-                        resString = substrings[0].Trim();
-                        if (resString.Length > 8)
-                        {
-                            productNumValue = resString.Substring(resString.Length - 8).ToString();
-                            uniformNumValue = resString.Substring(21, 2);
-                            keyValue = resString.Substring(4, 11);
-                        }
-                        // 既存の製品に同じ製品番号があるかチェックする
-                        ProductDemo duplicateProduct = _itemsNotDelete.FirstOrDefault(p => p.product_num == productNumValue && p.key == keyValue);
-                        if (duplicateProduct != null)
-                        {
-                            // エラーサウンド
-                            SoundPlayer.PlaySound(resultErrorSound);
-                            scanTextResult.Text = "E1003: 既にスキャン済みの仕入先かんばんです。";
-                            scanTextResult.TextColor = Colors.Red;
-                            return;
-                        }
-
-                        // OKサウンド
-                        SoundPlayer.PlaySound(resultOkSound);
-                        scanTextResult.Text = "スキャンOK";
-                        scanTextResult.TextColor = Colors.Black;
-                        numberInputModal.IsVisible = true;
-                        bulkStockContent.IsVisible = false;
-                    }
-                    else
+                    supplierProductNumber = clipboardContent.Substring(81, 50).ToString().Trim();
+                    lotNumber = clipboardContent.Substring(29, 10).Trim();
+                    // 既存の製品に同じ製品番号があるかチェックする
+                    D_ReceiveModel duplicateProduct = _itemsNotDelete.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
+                    if (duplicateProduct != null)
                     {
                         // エラーサウンド
                         SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = "E1000:QRコードが正しくありません。";
+                        scanTextResult.Text = "E1003: 既にスキャン済みの仕入先かんばんです。";
                         scanTextResult.TextColor = Colors.Red;
+                        return;
                     }
+
+                    // OKサウンド
+                    SoundPlayer.PlaySound(resultOkSound);
+                    scanTextResult.Text = "スキャンOK";
+                    scanTextResult.TextColor = Colors.Black;
+                    numberInputModal.IsVisible = true;
+                    bulkStockContent.IsVisible = false;
+                }
+                else
+                {
+                    // エラーサウンド
+                    SoundPlayer.PlaySound(resultErrorSound);
+                    scanTextResult.Text = "E1000:QRコードが正しくありません。";
+                    scanTextResult.TextColor = Colors.Red;
                 }
             }
         }
@@ -198,44 +188,39 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 else
                 {
                     // 既存の製品に同じ製品番号があるかチェックする
-                    ProductDemo existingProduct = _items.FirstOrDefault(p => p.product_num == productNumValue);
+                    D_ReceiveModel existingProduct =  _items.Where(p => p.SupplierProductNumber == supplierProductNumber).FirstOrDefault();
                     // 既存の製品に同じ製品番号とキーがあるかチェックする 
-                    ProductDemo duplicateProduct = _itemsNotDelete.FirstOrDefault(p => p.product_num == productNumValue && p.key == keyValue);
+                    D_ReceiveModel duplicateProduct = _itemsNotDelete.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
                     if (duplicateProduct == null)
                     {
                         count++;
-                        if (count == 1)
-                            CounterBtn.Text = $"{count}";
-                        else
-                            CounterBtn.Text = $"{count}";
+                        CounterBtn.Text = $"{count}";
 
                         if (existingProduct != null)
                         {
-                            _items.Add(new ProductDemo
+                            _items.Add(new D_ReceiveModel
                             {
-                                Id = 2,
-                                product_num = productNumValue,
-                                uniform_num = uniformNumValue,
-                                key = keyValue,
-                                box_num = ((enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0) + existingProduct.box_num
+                                ReceiveID = 2,
+                                SupplierProductNumber = supplierProductNumber,
+                                LotNumber = lotNumber,
+                                Quantity = ((enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0) + existingProduct.Quantity
                             });
                             // 既存の製品を削除する
                             _items.Remove(existingProduct);
                         }
                         else
                         {
-                            _items.Add(new ProductDemo
+                            _items.Add(new D_ReceiveModel
                             {
-                                Id = 2,
-                                product_num = productNumValue,
-                                uniform_num = uniformNumValue,
-                                key = keyValue,
-                                box_num = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0
+                                ReceiveID = 2,
+                                SupplierProductNumber = supplierProductNumber,
+                                LotNumber = lotNumber,
+                                Quantity = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0
                             });
                             // 重複処理前のすべてのアイテムを取得する
-                            _itemsNotDelete.Add(new ProductDemo { Id = 2, product_num = productNumValue, uniform_num = uniformNumValue, key = keyValue, box_num = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
+                            _itemsNotDelete.Add(new D_ReceiveModel { ReceiveID = 2, SupplierProductNumber = supplierProductNumber, LotNumber = lotNumber, Quantity = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
                         }
-                        _itemsHistory.Add(new ProductDemo { Id = 2, product_num = productNumValue, key = keyValue, uniform_num = uniformNumValue, box_num = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
+                        _itemsHistory.Add(new D_ReceiveModel { ReceiveID = 2, SupplierProductNumber = supplierProductNumber, LotNumber = lotNumber, Quantity = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
                         // 履歴コレクションビュー
                         historyCollectionView.ItemsSource = _itemsHistory.Reverse();
 

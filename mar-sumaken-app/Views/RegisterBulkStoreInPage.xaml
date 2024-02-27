@@ -109,10 +109,10 @@
                                     </Grid.ColumnDefinitions>
 
                                     <Label Grid.Column="0" Grid.Row="0" FontFamily="Rounded Mplus 1c" TextColor="#A6A6A6" Text="品　番：" FontSize="16"/>
-                                    <Label Grid.Column="1" Grid.Row="0" Text="{Binding product_num}"  FontSize="16"/>
+                                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding SupplierProductNumber}"  FontSize="16"/>
                                     <Label Grid.Column="0" Grid.Row="1" FontFamily="Rounded Mplus 1c" TextColor="#A6A6A6" Text="収容数：" FontSize="16"/>
-                                    <Label Grid.Column="1" Grid.Row="1" Text="{Binding uniform_num}" HorizontalTextAlignment="Start" FontSize="16"/>
-                                    <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" Padding="0, 10,0,0" Text="{Binding box_num}" FontSize="16" WidthRequest="155" HorizontalOptions="EndAndExpand" HorizontalTextAlignment="End" />
+                                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding NumberOfBoxes}" HorizontalTextAlignment="Start" FontSize="16"/>
+                                        <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" Padding="0, 10,0,0" Text="{Binding Quantity}" FontSize="16" WidthRequest="155" HorizontalOptions="EndAndExpand" HorizontalTextAlignment="End" />
                                     <Label Grid.Column="3" Grid.Row="0" Grid.RowSpan="3" Padding="0, 10,0,0" Text=" 箱" FontSize="16" HorizontalTextAlignment="End"/>
                                 </Grid>
                                 <Grid Padding="5" VerticalOptions="Center" >
@@ -164,13 +164,13 @@
                                         </Grid.ColumnDefinitions>
 
                                         <Label Grid.Column="0" Grid.Row="0" FontFamily="Rounded Mplus 1c" TextColor="#A6A6A6" Text="品番：" FontSize="16"/>
-                                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding product_num}"  FontSize="16"/>
+                                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding SupplierProductNumber}"  FontSize="16"/>
                                         <Label Grid.Column="0" Grid.Row="1" FontFamily="Rounded Mplus 1c" TextColor="#A6A6A6" Text="キー：" FontSize="16"/>
-                                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding key}" HorizontalTextAlignment="Start" FontSize="16"/>
+                                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding LotNumber}" HorizontalTextAlignment="Start" FontSize="16"/>
                                         <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" Padding="0" Text="収容数 : " FontSize="16" WidthRequest="140" HorizontalOptions="EndAndExpand" HorizontalTextAlignment="End" TextColor="#A6A6A6"/>
-                                        <Label Grid.Column="3" Grid.Row="0" Grid.RowSpan="3" Padding="0" Text="{Binding uniform_num}" FontSize="16" HorizontalTextAlignment="End"/>
+                                        <Label Grid.Column="3" Grid.Row="0" Grid.RowSpan="3" Padding="0" Text="{Binding NumberOfBoxes}" FontSize="16" HorizontalTextAlignment="End"/>
                                         <Label Grid.Column="2" Grid.Row="1" Grid.RowSpan="3" Padding="0" Text="箱　数 : " FontSize="16" WidthRequest="140" HorizontalOptions="EndAndExpand" HorizontalTextAlignment="End" TextColor="#A6A6A6"/>
-                                        <Label Grid.Column="3" Grid.Row="1" Grid.RowSpan="3" Padding="0" Text="{Binding box_num}" FontSize="16" HorizontalTextAlignment="End"/>
+                                        <Label Grid.Column="3" Grid.Row="1" Grid.RowSpan="3" Padding="0" Text="{Binding Quantity}" FontSize="16" HorizontalTextAlignment="End"/>
                                     </Grid>
                                     <Grid Padding="5" VerticalOptions="Center" >
                                         <Grid.RowDefinitions>

@@ -123,6 +123,7 @@ public partial class LoginPage : ContentPage
                     loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
                     loginUserSqlLite.CompanyPassword = _handySetting.CompanyPassword;
                     loginUserSqlLite.LoginID = contentFromApi.M_User.LoginID;
+                    loginUserSqlLite.UserID = contentFromApi.M_User.UserID;
                     loginUserSqlLite.UserName = contentFromApi.M_User.UserName;
                     loginUserSqlLite.DepoID = contentFromApi.M_Depo.DepoID;
                     loginUserSqlLite.DepoName = contentFromApi.M_Depo.DepoName;

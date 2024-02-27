@@ -56,13 +56,13 @@
 
                     <StackLayout BackgroundColor="#f2f2f2">
                         <StackLayout x:Name="mainContent" BackgroundColor="#fff">
-                            <Frame BackgroundColor="#FD5A00" CornerRadius="0" BorderColor="#FD5A00">
+                            <Frame BackgroundColor="#FD5A00" CornerRadius="0" BorderColor="#FD5A00" Padding="0, 8" Margin="0">
                                 <StackLayout HorizontalOptions="Center">
                                     <FlexLayout Direction="Row" JustifyContent="Center" Padding="0" Margin="0">
-                                        <Label x:Name="userName" FontSize="16" TextColor="#fff"/>
-                                        <Label Text="さん" FontSize="13" TextColor="#fff" Padding="0, 4, 0, 0"/>
-                                        <Label x:Name="depoName" FontSize="16" TextColor="#fff" Margin="5, 0, 0 ,0"/>
-                                        <Label Text="で作業中" FontSize="13" TextColor="#fff" Padding="0, 4, 0, 0"/>
+                                        <Label x:Name="userName" FontSize="18" TextColor="#fff"/>
+                                    </FlexLayout>
+                                    <FlexLayout Direction="Row" JustifyContent="Center" Padding="0" Margin="0, 8, 0, 0">
+                                        <Label x:Name="depoName" FontSize="18" TextColor="#fff"/>
                                     </FlexLayout>
                                 </StackLayout>
                             </Frame>

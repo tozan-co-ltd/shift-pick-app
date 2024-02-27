@@ -18,6 +18,7 @@ public partial class RegisterStoreOutPage : ContentPage
     private readonly LocalDbService _dbService;
     private HandySettingModel.HandySetting _handySetting;
     List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+
     public RegisterStoreOutPage(string receiver, string currentDate, string selectedTrip, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch)
     {
         InitializeComponent();

@@ -14,7 +14,10 @@ public partial class MenuPage : FlyoutPage
 {
     private readonly LocalDbService _dbService;
     private LoginModel.LoginUserSqlLite _loginUserSqlLite;
-    private List<M_HandyMenuModel> listHandyMenu;
+    public List<M_HandyMenuModel> listHandyMenu;
+    private HandySettingModel.HandySetting _handySetting;
+    public List<M_SupplierKanbanModel> listMSupplierKanban;
+    public List<R_HandyMenuSupplierKanbanModel> listRHandyMenuSupplierKanban;
     bool isItemTapped = false;
     public List<LoginModel.LoginUserSqlLite> loginUsers;
 
@@ -40,6 +43,8 @@ public partial class MenuPage : FlyoutPage
         {
             // メニュー一覧を取得
             listHandyMenu = await _dbService.GetMenuAsync();
+            var settings = await _dbService.GetSetting();
+            _handySetting = settings.Last();
             if (listHandyMenu.Count > 0)
                 myListView.ItemsSource = listHandyMenu;
             else
@@ -122,9 +127,52 @@ public partial class MenuPage : FlyoutPage
     {
         try
         {
+            var latestMastersPostBody = new LatestMastersModel.LatestMastersPostBody();
+            latestMastersPostBody.CompanyCode = _handySetting.CompanyCode;
+            latestMastersPostBody.CompanyPassword = _handySetting.CompanyPassword;
+            latestMastersPostBody.UserID = _loginUserSqlLite.UserID;
+            var jsonDataSend = JsonConvert.SerializeObject(latestMastersPostBody);
+
+            // ネットワーク接続チェック
+            if (!NetworkCheck.CheckNetworkConnection())
+            {
+                await DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
+                Application.Current.MainPage = new MenuPage();
+                return;
+            }
+
+            // API接続
+            var response = await App.API.PostMethod(jsonDataSend, _handySetting.HandyApiUrl, "LatestMasters/Fetch");
+            if (response.success)
+            {
+                // APIからコンテンツを取得
+                var contentFromApi = JsonConvert.DeserializeObject<LatestMastersModel.LatestMastersPostBackContent>(response.content);
+                var listlatestMastersSqlLite =  new List<M_SupplierKanbanModel>();
+                listlatestMastersSqlLite = contentFromApi.M_SupplierKanbanList;
+                // ローカルDBの古いメニューを削除
+                await _dbService.ALLDeleteMSupplierKanbanAsync();
+                foreach (var latestMastersSqlLite in listlatestMastersSqlLite)
+                    await _dbService.SaveMSupplierKanbanAsync(latestMastersSqlLite);
+
+                var listRHandyMenuSupplierKanbanSqlLite = new List<R_HandyMenuSupplierKanbanModel>();
+                listRHandyMenuSupplierKanbanSqlLite = contentFromApi.R_HandyMenuSupplierKanbanList;
+                // ローカルDBの古いメニューを削除
+                await _dbService.ALLDeleteRHandyMenuSupplierKanbanAsync();
+                foreach (var rHandyMenuSupplierKanbanSqlLite in listRHandyMenuSupplierKanbanSqlLite)
+                    await _dbService.SaveRHandyMenuSupplierKanbanAsync(rHandyMenuSupplierKanbanSqlLite);
+            }
+            else
+            {
+                Application.Current.MainPage = new MenuPage();
+                return;
+            }
+
+
             // 入庫
             if (title == Const.C_REGISTER_STORE_IN_PAGE)
+            {
                 Application.Current.MainPage = new RegisterStoreInPage(handyMenuID);
+            }
             else if (title == Const.C_REGISTER_BULK_STORE_IN_PAGE)
                 Application.Current.MainPage = new RegisterBulkStoreInPage();
 
@@ -166,7 +214,7 @@ public partial class MenuPage : FlyoutPage
         }
 
         // API接続
-        var response = await App.API.PostMethod(jsonDataSend, "https://wbtzn/sumaken-api-MRq2xg5_test/api/", "M_Company/FetchDelivery");
+        var response = await App.API.PostMethod(jsonDataSend, _handySetting.HandyApiUrl, "M_Company/FetchDelivery");
         if (response.success)
         { 
             // APIからコンテンツを取得

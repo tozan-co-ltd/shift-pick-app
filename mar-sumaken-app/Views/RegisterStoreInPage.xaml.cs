@@ -296,6 +296,13 @@ public partial class RegisterStoreInPage : ContentPage
                 storeInPostBody.ScanReceive = listScanReceive;
                 storeInPostBody.HandyErrorMessage = listDHandyErrorMessage;
                 var jsonDataSend = JsonConvert.SerializeObject(storeInPostBody);
+                // ネットワーク接続チェック
+                if (!NetworkCheck.CheckNetworkConnection())
+                {
+                    await DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
+                    return;
+                }
+
                 // APIにリクエストを送る
                 var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "StoreIn/Register");
                 // APIからコンテンツを取得

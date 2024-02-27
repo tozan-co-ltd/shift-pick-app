@@ -181,11 +181,10 @@ public partial class RegisterStoreInPage : ContentPage
                         return;
                     }
 
-                    // ポスト本体に設定
+                    //  仕入先かんばんデータを設定
                     storeInPostBody.CompanyCode = settings.Last().CompanyCode;
                     storeInPostBody.CompanyPassword = settings.Last().CompanyPassword;
                     listScanReceive.Add(scanResultModel);
-                    storeInPostBody.ScanReceive = listScanReceive;
 
                     // OKサウンド
                     SoundPlayer.PlaySound(resultOkSound);
@@ -294,6 +293,7 @@ public partial class RegisterStoreInPage : ContentPage
         {
             if (_numberOfBoxList.Count() > 0)
             {
+                storeInPostBody.ScanReceive = listScanReceive;
                 storeInPostBody.HandyErrorMessage = listDHandyErrorMessage;
                 var jsonDataSend = JsonConvert.SerializeObject(storeInPostBody);
                 // APIにリクエストを送る

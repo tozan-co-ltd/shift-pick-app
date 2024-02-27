@@ -100,7 +100,6 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     {
                         // エラーサウンド
                         SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = "E1003: 既にスキャン済みの仕入先かんばんです。";
                         scanTextResult.TextColor = Colors.Red;
                         return;
                     }

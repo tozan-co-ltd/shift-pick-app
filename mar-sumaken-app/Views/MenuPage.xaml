@@ -29,7 +29,7 @@
                                 <BoxView HeightRequest="1" Color="#ccc" HorizontalOptions="FillAndExpand" />
                             </StackLayout>
 
-                            <Label Text="ログアウトID" FontAttributes="Bold" Padding="15, 10, 0, 5" FontSize="20"/>
+                            <Label Text="ログインID" FontAttributes="Bold" Padding="15, 10, 0, 5" FontSize="20"/>
                             <StackLayout>
                                 <Label x:Name="loginId" Text="Item2"  Margin="25,0,0,10" FontSize="20"/>
                                 <BoxView HeightRequest="1" Color="#ccc" HorizontalOptions="FillAndExpand" />

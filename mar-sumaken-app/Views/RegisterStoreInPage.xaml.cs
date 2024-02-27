@@ -110,7 +110,6 @@ public partial class RegisterStoreInPage : ContentPage
 
                 if (string.IsNullOrEmpty(clipboardContent))
                 {
-                    //d_HandyErrorMessageModel.HandyMenuID = settings.Last().Han;
                     scanTextResult.Text = "E2001: QRコードが読めません。";
                     scanTextResult.TextColor = Colors.Red;
                     d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
@@ -126,7 +125,7 @@ public partial class RegisterStoreInPage : ContentPage
 
                 string[] substrings = clipboardContent.Split(' ');
                 // (株)　刈谷支のQR社用
-                if (substrings[0].Trim().IndexOf(mSupplierKanban.IdentifyString) != -1)
+                if (substrings.First().Trim().IndexOf(mSupplierKanban.IdentifyString) != -1)
                 {
                     string supplierProductNumber = string.Empty;
                     int numberOfBoxes = 0;
@@ -211,7 +210,8 @@ public partial class RegisterStoreInPage : ContentPage
         }
         catch (Exception ex)
         {
-            throw;
+            await DisplayAlert("エラー", ex.Message, "閉じる");
+            return;
         }
     }
 

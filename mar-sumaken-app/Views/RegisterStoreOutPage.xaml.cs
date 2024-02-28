@@ -18,16 +18,17 @@ public partial class RegisterStoreOutPage : ContentPage
     private readonly LocalDbService _dbService;
     private HandySettingModel.HandySetting _handySetting;
     List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
-    public RegisterStoreOutPage(string receiver, string currentDate, string selectedTrip, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch)
+    public RegisterStoreOutPage(string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch, string deliverySlipNumber)
     {
         InitializeComponent();
-        selectedReceiverLable.Text = $"{receiver}";
+        selectedDeliveryNameLabel.Text = $"{deliveryName}";
         selectedDateLabel.Text = $"{currentDate}";
-        selectedTripLabel.Text = $"{selectedTrip}";
+        selectedDeliveryTimeClassLabel.Text = $"{selectedDeliveryTimeClass}";
         selectedDate = DateTime.Parse(currentDate);
-        selectedPlaceLabel.Text = $"{place}";
+        selectedDeliveryLocationLabel.Text = $"{deliveryLocation}";
         shippingListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
+        deliverySlipNumberLabel.Text = deliverySlipNumber;
         lstDShipmentSchedules = dShipmentScheduleListSearch;
         listMCompany = mCompanySqlLite;
 
@@ -44,7 +45,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules);
+        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDeliveryNameLabel.Text, selectedDate, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, deliverySlipNumberLabel.Text);
     }
 
     /// <summary>

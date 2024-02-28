@@ -36,7 +36,7 @@
                             <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
                                 <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
                                     <Label Text="納入名:" FontSize="14" TextColor="#fff"/>
-                                    <Label x:Name="selectedReceiverLable" FontSize="14" TextColor="#fff" Margin="0"/>
+                                    <Label x:Name="selectedDeliveryNameLabel" FontSize="14" TextColor="#fff" Margin="0"/>
                                 </FlexLayout>
                             </Frame>
 
@@ -45,16 +45,16 @@
                                     <Label Text="納入指示日:" FontSize="14" TextColor="#fff"/>
                                     <Label x:Name="selectedDateLabel" FontSize="14" TextColor="#fff" Margin="0, 0, 8, 0"/>
                                     <Label Text="納場:" FontSize="14" TextColor="#fff"/>
-                                    <Label x:Name="selectedPlaceLabel" FontSize="14" TextColor="#fff" />
+                                    <Label x:Name="selectedDeliveryLocationLabel" FontSize="14" TextColor="#fff" />
                                 </FlexLayout>
                             </Frame>
 
                             <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0">
                                 <FlexLayout Direction="Row" JustifyContent="Center" Padding="0" Margin="0">
                                     <Label Text ="便:" FontSize="14"  TextColor="#fff" Margin="0"/>
-                                    <Label x:Name="selectedTripLabel" FontSize="14"  TextColor="#fff" Margin="0, 0, 8, 0"/>
+                                    <Label x:Name="selectedDeliveryTimeClassLabel" FontSize="14"  TextColor="#fff" Margin="0, 0, 8, 0"/>
                                     <Label Text ="納番:" FontSize="14" TextColor="#fff" />
-                                    <Label Text ="Y1670" FontSize="14" TextColor="#fff" />
+                                    <Label x:Name="deliverySlipNumberLabel" FontSize="14" TextColor="#fff" />
                                 </FlexLayout>
                             </Frame>
                         </StackLayout>

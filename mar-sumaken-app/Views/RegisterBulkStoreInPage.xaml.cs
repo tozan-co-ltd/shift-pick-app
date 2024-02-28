@@ -35,7 +35,6 @@ public partial class RegisterBulkStoreInPage : ContentPage
     /// </summary>
     private ObservableCollection<D_ReceiveModel> _HistoryListDisplay = new ObservableCollection<D_ReceiveModel>();
 
-    private ObservableCollection<D_ReceiveModel> _listItemsNoteDetele = new ObservableCollection<D_ReceiveModel>();
     public List<D_HandyErrorMessageModel> listDHandyErrorMessage = new List<D_HandyErrorMessageModel>();
     public List<ScanReceiveModel> listScanReceive = new List<ScanReceiveModel>();
     public M_SupplierKanbanModel mSupplierKanban = new M_SupplierKanbanModel();
@@ -134,7 +133,9 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 listMSupplierKanbanForCheckQRCode = await _dbService.GetMSupplierKanbanByHandySupplierKanbanID(listRHandyMenuSupplierKanban.FirstOrDefault().SupplierKanbanID);
                 mSupplierKanban = listMSupplierKanbanForCheckQRCode.FirstOrDefault();
 
-                if (clipboardContent.Trim().IndexOf(mSupplierKanban.IdentifyString) != -1)
+                // スキャンデータチェック
+                string[] substrings = clipboardContent.Split(' ');
+                if (substrings.First().Trim().IndexOf(mSupplierKanban.IdentifyString) != -1 && substrings.First().Trim().Length == mSupplierKanban.IdentifyString.Length) 
                 {
                     // 文字列をトリム
                     var supplierProductNumberTrim = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).ToString().Trim();
@@ -144,7 +145,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     lotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex-1, mSupplierKanban.LotLength).Trim();
 
                     // 履歴一覧表示リスト内の同じ品番・キーを取得
-                    D_ReceiveModel duplicateProduct = _listItemsNoteDetele.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
+                    D_ReceiveModel duplicateProduct = _HistoryListDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
                     if (duplicateProduct != null)
                     {
                         // 既にスキャンしている場合はエラー
@@ -268,7 +269,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     // 箱数集計表示リスト内の同じ品番を取得
                     D_ReceiveModel existingProduct =  _TotalNumberOfBoxesDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber).FirstOrDefault();
                     // 履歴一覧表示リスト内の同じ品番・キーを取得
-                    D_ReceiveModel duplicateProduct = _listItemsNoteDetele.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
+                    D_ReceiveModel duplicateProduct = _HistoryListDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
 
                     var scanResultModel = new ScanReceiveModel();
                     var d_ScanResultModel = new D_ScanResultModel();
@@ -293,8 +294,6 @@ public partial class RegisterBulkStoreInPage : ContentPage
                         // 箱数集計表示リストに新しい行を追加
                         quantity = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0;
                         _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel { SupplierProductNumber = supplierProductNumber, LotNumber = lotNumber, Quantity = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
-                        _listItemsNoteDetele.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, LotNumber = lotNumber, Quantity = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
-
                         // 読取実績・入荷実績のデータを設定
                         scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
                         scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, quantity, mSupplierKanban.CompanyID);

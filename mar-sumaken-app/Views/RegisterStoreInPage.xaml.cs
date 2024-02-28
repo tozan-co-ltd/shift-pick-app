@@ -31,7 +31,6 @@ public partial class RegisterStoreInPage : ContentPage
     /// </summary>
     private ObservableCollection<D_ReceiveModel> _HistoryListDisplay = new ObservableCollection<D_ReceiveModel>();
 
-    private ObservableCollection<D_ReceiveModel> _historyList = new ObservableCollection<D_ReceiveModel>();
     private readonly LocalDbService _dbService = new LocalDbService();
     public D_StoreInModel.StoreInPostBody storeInPostBody = new D_StoreInModel.StoreInPostBody();
     public List<D_HandyErrorMessageModel> listDHandyErrorMessage = new List<D_HandyErrorMessageModel>();
@@ -150,7 +149,7 @@ public partial class RegisterStoreInPage : ContentPage
                     D_ReceiveModel existingProduct = _TotalNumberOfBoxesDisplay.FirstOrDefault(p => p.SupplierProductNumber == supplierProductNumber);
 
                     // 履歴一覧表示リスト内の同じ品番・キーを取得
-                    D_ReceiveModel duplicateProduct = _historyList.FirstOrDefault(p => p.SupplierProductNumber == supplierProductNumber && p.MainProductKey == mainProductKey);
+                    D_ReceiveModel duplicateProduct = _HistoryListDisplay.FirstOrDefault(p => p.SupplierProductNumber == supplierProductNumber && p.MainProductKey == mainProductKey);
 
                     var scanResultModel = new ScanReceiveModel();
                     var d_ScanResultModel = new D_ScanResultModel();
@@ -180,8 +179,6 @@ public partial class RegisterStoreInPage : ContentPage
                             scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, numberOfBoxes, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
                             scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, numberOfBoxes, loginUser.Last().UserName, quantity, mSupplierKanban.CompanyID);
                         }
-                        // 重複ハンドル前のすべてのアイテムを取得
-                        _historyList.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = numberOfBoxes, MainProductKey = mainProductKey, Quantity = quantity });
                     }
                     else
                     {

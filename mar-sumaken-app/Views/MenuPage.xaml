@@ -59,10 +59,12 @@
                             <Frame BackgroundColor="#FD5A00" CornerRadius="0" BorderColor="#FD5A00" Padding="0, 8" Margin="0">
                                 <StackLayout HorizontalOptions="Center">
                                     <FlexLayout Direction="Row" JustifyContent="Center" Padding="0" Margin="0">
-                                        <Label x:Name="userName" FontSize="18" TextColor="#fff"/>
+                                        <Label Text="ユーザー名: " FontSize="16" TextColor="#fff"/>
+                                        <Label x:Name="userName" FontSize="16" TextColor="#fff"/>
                                     </FlexLayout>
                                     <FlexLayout Direction="Row" JustifyContent="Center" Padding="0" Margin="0, 8, 0, 0">
-                                        <Label x:Name="depoName" FontSize="18" TextColor="#fff"/>
+                                        <Label Text="メイン倉庫名: " FontSize="16" TextColor="#fff"/>
+                                        <Label x:Name="depoName" FontSize="16" TextColor="#fff"/>
                                     </FlexLayout>
                                 </StackLayout>
                             </Frame>

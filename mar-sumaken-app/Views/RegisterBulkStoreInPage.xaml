@@ -79,7 +79,7 @@
                 </StackLayout>
 
                 <FlexLayout Direction="Row" JustifyContent="SpaceAround" AlignItems="Center" Margin="0,20,0,20" Padding="0,0,0,10">
-                    <Button x:Name="numberOfBoxListBtn" FontFamily="FontAwesome6Solid" Text="箱数集計表示" TextColor=" White"  HorizontalOptions="StartAndExpand" CornerRadius="10"  HeightRequest="50" FontSize="15" Margin="13, 5, 0, 0" Clicked="OnShippingListBtnClicked"/>
+                    <Button x:Name="numberOfBoxListBtn" FontFamily="FontAwesome6Solid" Text="箱数集計表示" TextColor=" White"  HorizontalOptions="StartAndExpand" CornerRadius="10"  HeightRequest="50" FontSize="15" Margin="13, 5, 0, 0" Clicked="OnTotalNumberOfBoxesBtnClicked"/>
                     <Button x:Name="historyListBtn" FontFamily="FontAwesome6Solid" Text="履歴一覧表示" TextColor=" White" HorizontalOptions="EndAndExpand" CornerRadius="10" HeightRequest="50" FontSize="15" Margin="0, 5, 13, 0" Clicked="OnHistoryListBtnBClicked"/>
                 </FlexLayout>
 
@@ -88,7 +88,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <CollectionView x:Name="collectionView" IsVisible="{Binding IsScanReceiveTotalView}" ItemsUpdatingScrollMode="KeepLastItemInView" >
+                    <CollectionView x:Name="boxesCollectionView" IsVisible="{Binding IsScanReceiveTotalView}" ItemsUpdatingScrollMode="KeepLastItemInView" >
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" ItemSpacing="1" />
                     </CollectionView.ItemsLayout>

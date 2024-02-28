@@ -204,7 +204,7 @@ namespace mar_sumaken_app.Services
         }
 
         /// <summary>
-        /// 古いハンディメニューの仕入先かんばんデータドを取得
+        /// ハンディメニューIDが一致する仕入先かんばんデータを取得
         /// </summary>
         public async Task<List<R_HandyMenuSupplierKanbanModel>> GetRHandyMenuSupplierKanbanByHandyMenuID(int handyMenuID)
         {

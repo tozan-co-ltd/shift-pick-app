@@ -15,41 +15,40 @@
                 <Frame CornerRadius="0" BorderColor="Transparent" Padding="10">
                     <StackLayout HorizontalOptions="Center">
                         <Label 
-                         Text="入庫"
-                         FontSize="20"
-                         />
+                             Text="入庫"
+                             FontSize="20" />
                     </StackLayout>
                 </Frame>
 
                 <Frame BackgroundColor="#FD5A00" CornerRadius="0" BorderColor="#FD5A00" HeightRequest="50" Padding="0">
                     <StackLayout HorizontalOptions="Center">
                         <Label 
-                     Text="{Binding CurrentDate, StringFormat='入庫処理日: {0:yyyy/MM/dd}'}"
-                     FontSize="16" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
+                             Text="{Binding CurrentDate, StringFormat='入庫処理日: {0:yyyy/MM/dd}'}"
+                             FontSize="16" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
                     </StackLayout>
                 </Frame>
-                <StackLayout Background="#fff"  Padding="20, 15, 20, 5">
+                <StackLayout Background="#fff" Padding="20, 15, 20, 5">
                     <Label 
                         Text="仕入先かんばんを読み取ってください"
                         FontSize="16" />
                     <Label x:Name="scanTextResult" Padding="10, 15, 10, 15" FontAttributes="Bold" BackgroundColor="#f2f2f2" FontSize="16" Margin="0, 10, 0, 0"/>
                 </StackLayout>
         
-                <StackLayout Orientation="Horizontal"  Background="#fff" Margin="0" Padding="0">
+                <StackLayout Orientation="Horizontal" Background="#fff" Margin="0" Padding="0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                     </Grid>
 
-                    <StackLayout Grid.Column="0"  Orientation="Horizontal"  HorizontalOptions="FillAndExpand" VerticalOptions="Start" Padding="20, 15, 20,15">
+                    <StackLayout Grid.Column="0" Orientation="Horizontal"  HorizontalOptions="FillAndExpand" VerticalOptions="Start" Padding="20, 15, 20,15">
                         <Label Text="スキャン数" VerticalOptions="End" FontSize="16"/>
                         <Label x:Name="CounterBtn" VerticalOptions="End" Margin="20,0,20,0"  FontSize="16" BackgroundColor="#f2f2f2" FontAttributes="Bold" TextColor="#FD5A00" WidthRequest="100" HorizontalTextAlignment="End" Padding="10, 0, 10, 0"/>
                     </StackLayout>
                 </StackLayout>
 
                 <FlexLayout Direction="Row" JustifyContent="SpaceAround" AlignItems="Center" Margin="0,20,0,20" Padding="0,0,0,10">
-                    <Button x:Name="numberOfBoxListBtn" FontFamily="FontAwesome6Solid" Text="箱数集計表示" TextColor=" White"  HorizontalOptions="StartAndExpand" CornerRadius="10"  HeightRequest="50" FontSize="15" Margin="10, 5, 0, 0" Clicked="OnShippingListBtnClicked"/>
+                    <Button x:Name="numberOfBoxListBtn" FontFamily="FontAwesome6Solid" Text="箱数集計表示" TextColor=" White"  HorizontalOptions="StartAndExpand" CornerRadius="10"  HeightRequest="50" FontSize="15" Margin="10, 5, 0, 0" Clicked="OnTotalNumberOfBoxesBtnClicked"/>
                     <Button x:Name="historyListBtn" FontFamily="FontAwesome6Solid" Text="履歴一覧表示" TextColor=" White" HorizontalOptions="EndAndExpand" CornerRadius="10" HeightRequest="50" FontSize="15" Margin="0, 5, 10, 0" Clicked="OnHistoryListBtnBClicked"/>
                 </FlexLayout>
 
@@ -58,7 +57,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <CollectionView x:Name="collectionView" IsVisible="{Binding IsScanReceiveTotalView}" ItemsUpdatingScrollMode="KeepLastItemInView" >
+                    <CollectionView x:Name="boxesCollectionView" IsVisible="{Binding IsScanReceiveTotalView}" ItemsUpdatingScrollMode="KeepLastItemInView" >
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout Orientation="Vertical" ItemSpacing="1" />
                         </CollectionView.ItemsLayout>

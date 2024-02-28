@@ -86,7 +86,7 @@ public partial class LoginPage : ContentPage
             // ネットワーク接続チェック
             if (!NetworkCheck.CheckNetworkConnection())
             {
-                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
+                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
                 hasOnLoginClick = false;
                 return;
             }

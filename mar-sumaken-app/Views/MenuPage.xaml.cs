@@ -136,7 +136,7 @@ public partial class MenuPage : FlyoutPage
             // ネットワーク接続チェック
             if (!NetworkCheck.CheckNetworkConnection())
             {
-                await DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
+                await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
                 Application.Current.MainPage = new MenuPage();
                 return;
             }
@@ -163,10 +163,10 @@ public partial class MenuPage : FlyoutPage
             }
             else
             {
+                await DisplayAlert("エラー", response.content, "OK");
                 Application.Current.MainPage = new MenuPage();
                 return;
             }
-
 
             // 入庫
             if (title == Const.C_REGISTER_STORE_IN_PAGE)
@@ -174,7 +174,7 @@ public partial class MenuPage : FlyoutPage
                 Application.Current.MainPage = new RegisterStoreInPage(handyMenuID);
             }
             else if (title == Const.C_REGISTER_BULK_STORE_IN_PAGE)
-                Application.Current.MainPage = new RegisterBulkStoreInPage();
+                Application.Current.MainPage = new RegisterBulkStoreInPage(handyMenuID);
 
             // 出庫
             else if (title == Const.C_SEARCH_SHIPPING_INSTRUCTION_IN_PAGE)
@@ -208,7 +208,7 @@ public partial class MenuPage : FlyoutPage
         // ネットワーク接続チェック
         if (!NetworkCheck.CheckNetworkConnection())
         {
-            await DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
+            await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
             Application.Current.MainPage = new MenuPage();
             return (mCompanySqlLite, false);
         }

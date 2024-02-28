@@ -104,7 +104,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
-                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
+                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
                 return;
             }
 

@@ -14,19 +14,19 @@ namespace mar_sumaken_app.Views;
 public partial class RegisterStoreInPage : ContentPage
 {
     int count = 0;
-    int boxCout = 1;
+    int quantity = 1;
     bool isItemTapped = false;
-    private ObservableCollection<D_ReceiveModel> _numberOfBoxList;
-    private ObservableCollection<D_ReceiveModel> _historyList;
-    private ObservableCollection<D_ReceiveModel> _itemsHistory;
-    private readonly LocalDbService _dbService;
     private string? _handyApiUrl;
-    private HandySettingModel.HandySetting _handySetting;
     private bool _IsScanPageActive = false;
     public int handyMenuID = 0;
-    public D_StoreInModel.StoreInPostBody storeInPostBody;
-    public List<D_HandyErrorMessageModel> listDHandyErrorMessage;
-    public List<ScanReceiveModel> listScanReceive;
+    private HandySettingModel.HandySetting _handySetting;
+    private ObservableCollection<D_ReceiveModel> _numberOfBoxList = new ObservableCollection<D_ReceiveModel>();
+    private ObservableCollection<D_ReceiveModel> _historyList = new ObservableCollection<D_ReceiveModel>();
+    private ObservableCollection<D_ReceiveModel> _itemsHistory = new ObservableCollection<D_ReceiveModel>();
+    private readonly LocalDbService _dbService = new LocalDbService();
+    public D_StoreInModel.StoreInPostBody storeInPostBody = new D_StoreInModel.StoreInPostBody();
+    public List<D_HandyErrorMessageModel> listDHandyErrorMessage = new List<D_HandyErrorMessageModel>();
+    public List<ScanReceiveModel> listScanReceive = new List<ScanReceiveModel>();
     public M_SupplierKanbanModel mSupplierKanban;
     public List<M_SupplierKanbanModel> listMSupplierKanban;
     public List<M_SupplierKanbanModel> listMSupplierKanbanForCheckQRCode;
@@ -35,16 +35,9 @@ public partial class RegisterStoreInPage : ContentPage
     public RegisterStoreInPage(int menuID)
 	{
 		InitializeComponent();
-        _dbService = new LocalDbService();
         CounterBtn.Text = $"{count}";
         handyMenuID = menuID;
         Clipboard.ClipboardContentChanged += OnClipboardContentChanged;
-        _numberOfBoxList = new ObservableCollection<D_ReceiveModel>();
-        _historyList = new ObservableCollection<D_ReceiveModel>();
-        _itemsHistory = new ObservableCollection<D_ReceiveModel>();
-        storeInPostBody = new D_StoreInModel.StoreInPostBody();
-        listDHandyErrorMessage = new List<D_HandyErrorMessageModel>();
-        listScanReceive = new List<ScanReceiveModel>();
         numberOfBoxListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
         scanTextResult.Text = string.Empty;
@@ -116,7 +109,6 @@ public partial class RegisterStoreInPage : ContentPage
                     listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
                     return;
                 }
-
                 //  仕入先かんばん情報を取得
                 listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
                 listRHandyMenuSupplierKanban = await _dbService.GetRHandyMenuSupplierKanbanByHandyMenuID(handyMenuID);
@@ -133,12 +125,10 @@ public partial class RegisterStoreInPage : ContentPage
                     supplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();　//品番桁数
                     numberOfBoxes = int.Parse(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim()); // 収容数
                     mainProductKey = clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();　//キー
-
                     // 既存の製品に同じ製品番号があるかチェックする
                     D_ReceiveModel existingProduct = _numberOfBoxList.FirstOrDefault(p => p.SupplierProductNumber == supplierProductNumber);
                     // 既存の製品に同じ製品番号とキーがあるかチェックする 
                     D_ReceiveModel duplicateProduct = _historyList.FirstOrDefault(p => p.SupplierProductNumber == supplierProductNumber && p.MainProductKey == mainProductKey);
-
                     var scanResultModel = new ScanReceiveModel();
                     var d_ScanResultModel = new D_ScanResultModel();
                     var d_ReceiveModel = new D_ReceiveModel();
@@ -160,14 +150,13 @@ public partial class RegisterStoreInPage : ContentPage
                         }
                         else
                         {
-                            _numberOfBoxList.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = numberOfBoxes, MainProductKey = mainProductKey, Quantity = boxCout });
+                            _numberOfBoxList.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = numberOfBoxes, MainProductKey = mainProductKey, Quantity = quantity });
                             // 読取実績のデータを設定
                             scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, numberOfBoxes, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                            scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, numberOfBoxes, loginUser.Last().UserName, boxCout, mSupplierKanban.CompanyID);
+                            scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, numberOfBoxes, loginUser.Last().UserName, quantity, mSupplierKanban.CompanyID);
                         }
-
                         // 重複ハンドル前のすべてのアイテムを取得する
-                        _historyList.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = numberOfBoxes, MainProductKey = mainProductKey, Quantity = boxCout });
+                        _historyList.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = numberOfBoxes, MainProductKey = mainProductKey, Quantity = quantity });
                     }
                     else
                     {
@@ -179,10 +168,7 @@ public partial class RegisterStoreInPage : ContentPage
                         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
                         return;
                     }
-
                     //  仕入先かんばんデータを設定
-                    storeInPostBody.CompanyCode = settings.Last().CompanyCode;
-                    storeInPostBody.CompanyPassword = settings.Last().CompanyPassword;
                     listScanReceive.Add(scanResultModel);
 
                     // OKサウンド
@@ -246,15 +232,15 @@ public partial class RegisterStoreInPage : ContentPage
     /// <param name="d_ReceiveModel">ハンディエラーメッセージ</param>
     /// <param name="supplierProductNumber">仕入先品番</param>
     /// <param name="numberOfBoxes">入力箱数</param>
-    /// <param name="boxCout">箱数</param>
+    /// <param name="quantity">箱数</param>
     /// <returns></returns>
-    public D_ReceiveModel SetDReceiveModel(D_ReceiveModel d_ReceiveModel, string supplierProductNumber, int numberOfBoxes, string userName, int boxCout , int companyID)
+    public D_ReceiveModel SetDReceiveModel(D_ReceiveModel d_ReceiveModel, string supplierProductNumber, int numberOfBoxes, string userName, int quantity , int companyID)
     {
         d_ReceiveModel.CompanyID = companyID;
         d_ReceiveModel.ReceiveDatetime = DateTime.Now;
         d_ReceiveModel.SupplierProductNumber = supplierProductNumber;
         d_ReceiveModel.NumberOfBoxes = numberOfBoxes;
-        d_ReceiveModel.Quantity = boxCout;
+        d_ReceiveModel.Quantity = quantity;
         d_ReceiveModel.ScanedAt = DateTime.Now;
         d_ReceiveModel.CreatedAt = DateTime.Now;
         d_ReceiveModel.CreatedBy = userName;
@@ -293,13 +279,16 @@ public partial class RegisterStoreInPage : ContentPage
         {
             if (_numberOfBoxList.Count() > 0)
             {
+                var settings = await _dbService.GetSetting();
+                storeInPostBody.CompanyCode = settings.Last().CompanyCode;
+                storeInPostBody.CompanyPassword = settings.Last().CompanyPassword;
                 storeInPostBody.ScanReceive = listScanReceive;
                 storeInPostBody.HandyErrorMessage = listDHandyErrorMessage;
                 var jsonDataSend = JsonConvert.SerializeObject(storeInPostBody);
                 // ネットワーク接続チェック
                 if (!NetworkCheck.CheckNetworkConnection())
                 {
-                    await DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
+                    await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
                     return;
                 }
 
@@ -311,7 +300,6 @@ public partial class RegisterStoreInPage : ContentPage
                     await DisplayAlert("エラー", response.content, "OK");
                     return;
                 }
-
                 // サウンドのパスを取得する
                 string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
 

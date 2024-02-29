@@ -24,6 +24,11 @@ public partial class RegisterStoreOutPage : ContentPage
     private readonly LocalDbService _dbService;
     private LoginModel.LoginUserSqlLite _loginUserSqlLite;
     private HandySettingModel.HandySetting _handySetting;
+    public List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    public List<M_ProductModel> listProducts = new List<M_ProductModel>();
+
+
+    public RegisterStoreOutPage(string receiver, string currentDate, string selectedTrip, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch, List<M_ProductModel> listProductItems)
     string firstScanContent = string.Empty;
     bool isFirstScan = true;
     string secondScanContent = string.Empty;
@@ -41,6 +46,7 @@ public partial class RegisterStoreOutPage : ContentPage
         historyListBtn.BackgroundColor = Colors.Gray;
         lstDShipmentSchedules = dShipmentScheduleListSearch;
         listMCompany = mCompanySqlLite;
+        listProducts = listProductItems;
 
         _dbService = new LocalDbService();
         // 進捗を数える
@@ -208,7 +214,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules);
+        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules, listProducts);
     }
 
     /// <summary>

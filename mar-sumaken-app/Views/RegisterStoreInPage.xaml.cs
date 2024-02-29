@@ -45,6 +45,7 @@ public partial class RegisterStoreInPage : ContentPage
     /// 入庫画面表示
     /// </summary>
     /// <param name="menuID"></param>
+    /// <param name="listProductItems"></param>
     public RegisterStoreInPage(int menuID, List<M_ProductModel> listProductItems)
 	{
 		InitializeComponent();
@@ -140,7 +141,7 @@ public partial class RegisterStoreInPage : ContentPage
                     string supplierProductNumber = string.Empty;
                     int numberOfBoxes = 0;
                     string mainProductKey = string.Empty;
-                    // 品番桁数
+                    // 品番
                     supplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
                     // 仕入先品番が存在をチェック
                     bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
@@ -148,7 +149,7 @@ public partial class RegisterStoreInPage : ContentPage
                     {
                         // 識別文字列が正しくない場合はエラー
                         SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = "E2015: 仕入先品番が存在しません。";
+                        scanTextResult.Text = "E2002: 品番マスターにデータがありません。";
                         scanTextResult.TextColor = Colors.Red;
                         d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);

@@ -17,9 +17,11 @@ public partial class RegisterStoreOutPage : ContentPage
     public string currentDate = string.Empty; 
     private readonly LocalDbService _dbService;
     private HandySettingModel.HandySetting _handySetting;
-    List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    public List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    public List<M_ProductModel> listProducts = new List<M_ProductModel>();
 
-    public RegisterStoreOutPage(string receiver, string currentDate, string selectedTrip, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch)
+
+    public RegisterStoreOutPage(string receiver, string currentDate, string selectedTrip, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch, List<M_ProductModel> listProductItems)
     {
         InitializeComponent();
         selectedReceiverLable.Text = $"{receiver}";
@@ -31,6 +33,7 @@ public partial class RegisterStoreOutPage : ContentPage
         historyListBtn.BackgroundColor = Colors.Gray;
         lstDShipmentSchedules = dShipmentScheduleListSearch;
         listMCompany = mCompanySqlLite;
+        listProducts = listProductItems;
 
         _dbService = new LocalDbService();
         // 進捗を数える
@@ -45,7 +48,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules);
+        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules, listProducts);
     }
 
     /// <summary>

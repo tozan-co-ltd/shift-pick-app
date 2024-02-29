@@ -18,13 +18,15 @@ public partial class SearchShippingInstructionListPage : ContentPage
     private readonly LocalDbService _dbService;
     bool hasOnSearchClick = false; // 検索クリック
     List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     int selectedCompanyID;
 
-    public SearchShippingInstructionListPage(List<M_CompanyModel> mCompanySqlLite)
+    public SearchShippingInstructionListPage(List<M_CompanyModel> mCompanySqlLite, List<M_ProductModel> listProductItems)
 	{
 		InitializeComponent();
         _dbService = new LocalDbService();
         listMCompany = mCompanySqlLite;
+        listProducts = listProductItems;
         // 出荷指示リスト検索設定
         SetSearchShippingInstruction();
     }
@@ -139,7 +141,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                Application.Current.MainPage = new DisplayShippingInstructionListPage((string)receiver.SelectedItem,selectedDate, selectedTripOption, (string)place.SelectedItem, listMCompany, shipmentScheduleList);
+                Application.Current.MainPage = new DisplayShippingInstructionListPage((string)receiver.SelectedItem,selectedDate, selectedTripOption, (string)place.SelectedItem, listMCompany, shipmentScheduleList, listProducts);
             }
             else
                 await DisplayAlert("エラー", response.content, "OK");

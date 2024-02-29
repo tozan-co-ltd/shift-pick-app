@@ -18,8 +18,9 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     public string selectedPlace = string.Empty;
     public string selectedReceiver = string.Empty;
     List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    public List<M_ProductModel> listProducts = new List<M_ProductModel>();
 
-    public DisplayShippingInstructionListPage(string receiver, DateTime selectedDate, string selectedOption, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList)
+    public DisplayShippingInstructionListPage(string receiver, DateTime selectedDate, string selectedOption, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems)
 	{
 		InitializeComponent();
         selectedReceiverLable.Text = $"{receiver}";
@@ -28,6 +29,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         currentDate = $"{selectedDate.ToShortDateString()}";
         selectedPlaceLabel.Text = $"{place}";
         listMCompany = mCompanySqlLite;
+        listProducts = listProductItems;
         lstDShipmentSchedules = new List<D_ShipmentSchedule>();
 
         // 箱数降順
@@ -129,7 +131,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new SearchShippingInstructionListPage(listMCompany);
+        Application.Current.MainPage = new SearchShippingInstructionListPage(listMCompany, listProducts);
     }
 
     /// <summary>
@@ -141,7 +143,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         {
             Application.Current.MainPage = new LoadingPage();
             await Task.Delay(200);
-            Application.Current.MainPage = new RegisterStoreOutPage((string)selectedReceiverLable.Text, selectedDateLabel.Text, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules);
+            Application.Current.MainPage = new RegisterStoreOutPage((string)selectedReceiverLable.Text, selectedDateLabel.Text, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules, listProducts);
         }
         catch (Exception ex)
         {

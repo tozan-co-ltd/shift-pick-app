@@ -33,6 +33,7 @@ public partial class RegisterStoreInPage : ContentPage
 
     private readonly LocalDbService _dbService = new LocalDbService();
     public D_StoreInModel.StoreInPostBody storeInPostBody = new D_StoreInModel.StoreInPostBody();
+    public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     public List<D_HandyErrorMessageModel> listDHandyErrorMessage = new List<D_HandyErrorMessageModel>();
     public List<ScanReceiveModel> listScanReceive = new List<ScanReceiveModel>();
     public M_SupplierKanbanModel mSupplierKanban;
@@ -44,11 +45,12 @@ public partial class RegisterStoreInPage : ContentPage
     /// 入庫画面表示
     /// </summary>
     /// <param name="menuID"></param>
-    public RegisterStoreInPage(int menuID)
+    public RegisterStoreInPage(int menuID, List<M_ProductModel> listProductItems)
 	{
 		InitializeComponent();
         CounterBtn.Text = $"{count}";
         handyMenuID = menuID;
+        listProducts = listProductItems;
         Clipboard.ClipboardContentChanged += OnClipboardContentChanged;
         numberOfBoxListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
@@ -140,6 +142,19 @@ public partial class RegisterStoreInPage : ContentPage
                     string mainProductKey = string.Empty;
                     // 品番桁数
                     supplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
+                    // 仕入先品番が存在をチェック
+                    bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
+                    if (!existsSupplierProductNumber)
+                    {
+                        // 識別文字列が正しくない場合はエラー
+                        SoundPlayer.PlaySound(resultErrorSound);
+                        scanTextResult.Text = "E2015: 仕入先品番が存在しません。";
+                        scanTextResult.TextColor = Colors.Red;
+                        d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
+                        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                        return;
+                    }
+
                     // 収容数
                     numberOfBoxes = int.Parse(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
                     // キー
@@ -329,10 +344,9 @@ public partial class RegisterStoreInPage : ContentPage
                 string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
                 SoundPlayer.PlaySound(resultOkSound);
                 await Application.Current.MainPage.DisplayAlert("完了", "データ登録が完了しました", "OK");
-
                 Application.Current.MainPage = new LoadingPage();
-                await Task.Delay(300);
-                Application.Current.MainPage = new RegisterStoreInPage(handyMenuID);
+                await Task.Delay(200);
+                Application.Current.MainPage = new RegisterStoreInPage(handyMenuID, listProducts);
             }
             else
             {

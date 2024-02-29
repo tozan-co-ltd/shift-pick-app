@@ -37,6 +37,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
 
     public List<D_HandyErrorMessageModel> listDHandyErrorMessage = new List<D_HandyErrorMessageModel>();
     public List<ScanReceiveModel> listScanReceive = new List<ScanReceiveModel>();
+    public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     public M_SupplierKanbanModel mSupplierKanban = new M_SupplierKanbanModel();
     public List<M_SupplierKanbanModel> listMSupplierKanban = new List<M_SupplierKanbanModel>();
     public List<M_SupplierKanbanModel> listMSupplierKanbanForCheckQRCode = new List<M_SupplierKanbanModel>();
@@ -47,11 +48,12 @@ public partial class RegisterBulkStoreInPage : ContentPage
     /// まとめ入庫画面表示
     /// </summary>
     /// <param name="menuID"></param>
-    public RegisterBulkStoreInPage(int menuID)
+    public RegisterBulkStoreInPage(int menuID, List<M_ProductModel> listProductItems)
     {
         InitializeComponent();
         Clipboard.ClipboardContentChanged += OnClipboardContentChanged;
         handyMenuID = menuID;
+        listProducts = listProductItems;
         CounterBtn.Text = $"{count}";
         numberOfBoxListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
@@ -142,6 +144,19 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     if(supplierProductNumberTrim.IndexOf("-") != -1) // -の後ろの文字を削除する
                         supplierProductNumberTrim = supplierProductNumberTrim.Substring(0, supplierProductNumberTrim.IndexOf('-'));
                     supplierProductNumber = supplierProductNumberTrim;
+                    // 仕入先品番が存在をチェック
+                    bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
+                    if(!existsSupplierProductNumber)
+                    {
+                        // 識別文字列が正しくない場合はエラー
+                        SoundPlayer.PlaySound(resultErrorSound);
+                        scanTextResult.Text = "E2015: 仕入先品番が存在しません。";
+                        scanTextResult.TextColor = Colors.Red;
+                        d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
+                        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                        return;
+                    }
+
                     lotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex-1, mSupplierKanban.LotLength).Trim();
 
                     // 履歴一覧表示リスト内の同じ品番・キーを取得
@@ -433,10 +448,9 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
                 SoundPlayer.PlaySound(resultOkSound);
                 await Application.Current.MainPage.DisplayAlert("完了", "データ登録が完了しました。", "OK");
-
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                Application.Current.MainPage = new RegisterBulkStoreInPage(handyMenuID);
+                Application.Current.MainPage = new RegisterBulkStoreInPage(handyMenuID, listProducts);
             }
             else
             {

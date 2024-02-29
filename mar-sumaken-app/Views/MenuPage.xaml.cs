@@ -128,6 +128,7 @@ public partial class MenuPage : FlyoutPage
         try
         {
             var latestMastersPostBody = new LatestMastersModel.LatestMastersPostBody();
+            var listProducts = new List<M_ProductModel>();
             latestMastersPostBody.CompanyCode = _handySetting.CompanyCode;
             latestMastersPostBody.CompanyPassword = _handySetting.CompanyPassword;
             latestMastersPostBody.UserID = _loginUserSqlLite.UserID;
@@ -149,6 +150,7 @@ public partial class MenuPage : FlyoutPage
                 var contentFromApi = JsonConvert.DeserializeObject<LatestMastersModel.LatestMastersPostBackContent>(response.content);
                 var listlatestMastersSqlLite =  new List<M_SupplierKanbanModel>();
                 listlatestMastersSqlLite = contentFromApi.M_SupplierKanbanList;
+                listProducts = contentFromApi.M_ProductList;
                 // ローカルDBの古いメニューを削除
                 await _dbService.ALLDeleteMSupplierKanbanAsync();
                 foreach (var latestMastersSqlLite in listlatestMastersSqlLite)
@@ -171,10 +173,10 @@ public partial class MenuPage : FlyoutPage
             // 入庫
             if (title == Const.C_REGISTER_STORE_IN_PAGE)
             {
-                Application.Current.MainPage = new RegisterStoreInPage(handyMenuID);
+                Application.Current.MainPage = new RegisterStoreInPage(handyMenuID, listProducts);
             }
             else if (title == Const.C_REGISTER_BULK_STORE_IN_PAGE)
-                Application.Current.MainPage = new RegisterBulkStoreInPage(handyMenuID);
+                Application.Current.MainPage = new RegisterBulkStoreInPage(handyMenuID, listProducts);
 
             // 出庫
             else if (title == Const.C_SEARCH_SHIPPING_INSTRUCTION_IN_PAGE)
@@ -182,7 +184,7 @@ public partial class MenuPage : FlyoutPage
                 // API接続
                 var listCompanyResult = await GetListCompanyFromApi();
                 if (listCompanyResult.success) 
-                    Application.Current.MainPage = new SearchShippingInstructionListPage(listCompanyResult.mCompanySqlLite);
+                    Application.Current.MainPage = new SearchShippingInstructionListPage(listCompanyResult.mCompanySqlLite, listProducts);
             }
         }
         catch (Exception)

@@ -40,6 +40,8 @@ public partial class RegisterStoreOutPage : ContentPage
         shippingListBtn.BackgroundColor = Colors.Teal;
         historyListBtn.BackgroundColor = Colors.Gray;
         lstDShipmentSchedules = dShipmentScheduleListSearch;
+        listMCompany = mCompanySqlLite;
+
         _dbService = new LocalDbService();
         // 進捗を数える
         int sumProgressBar = dShipmentScheduleListSearch.Sum(obj => obj.NumberOfBoxesRemaining);
@@ -206,7 +208,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, lstDShipmentSchedules);
+        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules);
     }
 
     /// <summary>

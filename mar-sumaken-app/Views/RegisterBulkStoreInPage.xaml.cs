@@ -125,7 +125,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     {
                         // エラーサウンド
                         SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = "E1000:QRコードが正しくありません。";
+                        scanTextResult.Text = "E1000: QRコードが正しくありません。";
                         scanTextResult.TextColor = Colors.Red;
                     }
                 }

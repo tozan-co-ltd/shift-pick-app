@@ -17,11 +17,14 @@ public partial class SearchShippingInstructionListPage : ContentPage
     string selectedTripOption = "1"; // デフォルトでは、便は 1 です
     private readonly LocalDbService _dbService;
     bool hasOnSearchClick = false; // 検索クリック
+    List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    int selectedCompanyID;
 
-    public SearchShippingInstructionListPage()
+    public SearchShippingInstructionListPage(List<M_CompanyModel> mCompanySqlLite)
 	{
 		InitializeComponent();
         _dbService = new LocalDbService();
+        listMCompany = mCompanySqlLite;
         // 出荷指示リスト検索設定
         SetSearchShippingInstruction();
     }
@@ -31,8 +34,8 @@ public partial class SearchShippingInstructionListPage : ContentPage
     /// </summary>
     private void SetSearchShippingInstruction()
     {
-        receiver.ItemsSource = receiverList;
-        receiver.SelectedItem = "会社名1";
+        receiver.ItemsSource = listMCompany.Select(c => c.CompanyName).ToList();
+        receiver.SelectedItem = listMCompany.Select(c => c.CompanyName).ToList().FirstOrDefault();
 
         place.ItemsSource = placeList;
         place.SelectedItem = "E5";
@@ -65,6 +68,12 @@ public partial class SearchShippingInstructionListPage : ContentPage
     /// </summary>
     private void OnReceiverChanged(object sender, EventArgs e)
     {
+        // 会社IDを取得
+        int selectedIndex = receiver.SelectedIndex;
+        if (selectedIndex != -1)
+        {
+            selectedCompanyID = listMCompany[selectedIndex].CompanyID;
+        }
         receiver.SelectedItem = (string)receiver.SelectedItem;
     }
 
@@ -95,7 +104,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
-                await Application.Current.MainPage.DisplayAlert("エラー", "E3003 ネットワークが利用できません。", "OK");
+                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
                 return;
             }
 
@@ -109,7 +118,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
             var shipmentScheduleRequestBody = new
             {
-                CompanyID = 4,
+                CompanyID = selectedCompanyID,
                 CompanyCode = loginUserSqlLite.CompanyCode,
                 CompanyPassword = loginUserSqlLite.CompanyPassword,
                 DepoID = loginUserSqlLite.DepoID,
@@ -130,7 +139,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                Application.Current.MainPage = new DisplayShippingInstructionListPage((string)receiver.SelectedItem,selectedDate, selectedTripOption, (string)place.SelectedItem, shipmentScheduleList);
+                Application.Current.MainPage = new DisplayShippingInstructionListPage((string)receiver.SelectedItem,selectedDate, selectedTripOption, (string)place.SelectedItem, listMCompany, shipmentScheduleList);
             }
             else
                 await DisplayAlert("エラー", response.content, "OK");

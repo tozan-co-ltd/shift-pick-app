@@ -150,7 +150,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     {
                         // 識別文字列が正しくない場合はエラー
                         SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = "E2015: 仕入先品番が存在しません。";
+                        scanTextResult.Text = "E2002: 品番マスターにデータがありません。";
                         scanTextResult.TextColor = Colors.Red;
                         d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);

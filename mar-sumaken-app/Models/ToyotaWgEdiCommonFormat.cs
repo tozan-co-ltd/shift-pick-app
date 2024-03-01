@@ -22,7 +22,7 @@ namespace mar_sumaken_app.Models
             public const string ProductAbbreviationIndex = "20P";
             public const string ProductCodeIndex = "P";
             public const string QuantityIndex = "Q";
-            public const string ProductLabelBranchNumberIndex = "17K";
+            public const string KanbanSerialNumberIndex = "17K";
             public const string FreeAreaIndex = "Z";
         }
 

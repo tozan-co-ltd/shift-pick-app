@@ -64,5 +64,18 @@ namespace mar_sumaken_app.Models
         /// </summary>
         
         public int Quantity { get; set; }
+
+        /// <summary>
+        /// 読取日時
+        /// </summary>
+        public DateTime ScanedAt { get; set; }
+        /// <summary>
+        /// 作成日時
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
+        /// <summary>
+        /// 作成者
+        /// </summary>
+        public string CreatedBy { get; set; }
     }
 }

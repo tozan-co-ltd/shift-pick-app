@@ -10,17 +10,19 @@ namespace mar_sumaken_app.Views;
 
 public partial class DisplayShippingInstructionListPage : ContentPage
 {
-    private List<D_ShipmentSchedule> lstDShipmentSchedules;
     private int _itemsPerPage = 10;
+    public int handyMenuID = 0;
     public int currentPage = 1;
     public string currentDate = string.Empty;
     public string slectedTrip = string.Empty;
     public string selectedPlace = string.Empty;
     public string selectedReceiver = string.Empty;
-    List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    public List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
+    private List<D_ShipmentSchedule> lstDShipmentSchedules = new List<D_ShipmentSchedule>();
 
-    public DisplayShippingInstructionListPage(string receiver, DateTime selectedDate, string selectedOption, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems)
+
+    public DisplayShippingInstructionListPage(int menuID, string receiver, DateTime selectedDate, string selectedOption, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems)
 	{
 		InitializeComponent();
         selectedReceiverLable.Text = $"{receiver}";
@@ -30,8 +32,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         selectedPlaceLabel.Text = $"{place}";
         listMCompany = mCompanySqlLite;
         listProducts = listProductItems;
-        lstDShipmentSchedules = new List<D_ShipmentSchedule>();
-
+        handyMenuID = menuID;
         // 箱数降順
         lstDShipmentSchedules = new List<D_ShipmentSchedule>(shipmentScheduleList.OrderByDescending(p => p.NumberOfBoxes));
         // No昇順
@@ -131,7 +132,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new SearchShippingInstructionListPage(listMCompany, listProducts);
+        Application.Current.MainPage = new SearchShippingInstructionListPage(handyMenuID, listMCompany, listProducts);
     }
 
     /// <summary>
@@ -143,7 +144,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         {
             Application.Current.MainPage = new LoadingPage();
             await Task.Delay(200);
-            Application.Current.MainPage = new RegisterStoreOutPage((string)selectedReceiverLable.Text, selectedDateLabel.Text, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules, listProducts);
+            Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, (string)selectedReceiverLable.Text, selectedDateLabel.Text, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules, listProducts);
         }
         catch (Exception ex)
         {

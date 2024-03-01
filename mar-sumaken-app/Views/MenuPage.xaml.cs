@@ -184,7 +184,7 @@ public partial class MenuPage : FlyoutPage
                 // API接続
                 var listCompanyResult = await GetListCompanyFromApi();
                 if (listCompanyResult.success) 
-                    Application.Current.MainPage = new SearchShippingInstructionListPage(listCompanyResult.mCompanySqlLite, listProducts);
+                    Application.Current.MainPage = new SearchShippingInstructionListPage(handyMenuID, listCompanyResult.mCompanySqlLite, listProducts);
             }
         }
         catch (Exception)

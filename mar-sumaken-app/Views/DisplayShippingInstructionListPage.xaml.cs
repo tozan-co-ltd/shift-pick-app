@@ -17,7 +17,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
 
-    public DisplayShippingInstructionListPage(string deliveryName, DateTime selectedDate, string selectedOption, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, string deliverySlipNumber)
+    public DisplayShippingInstructionListPage(string deliveryName, DateTime selectedDate, string selectedOption, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems, string deliverySlipNumber)
 	{
 		InitializeComponent();
         selectedDeliveryNameLabel.Text = $"{deliveryName}";
@@ -149,7 +149,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         {
             Application.Current.MainPage = new LoadingPage();
             await Task.Delay(200);
-            Application.Current.MainPage = new RegisterStoreOutPage((string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, deliverySlipNumberLabel.Text);
+            Application.Current.MainPage = new RegisterStoreOutPage((string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, listProducts, deliverySlipNumberLabel.Text);
         }
         catch (Exception ex)
         {

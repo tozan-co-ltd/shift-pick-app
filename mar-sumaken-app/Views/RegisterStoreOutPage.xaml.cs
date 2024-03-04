@@ -18,7 +18,9 @@ public partial class RegisterStoreOutPage : ContentPage
     private readonly LocalDbService _dbService;
     private HandySettingModel.HandySetting _handySetting;
     List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
-    public RegisterStoreOutPage(string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch, string deliverySlipNumber)
+    public List<M_ProductModel> listProducts = new List<M_ProductModel>();
+
+    public RegisterStoreOutPage(string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch, List<M_ProductModel> listProductItems, string deliverySlipNumber)
     {
         InitializeComponent();
         selectedDeliveryNameLabel.Text = $"{deliveryName}";
@@ -46,7 +48,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDeliveryNameLabel.Text, selectedDate, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, deliverySlipNumberLabel.Text);
+        Application.Current.MainPage = new DisplayShippingInstructionListPage(selectedDeliveryNameLabel.Text, selectedDate, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, listProducts, deliverySlipNumberLabel.Text);
     }
 
     /// <summary>

@@ -148,7 +148,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                Application.Current.MainPage = new DisplayShippingInstructionListPage((string)deliveryName.SelectedItem,selectedDate, chosedDeliveryTimeClass, (string)deliveryLocation.SelectedItem, listMCompany, shipmentScheduleList, deliverySlipNumber);
+                Application.Current.MainPage = new DisplayShippingInstructionListPage((string)deliveryName.SelectedItem,selectedDate, chosedDeliveryTimeClass, (string)deliveryLocation.SelectedItem, listMCompany, shipmentScheduleList, listProducts, deliverySlipNumber);
             }
             else
                 await DisplayAlert("ÉGÉâÅ[", response.content, "OK");

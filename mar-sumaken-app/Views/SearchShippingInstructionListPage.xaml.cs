@@ -12,14 +12,14 @@ namespace mar_sumaken_app.Views;
 public partial class SearchShippingInstructionListPage : ContentPage
 {
     bool isItemTapped = false;
-    List<string> receiverList = new List<string> { "会社名1", "会社名2" };
     ObservableCollection<string> placeList = new ObservableCollection<string> { "E5", "T5" };
-    string selectedTripOption = "1"; // デフォルトでは、便は 1 です
+    string chosedDeliveryTimeClass = "1"; // デフォルトでは、便は 1 です
     private readonly LocalDbService _dbService;
     bool hasOnSearchClick = false; // 検索クリック
     List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     int selectedCompanyID;
+    private string? _handyApiUrl;
 
     public SearchShippingInstructionListPage(List<M_CompanyModel> mCompanySqlLite, List<M_ProductModel> listProductItems)
 	{
@@ -34,13 +34,18 @@ public partial class SearchShippingInstructionListPage : ContentPage
     /// <summary>
     /// 出荷指示リスト検索設定
     /// </summary>
-    private void SetSearchShippingInstruction()
+    private async void SetSearchShippingInstruction()
     {
-        receiver.ItemsSource = listMCompany.Select(c => c.CompanyName).ToList();
-        receiver.SelectedItem = listMCompany.Select(c => c.CompanyName).ToList().FirstOrDefault();
+        // ローカルDBのハンディ設定情報取得
+        var settings = await _dbService.GetSetting();
+        if (settings.Count() > 0 && settings.Last() != null)
+            _handyApiUrl = settings.Last().HandyApiUrl;
 
-        place.ItemsSource = placeList;
-        place.SelectedItem = "E5";
+        deliveryName.ItemsSource = listMCompany.Select(c => c.CompanyName).ToList();
+        deliveryName.SelectedItem = listMCompany.Select(c => c.CompanyName).ToList().FirstOrDefault();
+
+        deliveryLocation.ItemsSource = placeList;
+        deliveryLocation.SelectedItem = "E5";
         datePicker.Date = CustomDatePicker.SetDisplayDatePicker();
     }
 
@@ -60,38 +65,38 @@ public partial class SearchShippingInstructionListPage : ContentPage
     /// <summary>
     /// 納入場所を変更するのを処理
     /// </summary>
-    private void OnPlaceChanged(object sender, EventArgs e)
+    private void OnDeliveryLocationChanged(object sender, EventArgs e)
     {
-        place.SelectedItem = (string)place.SelectedItem;
+        deliveryLocation.SelectedItem = (string)deliveryLocation.SelectedItem;
     }
 
     /// <summary>
     /// 納入会社名を変更するのを処理
     /// </summary>
-    private void OnReceiverChanged(object sender, EventArgs e)
+    private void OnDeliveryNameChanged(object sender, EventArgs e)
     {
         // 会社IDを取得
-        int selectedIndex = receiver.SelectedIndex;
+        int selectedIndex = deliveryName.SelectedIndex;
         if (selectedIndex != -1)
         {
             selectedCompanyID = listMCompany[selectedIndex].CompanyID;
         }
-        receiver.SelectedItem = (string)receiver.SelectedItem;
+        deliveryName.SelectedItem = (string)deliveryName.SelectedItem;
     }
 
     /// <summary>
     /// 便を変更するのを処理
     /// </summary>
-    private void OnTripButtonClicked(object sender, EventArgs e)
+    private void OnDeliveryTimeClassClicked(object sender, EventArgs e)
     {
-        trip1.BackgroundColor = Colors.Gray;
-        trip2.BackgroundColor = Colors.Gray;
-        trip3.BackgroundColor = Colors.Gray;
-        trip4.BackgroundColor = Colors.Gray;
+        deliveryTimeClass1.BackgroundColor = Colors.Gray;
+        deliveryTimeClass2.BackgroundColor = Colors.Gray;
+        deliveryTimeClass3.BackgroundColor = Colors.Gray;
+        deliveryTimeClass4.BackgroundColor = Colors.Gray;
 
-        Button selectedTrip = (Button)sender;
-        selectedTrip.BackgroundColor = Color.FromHex("#008577");
-        selectedTripOption = selectedTrip.Text;
+        Button selectedDeliveryTimeClass = (Button)sender;
+        selectedDeliveryTimeClass.BackgroundColor = Color.FromHex("#008577");
+        chosedDeliveryTimeClass = selectedDeliveryTimeClass.Text;
     }
 
     /// <summary>
@@ -125,23 +130,25 @@ public partial class SearchShippingInstructionListPage : ContentPage
                 CompanyPassword = loginUserSqlLite.CompanyPassword,
                 DepoID = loginUserSqlLite.DepoID,
                 DeliveryDate = selectedDate,
-                DeliveryTimeClass = selectedTripOption,
-                DeliveryLocation = (string)place.SelectedItem,selectedTripOption
+                DeliveryTimeClass = chosedDeliveryTimeClass,
+                DeliveryLocation = (string)deliveryLocation.SelectedItem,chosedDeliveryTimeClass
             };
 
             var jsonDataSend = JsonConvert.SerializeObject(shipmentScheduleRequestBody);
 
             // APIにリクエストを送る
-            var response = await App.API.PostMethod(jsonDataSend, "https://wbtzn/sumaken-api-MRq2xg5_test/api/", "ShipmentSchedule/Find");
+            var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "ShipmentSchedule/Find");
             if (response.success)
             {
                 // APIからコンテンツを取得
                 var contentFromApi = JsonConvert.DeserializeObject<ShipmentScheduleModel.ShipmentScheduelResponseBody>(response.content);
                 var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList;
+                // 納入書番号
+                var deliverySlipNumber = shipmentScheduleList.FirstOrDefault().DeliverySlipNumber;
 
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                Application.Current.MainPage = new DisplayShippingInstructionListPage((string)receiver.SelectedItem,selectedDate, selectedTripOption, (string)place.SelectedItem, listMCompany, shipmentScheduleList, listProducts);
+                Application.Current.MainPage = new DisplayShippingInstructionListPage((string)deliveryName.SelectedItem,selectedDate, chosedDeliveryTimeClass, (string)deliveryLocation.SelectedItem, listMCompany, shipmentScheduleList, listProducts, deliverySlipNumber);
             }
             else
                 await DisplayAlert("エラー", response.content, "OK");

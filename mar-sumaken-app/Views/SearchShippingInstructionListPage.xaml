@@ -27,7 +27,7 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="TripButtonStyle" TargetType="Button">
+        <Style x:Key="DeliveryTimeClassButtonStyle" TargetType="Button">
             <Setter Property="FontAttributes" Value="Bold" />
             <Setter Property="FontSize" Value="18" />
             <Setter Property="WidthRequest" Value="60" />
@@ -54,7 +54,7 @@
                         <Label Text="納入先" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start"  Margin="0" FontSize="16"/>
                         <Frame Padding="0" BackgroundColor="#f2f2f2" BorderColor="Transparent" CornerRadius="0">
                             <StackLayout  Margin="0" Padding="10, 0, 10,0" BackgroundColor="#f2f2f2">
-                                <Picker x:Name="receiver" SelectedIndexChanged="OnReceiverChanged" VerticalOptions="CenterAndExpand" FontSize="15" FontAttributes="Bold" Title="納入先"/>
+                                <Picker x:Name="deliveryName" SelectedIndexChanged="OnDeliveryNameChanged" VerticalOptions="CenterAndExpand" FontSize="15" FontAttributes="Bold" Title="納入先"/>
                             </StackLayout>
                         </Frame>
                         
@@ -66,16 +66,16 @@
                         <Label Text="納入場所" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start" Margin="0,5,0,0" FontSize="16"/>
                         <Frame Padding="0" BackgroundColor="#f2f2f2" BorderColor="Transparent" CornerRadius="0">
                             <StackLayout  Margin="0" Padding="10, 0, 10,0" BackgroundColor="#f2f2f2">
-                                <Picker x:Name="place" SelectedIndexChanged="OnPlaceChanged" VerticalOptions="CenterAndExpand" FontSize="16" FontAttributes="Bold" Title="納入場所"/>
+                                <Picker x:Name="deliveryLocation" SelectedIndexChanged="OnDeliveryLocationChanged" VerticalOptions="CenterAndExpand" FontSize="16" FontAttributes="Bold" Title="納入場所"/>
                             </StackLayout>
                         </Frame>
 
                         <Label Text="便" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start" FontSize="16" Margin="0,5,0,0"/>
                         <FlexLayout Direction="Row" JustifyContent="SpaceBetween" Margin="0,0,0,18" Padding="0">
-                            <Button Text="1" x:Name="trip1" Clicked="OnTripButtonClicked" BackgroundColor="#008577" TextColor="White" Style="{StaticResource TripButtonStyle}" />
-                            <Button Text="2" x:Name="trip2" Clicked="OnTripButtonClicked" BackgroundColor="Gray" TextColor="White" Style="{StaticResource TripButtonStyle}"/>
-                            <Button Text="3" x:Name="trip3" Clicked="OnTripButtonClicked" BackgroundColor="Gray" TextColor="White" Style="{StaticResource TripButtonStyle}"/>
-                            <Button Text="4" x:Name="trip4" Clicked="OnTripButtonClicked" BackgroundColor="Gray" TextColor="White" Style="{StaticResource TripButtonStyle}"/>
+                            <Button Text="1" x:Name="deliveryTimeClass1" Clicked="OnDeliveryTimeClassClicked" BackgroundColor="#008577" TextColor="White" Style="{StaticResource DeliveryTimeClassButtonStyle}" />
+                            <Button Text="2" x:Name="deliveryTimeClass2" Clicked="OnDeliveryTimeClassClicked" BackgroundColor="Gray" TextColor="White" Style="{StaticResource DeliveryTimeClassButtonStyle}"/>
+                            <Button Text="3" x:Name="deliveryTimeClass3" Clicked="OnDeliveryTimeClassClicked" BackgroundColor="Gray" TextColor="White" Style="{StaticResource DeliveryTimeClassButtonStyle}"/>
+                            <Button Text="4" x:Name="deliveryTimeClass4" Clicked="OnDeliveryTimeClassClicked" BackgroundColor="Gray" TextColor="White" Style="{StaticResource DeliveryTimeClassButtonStyle}"/>
                         </FlexLayout>
 
                         <Button Visual="Material" Text="検索"  BackgroundColor="#FD5A00" HeightRequest="60" FontSize="22" Clicked="OnSearchButtonClicked" Margin="0"/>

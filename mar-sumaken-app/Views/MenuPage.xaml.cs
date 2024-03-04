@@ -151,6 +151,7 @@ public partial class MenuPage : FlyoutPage
                 var listlatestMastersSqlLite =  new List<M_SupplierKanbanModel>();
                 listlatestMastersSqlLite = contentFromApi.M_SupplierKanbanList;
                 listProducts = contentFromApi.M_ProductList;
+                var listShipmentScheduleQRCode = contentFromApi.M_ShipmentScheduleQRCodeList;
                 // ローカルDBの古いメニューを削除
                 await _dbService.ALLDeleteMSupplierKanbanAsync();
                 foreach (var latestMastersSqlLite in listlatestMastersSqlLite)
@@ -158,10 +159,15 @@ public partial class MenuPage : FlyoutPage
 
                 var listRHandyMenuSupplierKanbanSqlLite = new List<R_HandyMenuSupplierKanbanModel>();
                 listRHandyMenuSupplierKanbanSqlLite = contentFromApi.R_HandyMenuSupplierKanbanList;
-                // ローカルDBの古いメニューを削除
+                // ローカルDBの古いハンディメニューを削除
                 await _dbService.ALLDeleteRHandyMenuSupplierKanbanAsync();
                 foreach (var rHandyMenuSupplierKanbanSqlLite in listRHandyMenuSupplierKanbanSqlLite)
                     await _dbService.SaveRHandyMenuSupplierKanbanAsync(rHandyMenuSupplierKanbanSqlLite);
+
+                // ローカルDBの古い出荷指示QRコーを削除
+                await _dbService.ALLDeleteMShipmentScheduleQRCodeAsync();
+                foreach (var shipmentScheduleQRCodeSqlLite in listShipmentScheduleQRCode)
+                    await _dbService.SaveMShipmentScheduleQRCodeAsync(shipmentScheduleQRCodeSqlLite);
             }
             else
             {

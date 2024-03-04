@@ -133,7 +133,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
                 DepoID = loginUserSqlLite.DepoID,
                 DeliveryDate = selectedDate,
                 DeliveryTimeClass = chosedDeliveryTimeClass,
-                DeliveryLocation = (string)deliveryLocation.SelectedItem,chosedDeliveryTimeClass
+                DeliveryLocation = (string)deliveryLocation.SelectedItem,
             };
 
             var jsonDataSend = JsonConvert.SerializeObject(shipmentScheduleRequestBody);
@@ -150,7 +150,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                Application.Current.MainPage = new DisplayShippingInstructionListPage(handyMenuID, (string)deliveryName.SelectedItem,selectedDate, chosedDeliveryTimeClass, (string)deliveryLocation.SelectedItem, listMCompany, shipmentScheduleList, listProducts, deliverySlipNumber);
+                Application.Current.MainPage = new DisplayShippingInstructionListPage(handyMenuID, selectedCompanyID, (string)deliveryName.SelectedItem,selectedDate, chosedDeliveryTimeClass, (string)deliveryLocation.SelectedItem, listMCompany, shipmentScheduleList, listProducts, deliverySlipNumber);
             }
             else
                 await DisplayAlert("ÉGÉâÅ[", response.content, "OK");

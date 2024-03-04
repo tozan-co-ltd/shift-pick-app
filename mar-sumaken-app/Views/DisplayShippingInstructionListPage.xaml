@@ -34,7 +34,7 @@
                     <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0, 5, 0, 0">
                         <FlexLayout Direction="Row" JustifyContent="Center" Margin="0" Padding="0">
                             <Label Text="納入名:" FontSize="14" TextColor="#fff"/>
-                            <Label x:Name="selectedReceiverLable" FontSize="14" TextColor="#fff" Margin="0"/>
+                            <Label x:Name="selectedDeliveryNameLabel" FontSize="14" TextColor="#fff" Margin="0"/>
                         </FlexLayout>
                     </Frame>
                     
@@ -43,69 +43,73 @@
                             <Label Text="納入指示日:" FontSize="14" TextColor="#fff"/>
                             <Label x:Name="selectedDateLabel" FontSize="14" TextColor="#fff" Margin="0, 0, 8, 0"/>
                             <Label Text="納場:" FontSize="14" TextColor="#fff"/>
-                            <Label x:Name="selectedPlaceLabel" FontSize="14" TextColor="#fff" />
+                            <Label x:Name="selectedDeliveryLocationLabel" FontSize="14" TextColor="#fff" />
                         </FlexLayout>
                     </Frame>
 
                     <Frame BorderColor="Transparent" Margin="0" BackgroundColor="#FD5A00" Padding="0">
                         <FlexLayout Direction="Row" JustifyContent="Center" Padding="0" Margin="0">
                             <Label Text ="便:" FontSize="14"  TextColor="#fff" Margin="0"/>
-                            <Label x:Name="selectedTripLabel" FontSize="14"  TextColor="#fff" Margin="0, 0, 8, 0"/>
+                            <Label x:Name="selectedDeliveryTimeClassLabel" FontSize="14"  TextColor="#fff" Margin="0, 0, 8, 0"/>
                             <Label Text ="納番:" FontSize="14" TextColor="#fff" />
-                            <Label Text ="Y1670" FontSize="14" TextColor="#fff" />
+                            <Label x:Name="deliverySlipNumberLabel" FontSize="14" TextColor="#fff" />
                         </FlexLayout>
                     </Frame>
                 </StackLayout>
             </Frame>
 
             <Frame BorderColor="Transparent" Margin="0" Padding="0, 10, 0, 5">
-                <Label Text="出荷指示リスト" FontSize="16"  VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"  TextColor="#0D2C54"/>
+                <Label Text="出荷指示リスト" FontSize="16"  VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" TextColor="#0D2C54"/>
             </Frame>
-
-            <Frame Padding="0" HasShadow="False">
-                <StackLayout HorizontalOptions="Center">
-                    <Grid RowDefinitions="40, *" Padding="5, 5, 5,0" ColumnSpacing="5" >
-                        <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="0" BackgroundColor="#008080">
-                            <Label Text="No." Grid.Row="0" Grid.Column="0" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                            <Label Text="品番" Grid.Row="0" Grid.Column="1"  TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                            <Label Text="背番号" Grid.Row="0" Grid.Column="2" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                            <Label Text="収容数" Grid.Row="0" Grid.Column="3" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                            <Label Text="箱数" Grid.Row="0" Grid.Column="4" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                            <Label Text="残り" Grid.Row="0" Grid.Column="5" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                        </Grid>
-                        <CollectionView x:Name="collectionView" Grid.Row="1" BackgroundColor="#f2f2f2">
-                            <CollectionView.ItemTemplate>
+            <StackLayout x:Name="shippingInstructionsList">
+                <Frame Padding="0" HasShadow="False">
+                    <StackLayout HorizontalOptions="Center">
+                        <Grid RowDefinitions="40, *" Padding="5, 5, 5,0" ColumnSpacing="5" >
+                            <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="0" BackgroundColor="#008080">
+                                <Label Text="No." Grid.Row="0" Grid.Column="0" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                <Label Text="品番" Grid.Row="0" Grid.Column="1"  TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                <Label Text="背番号" Grid.Row="0" Grid.Column="2" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                <Label Text="収容数" Grid.Row="0" Grid.Column="3" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                <Label Text="箱数" Grid.Row="0" Grid.Column="4" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                <Label Text="残り" Grid.Row="0" Grid.Column="5" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                            </Grid>
+                            <CollectionView x:Name="collectionView" Grid.Row="1" BackgroundColor="#f2f2f2">
+                                <CollectionView.ItemTemplate>
                                     <DataTemplate>
-                                    <StackLayout>
-                                        <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="1" Padding="0, 5, 0, 5">
-                                            <Label Text="{Binding No}" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                            <Label Text="{Binding DeliveryProductNumber}" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                            <Label Text="{Binding DeliveryProductAbbreviation}" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                            <Label Text="{Binding LotQuantity}" Grid.Column="3" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                            <Label Text="{Binding NumberOfBoxes}" Grid.Column="4" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                            <Label Text="{Binding NumberOfBoxesRemaining}" Grid.Column="5" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
-                                        </Grid>
-                                        <Grid Padding="0" VerticalOptions="Center" >
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="1" />
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="#C9C9C9" HeightRequest="1" VerticalOptions="Start" HorizontalOptions="FillAndExpand"/>
-                                        </Grid>
-                                    </StackLayout>
-                                </DataTemplate>
+                                        <StackLayout>
+                                            <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="1" Padding="0, 5, 0, 5">
+                                                <Label Text="{Binding No}" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                <Label Text="{Binding DeliveryProductNumber}" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                <Label Text="{Binding DeliveryProductAbbreviation}" Grid.Column="2" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                <Label Text="{Binding LotQuantity}" Grid.Column="3" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                <Label Text="{Binding NumberOfBoxes}" Grid.Column="4" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                                <Label Text="{Binding NumberOfBoxesRemaining}" Grid.Column="5" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>
+                                            </Grid>
+                                            <Grid Padding="0" VerticalOptions="Center" >
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="1" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="#C9C9C9" HeightRequest="1" VerticalOptions="Start" HorizontalOptions="FillAndExpand"/>
+                                            </Grid>
+                                        </StackLayout>
+                                    </DataTemplate>
                                 </CollectionView.ItemTemplate>
-                        </CollectionView>
-                </Grid>
+                            </CollectionView>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                    <Button FontFamily="FontAwesome6Solid" Text="&#xf048;" Clicked="OnPreviousClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
+                    <Label x:Name="pageNumber" VerticalOptions="CenterAndExpand" TextColor="#008080"/>
+                    <Label x:Name="totalPage" VerticalOptions="CenterAndExpand" />
+                    <Button FontFamily="FontAwesome6Solid" Text="&#xf051;" Clicked="OnNextClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
                 </StackLayout>
-            </Frame>
-            <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
-                <Button FontFamily="FontAwesome6Solid" Text="&#xf048;" Clicked="OnPreviousClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
-                <Label x:Name="pageNumber" VerticalOptions="CenterAndExpand" TextColor="#008080"/>
-                <Label x:Name="totalPage" VerticalOptions="CenterAndExpand" />
-                <Button FontFamily="FontAwesome6Solid" Text="&#xf051;" Clicked="OnNextClicked" Margin="10, 0 ,10 ,0" BackgroundColor="Transparent" TextColor="Gray" FontSize="24"/>
+            </StackLayout>
+            <StackLayout x:Name="noneShippingInstructions" IsVisible="false" Margin="0, 100, 0, 0">
+                <Label Text="未検品の出荷指示はありません" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" TextColor="Gray"></Label>
             </StackLayout>
         </StackLayout>
     </ScrollView>

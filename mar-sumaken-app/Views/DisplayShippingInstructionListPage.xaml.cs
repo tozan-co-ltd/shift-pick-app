@@ -14,21 +14,18 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     public int handyMenuID = 0;
     public int currentPage = 1;
     public string currentDate = string.Empty;
-    public string slectedTrip = string.Empty;
-    public string selectedPlace = string.Empty;
-    public string selectedReceiver = string.Empty;
-    public List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     private List<D_ShipmentSchedule> lstDShipmentSchedules = new List<D_ShipmentSchedule>();
-
-    public DisplayShippingInstructionListPage(int menuID, string receiver, DateTime selectedDate, string selectedOption, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems)
+    public DisplayShippingInstructionListPage(int menuID, string deliveryName, DateTime selectedDate, string selectedOption, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems, string deliverySlipNumber)
 	{
 		InitializeComponent();
-        selectedReceiverLable.Text = $"{receiver}";
+        selectedDeliveryNameLabel.Text = $"{deliveryName}";
         selectedDateLabel.Text = $"{selectedDate.ToString("yyyy/MM/dd")}";
-        selectedTripLabel.Text = $"{selectedOption}";
+        selectedDeliveryTimeClassLabel.Text = $"{selectedOption}";
         currentDate = $"{selectedDate.ToShortDateString()}";
-        selectedPlaceLabel.Text = $"{place}";
+        selectedDeliveryLocationLabel.Text = $"{deliveryLocation}";
+        deliverySlipNumberLabel.Text = deliverySlipNumber;
         listMCompany = mCompanySqlLite;
         listProducts = listProductItems;
         handyMenuID = menuID;
@@ -65,11 +62,19 @@ public partial class DisplayShippingInstructionListPage : ContentPage
 
             var previousButton = new Button { };
             previousButton.Clicked += OnPreviousClicked;
-
             var nextButton = new Button { };
             nextButton.Clicked += OnNextClicked;
-
-            DisplayItems();
+            if(lstDShipmentSchedules.Count() > 0)
+            {
+                shippingInstructionsList.IsVisible = true;
+                noneShippingInstructions.IsVisible = false;
+                DisplayItems();
+            }
+            else
+            {
+                shippingInstructionsList.IsVisible = false;
+                noneShippingInstructions.IsVisible = true;
+            }
         }
         catch (Exception)
         {
@@ -143,7 +148,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         {
             Application.Current.MainPage = new LoadingPage();
             await Task.Delay(200);
-            Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, (string)selectedReceiverLable.Text, selectedDateLabel.Text, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules, listProducts);
+            Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID,(string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, listProducts, deliverySlipNumberLabel.Text);
         }
         catch (Exception ex)
         {

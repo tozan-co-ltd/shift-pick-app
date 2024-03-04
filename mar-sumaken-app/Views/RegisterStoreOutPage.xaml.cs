@@ -54,14 +54,17 @@ public partial class RegisterStoreOutPage : ContentPage
     public List<R_HandyMenuSupplierKanbanModel> listRHandyMenuSupplierKanban;
     public D_StoreOutModel.StoreOutPostBody storeOutPostBody = new D_StoreOutModel.StoreOutPostBody();
 
-    public RegisterStoreOutPage(int menuID, string receiver, string currentDate, string selectedTrip, string place, List<M_CompanyModel> mCompanySqlLite, List<D_ShipmentSchedule> dShipmentScheduleListSearch, List<M_ProductModel> listProductItems)
+    public RegisterStoreOutPage(int menuID, string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch, List<M_ProductModel> listProductItems, string deliverySlipNumber)
     {
         InitializeComponent();
-        selectedReceiverLable.Text = $"{receiver}";
+        selectedDeliveryNameLabel.Text = $"{deliveryName}";
         selectedDateLabel.Text = $"{currentDate}";
-        selectedTripLabel.Text = $"{selectedTrip}";
+        selectedDeliveryTimeClassLabel.Text = $"{selectedDeliveryTimeClass}";
         selectedDate = DateTime.Parse(currentDate);
-        selectedPlaceLabel.Text = $"{place}";
+        selectedDeliveryLocationLabel.Text = $"{deliveryLocation}";
+        shippingListBtn.BackgroundColor = Colors.Teal;
+        historyListBtn.BackgroundColor = Colors.Gray;
+        deliverySlipNumberLabel.Text = deliverySlipNumber;
         lstDShipmentSchedules = dShipmentScheduleListSearch;
         listProducts = listProductItems;
         listMCompany = mCompanySqlLite;
@@ -435,7 +438,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new DisplayShippingInstructionListPage(handyMenuID, selectedReceiverLable.Text, selectedDate, selectedTripLabel.Text, selectedPlaceLabel.Text, listMCompany, lstDShipmentSchedules, listProducts);
+        Application.Current.MainPage = new DisplayShippingInstructionListPage(handyMenuID, selectedDeliveryNameLabel.Text, selectedDate, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, listProducts, deliverySlipNumberLabel.Text);
     }
 
     /// <summary>

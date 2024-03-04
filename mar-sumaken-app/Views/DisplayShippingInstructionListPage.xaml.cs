@@ -1,7 +1,7 @@
 using mar_sumaken_app.ViewModels;
 using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
-using ProductDemo = mar_sumaken_app.Models.ProductDemo;
+using ProductDemo = mar_sumaken_app.Models.D_ReceiveModel;
 using Newtonsoft.Json;
 using static mar_sumaken_app.Models.ShipmentScheduleModel;
 using mar_sumaken_app.Models;
@@ -15,6 +15,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     public int currentPage = 1;
     public string currentDate = string.Empty;
     List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    public List<M_ProductModel> listProducts = new List<M_ProductModel>();
 
     public DisplayShippingInstructionListPage(string deliveryName, DateTime selectedDate, string selectedOption, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, string deliverySlipNumber)
 	{
@@ -26,6 +27,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         selectedDeliveryLocationLabel.Text = $"{deliveryLocation}";
         deliverySlipNumberLabel.Text = deliverySlipNumber;
         listMCompany = mCompanySqlLite;
+        listProducts = listProductItems;
         lstDShipmentSchedules = new List<D_ShipmentSchedule>();
 
         // 箱数降順
@@ -135,7 +137,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new SearchShippingInstructionListPage(listMCompany);
+        Application.Current.MainPage = new SearchShippingInstructionListPage(listMCompany, listProducts);
     }
 
     /// <summary>

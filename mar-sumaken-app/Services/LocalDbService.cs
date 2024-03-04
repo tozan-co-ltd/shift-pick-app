@@ -22,6 +22,10 @@ namespace mar_sumaken_app.Services
                 _connection.CreateTableAsync<LoginModel.LoginUserSqlLite>().Wait();
                 // メニューデータテーブル
                 _connection.CreateTableAsync<M_HandyMenuModel>().Wait();
+                // 仕入先かんばんデータテーブル
+                _connection.CreateTableAsync<M_SupplierKanbanModel>().Wait();
+                // ハンディメニューデータテーブル
+                _connection.CreateTableAsync<R_HandyMenuSupplierKanbanModel>().Wait();
                 // 設定データテーブル
                 _connection.CreateTableAsync<HandySettingModel.HandySetting>().Wait();
             }
@@ -124,9 +128,9 @@ namespace mar_sumaken_app.Services
         /// <summary>
         /// メニューを保存
         /// </summary>
-        async public Task<int> SaveMenuAsync(M_HandyMenuModel menu0)
+        async public Task<int> SaveMenuAsync(M_HandyMenuModel menu)
         {
-            return await _connection.InsertAsync(menu0);
+            return await _connection.InsertAsync(menu);
         }
 
         /// <summary>
@@ -137,5 +141,76 @@ namespace mar_sumaken_app.Services
             return await _connection.DeleteAllAsync<M_HandyMenuModel>();
         }
         #endregion
+
+        #region 仕入先かんばんテーブル操作
+        /// <summary>
+        /// 仕入先かんばん一覧を取得
+        /// </summary>
+        public Task<List<M_SupplierKanbanModel>> GetMSupplierKanbanAsync()
+        {
+            return _connection.Table<M_SupplierKanbanModel>().OrderBy(x => x.SupplierKanbanID).ToListAsync();
+        }
+
+        /// <summary>
+        /// 仕入先かんばんを保存
+        /// </summary>
+        async public Task<int> SaveMSupplierKanbanAsync(M_SupplierKanbanModel m_SupplierKanbanModel)
+        {
+            return await _connection.InsertAsync(m_SupplierKanbanModel);
+        }
+
+        /// <summary>
+        /// 古い仕入先かんばんデータを消す
+        /// </summary>
+        public async Task<int> ALLDeleteMSupplierKanbanAsync()
+        {
+            return await _connection.DeleteAllAsync<M_SupplierKanbanModel>();
+        }
+
+        /// <summary>
+        /// 古いハンディメニューの仕入先かんばんデータドを取得
+        /// </summary>
+        public async Task<List<M_SupplierKanbanModel>> GetMSupplierKanbanByHandySupplierKanbanID(int supplierKanbanID)
+        {
+            return await _connection.Table<M_SupplierKanbanModel>().Where(x => x.SupplierKanbanID == supplierKanbanID).ToListAsync();
+        }
+        #endregion
+
+
+        #region  ハンディメニューの仕入先かんばんテーブル操作
+        /// <summary>
+        /// ハンディメニューの仕入先かんばん一覧を取得
+        /// </summary>
+        public Task<List<R_HandyMenuSupplierKanbanModel>> GetRHandyMenuSupplierKanbanAsync()
+        {
+            return _connection.Table<R_HandyMenuSupplierKanbanModel>().OrderBy(x => x.HandyMenuID)
+                            .ToListAsync();
+        }
+
+        /// <summary>
+        /// ハンディメニューの仕入先かんばんを保存
+        /// </summary>
+        async public Task<int> SaveRHandyMenuSupplierKanbanAsync(R_HandyMenuSupplierKanbanModel rHandyMenuSupplierKanbanModel)
+        {
+            return await _connection.InsertAsync(rHandyMenuSupplierKanbanModel);
+        }
+
+        /// <summary>
+        /// 古いハンディメニューの仕入先かんばんデータを消す
+        /// </summary>
+        public async Task<int> ALLDeleteRHandyMenuSupplierKanbanAsync()
+        {
+            return await _connection.DeleteAllAsync<R_HandyMenuSupplierKanbanModel>();
+        }
+
+        /// <summary>
+        /// ハンディメニューIDが一致する仕入先かんばんデータを取得
+        /// </summary>
+        public async Task<List<R_HandyMenuSupplierKanbanModel>> GetRHandyMenuSupplierKanbanByHandyMenuID(int handyMenuID)
+        {
+            return await _connection.Table<R_HandyMenuSupplierKanbanModel>().Where(x => x.HandyMenuID == handyMenuID).ToListAsync();
+        }
+        #endregion
+
     }
 }

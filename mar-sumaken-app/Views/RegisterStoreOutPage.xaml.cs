@@ -31,6 +31,7 @@ public partial class RegisterStoreOutPage : ContentPage
         deliverySlipNumberLabel.Text = deliverySlipNumber;
         lstDShipmentSchedules = dShipmentScheduleListSearch;
         listMCompany = mCompanySqlLite;
+        listProducts = listProductItems;
 
         _dbService = new LocalDbService();
         // 進捗を数える

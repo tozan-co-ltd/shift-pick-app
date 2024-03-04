@@ -17,14 +17,16 @@ public partial class SearchShippingInstructionListPage : ContentPage
     private readonly LocalDbService _dbService;
     bool hasOnSearchClick = false; // 検索クリック
     List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     int selectedCompanyID;
     private string? _handyApiUrl;
 
-    public SearchShippingInstructionListPage(List<M_CompanyModel> mCompanySqlLite)
+    public SearchShippingInstructionListPage(List<M_CompanyModel> mCompanySqlLite, List<M_ProductModel> listProductItems)
 	{
 		InitializeComponent();
         _dbService = new LocalDbService();
         listMCompany = mCompanySqlLite;
+        listProducts = listProductItems;
         // 出荷指示リスト検索設定
         SetSearchShippingInstruction();
     }
@@ -109,7 +111,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
-                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
+                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
                 return;
             }
 

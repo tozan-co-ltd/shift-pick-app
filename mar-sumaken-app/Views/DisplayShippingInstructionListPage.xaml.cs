@@ -21,7 +21,6 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     private List<D_ShipmentSchedule> lstDShipmentSchedules = new List<D_ShipmentSchedule>();
 
-
     public DisplayShippingInstructionListPage(int menuID, string receiver, DateTime selectedDate, string selectedOption, string place, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems)
 	{
 		InitializeComponent();

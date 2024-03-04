@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,12 @@ namespace mar_sumaken_app.Models
 {
     public class D_ShipmentModel
     {
+        [PrimaryKey]
+        [AutoIncrement]
+        [Column("ShipmentID")]
         /// <summary>
         /// 出荷実績ID
         /// </summary>
-        
         public int ShipmentID { get; set; }
         /// <summary>
         /// 出荷指示ID

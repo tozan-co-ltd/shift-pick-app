@@ -35,8 +35,8 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         listProducts = listProductItems;
         handyMenuID = menuID;
         companyID = selectedCompanyID;
-        // 箱数降順
-        lstDShipmentSchedules = new List<D_ShipmentSchedule>(shipmentScheduleList.OrderByDescending(p => p.NumberOfBoxes));
+        // 残りが0の行が表示されない, 箱数降順
+        lstDShipmentSchedules = shipmentScheduleList.Where(p => p.NumberOfBoxesRemaining != 0).OrderByDescending(p => p.NumberOfBoxes).ToList();
         // No昇順
         for (int i = 0; i < lstDShipmentSchedules.Count; i++)
             lstDShipmentSchedules[i].No = i+1;

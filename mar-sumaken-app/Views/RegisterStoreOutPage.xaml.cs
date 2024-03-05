@@ -23,12 +23,15 @@ public partial class RegisterStoreOutPage : ContentPage
     public DateTime selectedDate;
     public string currentDate = string.Empty;
     private string? _handyApiUrl;
+    public int overallProgress;
     public int companyID;
     public int handyMenuID;
     public int numberOfBoxes;
     public string mainProductKey;
     public int quantity;
     public int shipmentScheduleID;
+    int totalNumberOfBoxes;
+    int totalNumberOfBoxesRemaining;
     public bool isScanDelivery = true;
     public string deliveryScanContent = string.Empty;
     public string supplierScanContent = string.Empty;
@@ -38,6 +41,7 @@ public partial class RegisterStoreOutPage : ContentPage
     private HandySettingModel.HandySetting _handySetting;
     public M_SupplierKanbanModel mSupplierKanban;
     public List<D_ShipmentSchedule> lstDShipmentSchedules;
+    public List<D_ShipmentSchedule> lstHistoryDShipmentSchedules;
     public List<M_SupplierKanbanModel> listMSupplierKanban;
     public List<M_SupplierKanbanModel> listMSupplierKanbanForCheckQRCode;
     public List<R_HandyMenuSupplierKanbanModel> listRHandyMenuSupplierKanban;
@@ -71,20 +75,23 @@ public partial class RegisterStoreOutPage : ContentPage
         _dbService = new LocalDbService();
         // 出庫画面の設定
         SetRegisterStoreOutPage();
+
         // 進捗を数える
-        int sumProgressBar = dShipmentScheduleListSearch.Sum(obj => obj.NumberOfBoxesRemaining);
-        UpdateProgressBar(sumProgressBar);
+        totalNumberOfBoxesRemaining = dShipmentScheduleListSearch.Sum(obj => obj.NumberOfBoxesRemaining);
+        totalNumberOfBoxes = dShipmentScheduleListSearch.Sum(obj => obj.NumberOfBoxes);
+        UpdateProgressBar(totalNumberOfBoxes, totalNumberOfBoxesRemaining);
+
         // 残りが0の行が表示されない, 箱数降順
         lstDShipmentSchedules = dShipmentScheduleListSearch.Where(p => p.NumberOfBoxesRemaining != 0).OrderByDescending(p => p.NumberOfBoxes).ToList();
+        lstHistoryDShipmentSchedules = dShipmentScheduleListSearch;
 
-        var newListDShipmentSchedule = dShipmentScheduleListSearch;
-        foreach (var obj in newListDShipmentSchedule)
+        foreach (var obj in lstHistoryDShipmentSchedules)
         {
-            obj.NumScanAndNumBoxRemaining = $"1/{obj.NumberOfBoxesRemaining}";
+            obj.NumScanAndNumBoxRemaining = $"0/{obj.NumberOfBoxesRemaining}";
         }
-        collectionViewHistory.ItemsSource = newListDShipmentSchedule;
+        collectionViewHistory.ItemsSource = lstHistoryDShipmentSchedules;
 
-        if (newListDShipmentSchedule.Count == 0)
+        if (lstHistoryDShipmentSchedules.Count == 0)
         {
             shippingListTable.IsVisible = false;
             emptyLabel.IsVisible = true;
@@ -150,17 +157,19 @@ public partial class RegisterStoreOutPage : ContentPage
             // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
             listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
 
-            // check NumberOfBoxesRemaining
+            // 未検品の出荷指示がないためスキャンできません
+            if (progressBar.Progress == 1) { ShowErrorTextInLabel("E2001: 未検品の出荷指示がないためスキャンできません。", resultErrorSound, clipboardContent, loginUser.Last().DepoID, loginUser.Last().UserName);  return; }
+                
 
             if (string.IsNullOrEmpty(clipboardContent))
-                ShowErrorTextInLabel("E2001 QRコードが読めません。", resultErrorSound, clipboardContent, loginUser.Last().DepoID, loginUser.Last().UserName);
+                ShowErrorTextInLabel("E2001: QRコードが読めません。", resultErrorSound, clipboardContent, loginUser.Last().DepoID, loginUser.Last().UserName);
 
             string deliveryIdentifyString = string.Empty;
             if (isScanDelivery) 
             {
                 // 一回目コードの形式と日付をチェックすし、データを取得する
                 var deliveryQrIdentifyMatchStringList = listMShipmentScheduleQRCode.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
-                if(deliveryQrIdentifyMatchStringList.Count  <= 0 ) { ShowErrorTextInLabel("E2001 納入先コードを読み取ってください。", resultErrorSound, clipboardContent, loginUser.Last().DepoID, loginUser.Last().UserName); return; }
+                if(deliveryQrIdentifyMatchStringList.Count  <= 0 ) { ShowErrorTextInLabel("E2001: 納入先コードを読み取ってください。", resultErrorSound, clipboardContent, loginUser.Last().DepoID, loginUser.Last().UserName); return; }
 
                 deliveryIdentifyString = deliveryQrIdentifyMatchStringList.FirstOrDefault().IdentifyString;
 
@@ -239,12 +248,21 @@ public partial class RegisterStoreOutPage : ContentPage
                     }
                 }
 
-                var product = lstDShipmentSchedules.Find(p => p.DeliveryProductNumber == "6173961");
-                if (product != null)
+                var existDShipmentSchedule = lstDShipmentSchedules.Find(p => p.DeliveryProductNumber == "6173961");
+                var exitsHistoryDShipmentSchedule = lstHistoryDShipmentSchedules.Find(p => p.DeliveryProductNumber == "6173961");
+                if (existDShipmentSchedule != null)
                 {
-                    product.NumberOfBoxesRemaining--;
+                    existDShipmentSchedule.NumberOfBoxesRemaining--;
                     collectionView.ItemsSource = null;
                     collectionView.ItemsSource = lstDShipmentSchedules;
+                }
+                if(exitsHistoryDShipmentSchedule != null)
+                {
+                    exitsHistoryDShipmentSchedule.NumScan++;
+                    var numberOfBox = exitsHistoryDShipmentSchedule.NumScan + exitsHistoryDShipmentSchedule.NumberOfBoxesRemaining;
+                    exitsHistoryDShipmentSchedule.NumScanAndNumBoxRemaining = $"{exitsHistoryDShipmentSchedule.NumScan}/{numberOfBox}";
+                    collectionViewHistory.ItemsSource = null;
+                    collectionViewHistory.ItemsSource = lstHistoryDShipmentSchedules;
                 }
 
                 supplierScanContent = Clipboard.GetTextAsync().Result;
@@ -289,7 +307,6 @@ public partial class RegisterStoreOutPage : ContentPage
                 return;
             }
         }
-        
     }
 
     public static string QrcodeValueSubstring(int index, int stringLength, string qr)
@@ -412,6 +429,13 @@ public partial class RegisterStoreOutPage : ContentPage
             productNumberLabel.IsVisible = true;
             statusScanLabel.IsVisible = true;
 
+            // 全体進捗++
+            overallProgress++;
+
+            double completeProgress = (double)((totalNumberOfBoxes - totalNumberOfBoxesRemaining) + overallProgress) / (double)totalNumberOfBoxes;
+            progressBarValueLabel.Text = $"{(totalNumberOfBoxes - totalNumberOfBoxesRemaining) + overallProgress}/ " + totalNumberOfBoxes.ToString();
+            progressBar.Progress = completeProgress;
+
             // スキャン出来たら、ローカルで出荷実績モデルを保存
             d_ShipmentModel.ShipmentScheduleID = shipmentScheduleID;
             d_ShipmentModel.KanbanSerialNumber = deliveryKanbanModel.ProductLabelBranchNumber;
@@ -516,19 +540,19 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        isScanDelivery = true;
         Application.Current.MainPage = new DisplayShippingInstructionListPage(handyMenuID, companyID, selectedDeliveryNameLabel.Text, selectedDate, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, listProducts, deliverySlipNumberLabel.Text);
     }
 
     /// <summary>
     /// プログレスバーを更新する
     /// </summary>
-    private async void UpdateProgressBar(int sumProgressBar)
+    private async void UpdateProgressBar(int totalNumberOfBoxes, int totalNumberOfBoxesRemaining)
     {
         try
         {
-            progressBarValueLabel.Text = "10/"+sumProgressBar.ToString();
-            progressBar.Progress = 0.5;
+            double completeProgress = (double)(totalNumberOfBoxes - totalNumberOfBoxesRemaining) / (double)totalNumberOfBoxes;
+            progressBarValueLabel.Text = $"{totalNumberOfBoxes - totalNumberOfBoxesRemaining}/ " + totalNumberOfBoxes.ToString();
+            progressBar.Progress = completeProgress;
             progressBar.ProgressColor = Color.FromHex("#008080");
 
             if (progressBar.Progress == 1)

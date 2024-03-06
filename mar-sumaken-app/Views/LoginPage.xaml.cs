@@ -126,6 +126,7 @@ public partial class LoginPage : ContentPage
                     loginUserSqlLite.UserID = contentFromApi.M_User.UserID;
                     loginUserSqlLite.UserName = contentFromApi.M_User.UserName;
                     loginUserSqlLite.DepoID = contentFromApi.M_Depo.DepoID;
+                    loginUserSqlLite.AuthorizedKubun = contentFromApi.M_User.AuthorizedKubun;
                     loginUserSqlLite.DepoName = contentFromApi.M_Depo.DepoName;
 
                     // メニュー作成

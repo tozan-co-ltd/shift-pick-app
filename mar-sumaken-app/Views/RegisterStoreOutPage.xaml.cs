@@ -3,6 +3,7 @@ using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
 using mar_sumaken_app.ViewModels;
 using Microsoft.CodeAnalysis;
+using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Newtonsoft.Json;
 using System;
@@ -195,14 +196,12 @@ public partial class RegisterStoreOutPage : ContentPage
 
                 // 納入先品番をチェック
                 var dShipmentSchedule = ExistDeliveryProductNumberCheck(_loginUserSqlLite.DepoID, companyID, deliveryKanbanModel.DeliveryDate, deliveryKanbanModel.DeliveryTimeClass, deliveryKanbanModel.DeliveryLocation, deliveryKanbanModel.DeliverySlipNumber);
-                if (dShipmentSchedule == null) { ShowErrorTextInLabel("E2015: 出荷指示リストに一致するデータがありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
-                quantity = dShipmentSchedule.Quantity;
-                numberOfBoxes = dShipmentSchedule.NumberOfBoxes;
-                shipmentScheduleID = dShipmentSchedule.ShipmentScheduleID;
+                //if (dShipmentSchedule == null) { ShowErrorTextInLabel("E2015: 出荷指示リストに一致するデータがありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
+                //quantity = dShipmentSchedule.Quantity;
+                //shipmentScheduleID = dShipmentSchedule.ShipmentScheduleID;
 
                 //-----サンプルデータ
                 //quantity = lstDShipmentSchedules.FirstOrDefault().Quantity;
-                //numberOfBoxes = lstDShipmentSchedules.FirstOrDefault().NumberOfBoxes;
                 //shipmentScheduleID = lstDShipmentSchedules.FirstOrDefault().ShipmentScheduleID;
                
                 // ローカルで読取実績モデルの出荷実績モデルに出荷指示IDとシリアル番号(かんばん識別番号)をチェック
@@ -226,7 +225,7 @@ public partial class RegisterStoreOutPage : ContentPage
             {
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
                 var supplierIdentifyMatchStringList = listMSupplierKanban.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
-                if(supplierIdentifyMatchStringList.Count <= 0) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
+                //if(supplierIdentifyMatchStringList.Count <= 0) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
 
                 supplierIdentifyString = supplierIdentifyMatchStringList.FirstOrDefault().IdentifyString;
                 mSupplierKanban = supplierIdentifyMatchStringList.FirstOrDefault();
@@ -235,7 +234,7 @@ public partial class RegisterStoreOutPage : ContentPage
 
                 // マスターのプロダクトリストに存在仕入先品番をチェック
                 bool isExists = ExistSupplierProductNumberCheck(supplierIdentifyString, clipboardContent, quantity, deliveryKanbanModel.DeliveryProductNumber);
-                if (!isExists) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
+                //if (!isExists) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
 
                 dShipmentLocal.SupplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
                 if(dShipmentLocal.SupplierProductNumber.IndexOf("-") != -1) // -の後ろの文字を削除する
@@ -251,23 +250,27 @@ public partial class RegisterStoreOutPage : ContentPage
                    
                     var isDuplicates = listDShipment.Any(x => x.SupplierProductNumber == dShipmentLocal.SupplierProductNumber && x.MainProductKey == mainProductKey
                                                                             && x.FirstSubProductKey == dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == dShipmentLocal.SecondSubProductKey);
-                    if (isDuplicates)  // 仕入先品番重複チェック
+                    // ローカルで仕入先品番重複チェック
+                    bool isScanDuplicateInSqlLite = listDShipmentSqlLite.Any(x => x.SupplierProductNumber == dShipmentLocal.SupplierProductNumber && x.MainProductKey == dShipmentLocal.MainProductKey &&
+                                                                                                        x.FirstSubProductKey == dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == dShipmentLocal.SecondSubProductKey);
+
+                    if (isDuplicates || isScanDuplicateInSqlLite)  // 仕入先品番重複チェック
                     {
                         // [共通関数]エラーメッセージ表示実績作成その後、エラー解除要否チェックをする。
                         // 権限が作業者(解除要)であれば、[共通関数] 管理者エラー解除画面表示
-                        //とハンディエラーメッセージ実績挿入
-                        //そうでなければ[共通関数]エラーメッセージ表示
-                        //エラーコード： 既にスキャン済みの仕入先かんばんです
-                        ShowErrorTextInLabel("E2015: 既にスキャン済みの仕入先かんばんです。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
-                        isScanDelivery = true;
-                        return;
+                        if (_loginUserSqlLite.AuthorizedKubun == 3)
+                        {
+                            registerStoreOut.IsVisible = false;
+                            adminErrorCancel.IsVisible = true;
+                        }
+                        else
+                        {
+                            ShowErrorTextInLabel("E2015: 既にスキャン済みの仕入先かんばんです。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
+                            isScanDelivery = true;
+                            return;
+                        }
                     }
                 }
-
-                // ローカルで仕入先品番重複チェック
-                bool isScanDuplicateInSqlLite = listDShipmentSqlLite.Any(x => x.SupplierProductNumber == dShipmentLocal.SupplierProductNumber && x.MainProductKey == dShipmentLocal.MainProductKey &&
-                                                                                                    x.FirstSubProductKey == dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == dShipmentLocal.SecondSubProductKey);
-                if (isScanDuplicateInSqlLite) { ShowErrorTextInLabel("E2001: 既にスキャン済みの納入先かんばんです。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
 
                 // 仕入先かんばん分解 (出荷実績に値を入れる)
                 if (mSupplierKanban.LotLength != 0)
@@ -283,7 +286,7 @@ public partial class RegisterStoreOutPage : ContentPage
                 // 読取実績モデル値を入れる
                 scanShipmentModel.d_ShipmentModel = dShipmentLocal;
                 var d_ScanResultModel = new D_ScanResultModel();
-                d_ScanResultModel = SetScanResultModel(d_ScanResultModel, _loginUserSqlLite.DepoID, deliveryScanContent, supplierScanContent, _loginUserSqlLite.UserName);
+                d_ScanResultModel = SetScanResultModel(d_ScanResultModel, mSupplierKanban.SupplierKanbanID,  _loginUserSqlLite.DepoID, deliveryScanContent, supplierScanContent, _loginUserSqlLite.UserName);
                 scanShipmentModel.d_ScanResultModel = d_ScanResultModel;
                 listScanShipment.Add(scanShipmentModel);
 
@@ -474,8 +477,9 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <param name="secondScanedString"></param>
     /// <param name="userName">ユーザー名</param>
     /// <returns></returns>
-    public D_ScanResultModel SetScanResultModel(D_ScanResultModel d_ScanResultModel, int depoID, string firstScanedString, string secondScanedString, string userName)
+    public D_ScanResultModel SetScanResultModel(D_ScanResultModel d_ScanResultModel, int supplierKanbanID, int depoID, string firstScanedString, string secondScanedString, string userName)
     {
+        d_ScanResultModel.SupplierKanbanID = supplierKanbanID;
         d_ScanResultModel.DepoID = depoID;
         d_ScanResultModel.HandyMenuID = handyMenuID;
         d_ScanResultModel.FirstScanedString = firstScanedString;
@@ -737,5 +741,45 @@ public partial class RegisterStoreOutPage : ContentPage
         scanTextResult.IsVisible = false;
         deliveryScanContent = string.Empty;
         supplierScanContent = string.Empty;
+    }
+
+    private async void OnErrorCancelClicked(object sender, EventArgs e)
+    {
+        var loginID = txtLoginId.Text;
+        var password = txtPassword.Text;
+
+        //ログインIDまたはパスワードが空欄
+        //パスワードが4桁未満、または10桁を超える場合
+        if (string.IsNullOrWhiteSpace(loginID) || (4 > password.Length || password.Length > 10))
+        {
+            await DisplayAlert("エラー", "E2011: ログインIDまたはパスワードが正しくありません。", "OK");
+            return;
+        }
+
+        // ログインIDは合致するデータがない
+        if (!_loginUserSqlLite.UserName.Equals(loginID))
+        {
+            await DisplayAlert("エラー", "E2004: ログインIDが正しくありません。正しい値を入力してください。", "OK");
+            return;
+        }
+
+        // 入力されたパスワードをハッシュ化
+        //byte[] salt = Hashing.ConvertStringToBytes(_loginUserSqlLite.Salt);
+        //string hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(password, salt);
+
+        // ハッシュ化されたパスワードと一致するかチェック
+        //if (!_loginUserSqlLite.CompanyPassword.Equals(hashedPassword))
+        //{
+        //    await DisplayAlert("エラー", "E2004: パスワードが間違っています。", "OK");
+        //    return;
+        //}
+
+        // ハンディエラーメッセージ実績モデル
+        d_HandyErrorMessageModel.UnlockedAt = DateTime.Now;
+        d_HandyErrorMessageModel.UnlockedBy = _loginUserSqlLite.UserName;
+        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+        // 出庫登録画面を表示
+        registerStoreOut.IsVisible = true;
+        adminErrorCancel.IsVisible = false;
     }
 }

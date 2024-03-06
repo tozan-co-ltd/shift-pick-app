@@ -39,6 +39,7 @@ namespace mar_sumaken_app.Models
             public int DepoID { get; set; }
             public string DepoCode { get; set; }
             public string DepoName { get; set; }
+            public int AuthorizedKubun { get; set; }
         }
 
         /// <summary>

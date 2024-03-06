@@ -226,6 +226,8 @@ public partial class RegisterStoreOutPage : ContentPage
             {
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
                 var supplierIdentifyMatchStringList = listMSupplierKanban.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
+                if(supplierIdentifyMatchStringList.Count <= 0) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
+
                 supplierIdentifyString = supplierIdentifyMatchStringList.FirstOrDefault().IdentifyString;
                 mSupplierKanban = supplierIdentifyMatchStringList.FirstOrDefault();
                 Match match = Regex.Match(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim(), @"^\d+");
@@ -233,7 +235,7 @@ public partial class RegisterStoreOutPage : ContentPage
 
                 // マスターのプロダクトリストに存在仕入先品番をチェック
                 bool isExists = ExistSupplierProductNumberCheck(supplierIdentifyString, clipboardContent, quantity, deliveryKanbanModel.DeliveryProductNumber);
-                if (!isExists) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
+                if (!isExists) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
 
                 dShipmentLocal.SupplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
                 if(dShipmentLocal.SupplierProductNumber.IndexOf("-") != -1) // -の後ろの文字を削除する
@@ -257,6 +259,7 @@ public partial class RegisterStoreOutPage : ContentPage
                         //そうでなければ[共通関数]エラーメッセージ表示
                         //エラーコード： 既にスキャン済みの仕入先かんばんです
                         ShowErrorTextInLabel("E2015: 既にスキャン済みの仕入先かんばんです。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
+                        isScanDelivery = true;
                         return;
                     }
                 }
@@ -264,7 +267,7 @@ public partial class RegisterStoreOutPage : ContentPage
                 // ローカルで仕入先品番重複チェック
                 bool isScanDuplicateInSqlLite = listDShipmentSqlLite.Any(x => x.SupplierProductNumber == dShipmentLocal.SupplierProductNumber && x.MainProductKey == dShipmentLocal.MainProductKey &&
                                                                                                     x.FirstSubProductKey == dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == dShipmentLocal.SecondSubProductKey);
-                if (isScanDuplicateInSqlLite) { ShowErrorTextInLabel("E2001: 既にスキャン済みの納入先かんばんです。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
+                if (isScanDuplicateInSqlLite) { ShowErrorTextInLabel("E2001: 既にスキャン済みの納入先かんばんです。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
 
                 // 仕入先かんばん分解 (出荷実績に値を入れる)
                 if (mSupplierKanban.LotLength != 0)

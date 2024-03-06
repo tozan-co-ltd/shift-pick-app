@@ -19,7 +19,6 @@ namespace mar_sumaken_app.Models
         public string DeliveryProductNumber { get; set; } // 表示用品番
         public int LotQuantity { get; set; } // 収容数
         public int KanbanSerialNumber { get; set; } // かんばん識別番号
-        public int ProductLabelBranchNumber { get; set; }
     }
 }
 

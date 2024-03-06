@@ -30,11 +30,11 @@ namespace mar_sumaken_app.Models
         /// 出荷日時
         /// </summary>
         
-        public DateTime ShipmentDatetime { get; set; }
+        public DateTime ShipmentDatetime { get; set; } = DateTime.Now;
         /// <summary>
         /// シリアル番号(かんばん識別番号)
         /// </summary>
-        
+
         public int KanbanSerialNumber { get; set; }
         /// <summary>
         /// 仕入先品番
@@ -44,23 +44,23 @@ namespace mar_sumaken_app.Models
         /// <summary>
         /// ロット番号
         /// </summary>
-        public string LotNumber { get; set; }
+        public string LotNumber { get; set; } = string.Empty;
         /// <summary>
         /// メインキー
         /// </summary>
-        public string MainProductKey { get; set; }
+        public string MainProductKey { get; set; } = string.Empty;
         /// <summary>
         /// サブキー1
         /// </summary>
-        public string FirstSubProductKey { get; set; }
+        public string FirstSubProductKey { get; set; } = string.Empty;
         /// <summary>
         /// サブキー2
         /// </summary>
-        public string SecondSubProductKey { get; set; }
+        public string SecondSubProductKey { get; set; } = string.Empty;
         /// <summary>
         /// 箱数
         /// </summary>
-        
+
         public int NumberOfBoxes { get; set; }
         /// <summary>
         /// 数量
@@ -71,11 +71,11 @@ namespace mar_sumaken_app.Models
         /// <summary>
         /// 読取日時
         /// </summary>
-        public DateTime ScanedAt { get; set; }
+        public DateTime ScanedAt { get; set; } = DateTime.Now;
         /// <summary>
         /// 作成日時
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         /// <summary>
         /// 作成者
         /// </summary>

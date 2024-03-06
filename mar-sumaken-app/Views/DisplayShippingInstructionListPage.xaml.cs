@@ -189,9 +189,10 @@ public partial class DisplayShippingInstructionListPage : ContentPage
                 var contentFromApi = JsonConvert.DeserializeObject<ShipmentScheduleModel.ShipmentScheduelResponseBody>(response.content);
                 var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList; // 出荷指示
                 var dShipmentList = contentFromApi.D_ShipmentList; // 出荷実績
+                var mUserList = contentFromApi.M_UserList; // 出荷実績
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
-                Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, companyID, (string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, shipmentScheduleList, dShipmentList, listProducts, deliverySlipNumberLabel.Text);
+                Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, companyID, (string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, shipmentScheduleList, dShipmentList, mUserList, listProducts, deliverySlipNumberLabel.Text);
             }
             else
                 await DisplayAlert("エラー", response.content, "OK");

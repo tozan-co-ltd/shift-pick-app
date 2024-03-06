@@ -26,12 +26,21 @@ namespace mar_sumaken_app.Models
         /// <summary>
         /// スキャン文字列1
         /// </summary>
-        public string FirstScanedString { get; set; }
+        public string FirstScanedString
+        {
+            get { return _FirstScanedString ?? string.Empty; } // nullの場合、string.Emptyを返す
+            set { _FirstScanedString = value; }
+        }
+        private string _FirstScanedString;
 
         /// <summary>
         /// スキャン文字列2
         /// </summary>
-        public string SecondScanedString { get; set; } = string.Empty;
+        public string SecondScanedString {
+            get { return _SecondScanedString ?? string.Empty; } // nullの場合、string.Emptyを返す
+            set { _SecondScanedString = value; }
+        }
+        private string _SecondScanedString;
 
         /// <summary>
         /// エラーメッセージ

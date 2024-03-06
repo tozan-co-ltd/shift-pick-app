@@ -18,5 +18,8 @@ namespace mar_sumaken_app.Common
         public const string C_SOUND_ERROR_FOLDER = "ScanErrorSound/ScanErrorSound";
         public const string C_SOUND_OK_FOLDER = "ScanOkeySound/ScanOkeySound";
 
+        // 権限
+        public const int C_AUTHORIZED_KUBUN_WORKER = 3; // 作業者
+
     }
 }

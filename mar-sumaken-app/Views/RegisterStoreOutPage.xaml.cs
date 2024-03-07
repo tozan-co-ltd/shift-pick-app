@@ -227,6 +227,7 @@ public partial class RegisterStoreOutPage : ContentPage
                         errorMessengerLabel.Text = "E2015: 既にスキャン済みの納入先かんばんです。";
                         registerStoreOut.IsVisible = false;
                         adminErrorCancel.IsVisible = true;
+                        return;
                     }
                     else
                     {
@@ -270,6 +271,7 @@ public partial class RegisterStoreOutPage : ContentPage
                     registerStoreOut.IsVisible = false;
                     adminErrorCancel.IsVisible = true;
                     isScanDelivery = true;
+                    return;
                 }
 
                 dShipmentLocal.SupplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
@@ -301,6 +303,7 @@ public partial class RegisterStoreOutPage : ContentPage
                             registerStoreOut.IsVisible = false;
                             adminErrorCancel.IsVisible = true;
                             isScanDelivery = true;
+                            return;
                         }
                         else
                         {

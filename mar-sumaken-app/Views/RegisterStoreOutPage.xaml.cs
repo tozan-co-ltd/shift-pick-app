@@ -144,10 +144,7 @@ public partial class RegisterStoreOutPage : ContentPage
         // 設定情報を取得
         var settings = await _dbService.GetSetting();
         _handyApiUrl = settings.Last().HandyApiUrl;
-
-        //ローカルで出荷実績一覧を取得
-        listDShipmentSqlLite = await _dbService.GetDShipmentAsync();
-
+      
         // ローカルで出荷指示QRコードデータを取得
         listMShipmentScheduleQRCode = await _dbService.GetMShipmentScheduleQRCodeAsync();
 
@@ -173,6 +170,9 @@ public partial class RegisterStoreOutPage : ContentPage
 
             if (string.IsNullOrEmpty(clipboardContent))
                 ShowErrorTextInLabel("E2001: QRコードが読めません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
+
+            //ローカルで出荷実績一覧を取得
+            listDShipmentSqlLite = await _dbService.GetDShipmentAsync();
 
             string deliveryIdentifyString = string.Empty;
             if (isScanDelivery) 
@@ -219,7 +219,7 @@ public partial class RegisterStoreOutPage : ContentPage
                     if (_loginUserSqlLite.AuthorizedKubun == Const.C_AUTHORIZED_KUBUN_WORKER)
                     {
                         SoundPlayer.PlaySound(resultErrorSound);
-                        errorMessengerLabel.Text = "E2015: 既にスキャン済みの仕入先かんばんです。";
+                        errorMessengerLabel.Text = "E2015: 既にスキャン済みの納入先かんばんです。";
                         registerStoreOut.IsVisible = false;
                         adminErrorCancel.IsVisible = true;
                     }

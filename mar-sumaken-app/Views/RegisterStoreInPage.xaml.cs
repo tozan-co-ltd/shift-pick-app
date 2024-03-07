@@ -87,7 +87,7 @@ public partial class RegisterStoreInPage : ContentPage
             isItemTapped = true;
             if (_TotalNumberOfBoxesDisplay.Count() > 0)
             {
-                bool clipboardContent = await Application.Current.MainPage.DisplayAlert("確認", "読み取ったデータは削除されますが、戻ってよろしいですか。", "OK", "キャンセル");
+                bool clipboardContent = await DisplayAlert("確認", "読み取ったデータは削除されますが、戻ってよろしいですか。", "OK", "キャンセル");
                 if (clipboardContent)
                     Application.Current.MainPage = new MenuPage();
             }
@@ -130,12 +130,23 @@ public partial class RegisterStoreInPage : ContentPage
                 listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
                 listRHandyMenuSupplierKanban = await _dbService.GetRHandyMenuSupplierKanbanByHandyMenuID(handyMenuID);
                 listMSupplierKanbanForCheckQRCode = await _dbService.GetMSupplierKanbanByHandySupplierKanbanID(listRHandyMenuSupplierKanban.FirstOrDefault().SupplierKanbanID);
-                mSupplierKanban = listMSupplierKanbanForCheckQRCode.FirstOrDefault();
+                // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
+                var supplierIdentifyMatchStringList = listMSupplierKanbanForCheckQRCode.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
+                if (supplierIdentifyMatchStringList.Count <= 0)
+                {
+                    // 識別文字列が正しくない場合はエラー
+                    SoundPlayer.PlaySound(resultErrorSound);
+                    scanTextResult.Text = "E2001: QRコードが正しくありません。正しいQRコードを読み取ってください。";
+                    scanTextResult.TextColor = Colors.Red;
+                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
+                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    return;
+                }
 
-                // スキャンデータチェック
-                string[] substrings = clipboardContent.Split(' ');
+                mSupplierKanban = supplierIdentifyMatchStringList.FirstOrDefault();
+
                 // 識別文字列チェック
-                if (substrings.First().Trim().IndexOf(mSupplierKanban.IdentifyString) != -1)
+                if (clipboardContent.IndexOf(mSupplierKanban.IdentifyString) != -1 && mSupplierKanban.IdentifyStringStartIndex == 1)
                 {
                     // 文字列をトリム
                     string supplierProductNumber = string.Empty;

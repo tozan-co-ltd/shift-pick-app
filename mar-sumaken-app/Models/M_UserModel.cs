@@ -32,5 +32,9 @@ namespace mar_sumaken_app.Models
         /// 管理者権限区分
         /// </summary>
         public int AuthorizedKubun { get; set; }
+
+        public string Password { get; set; }
+
+        public string Salt { get; set; }
     }
 }

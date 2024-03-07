@@ -36,9 +36,12 @@ namespace mar_sumaken_app.Models
             public string LoginID { get; set; }
             public int UserID{ get; set; }
             public string UserName { get; set; }
+            public string Password { get; set; }
+            public string Salt { get; set; }
             public int DepoID { get; set; }
             public string DepoCode { get; set; }
             public string DepoName { get; set; }
+            public int AuthorizedKubun { get; set; }
         }
 
         /// <summary>

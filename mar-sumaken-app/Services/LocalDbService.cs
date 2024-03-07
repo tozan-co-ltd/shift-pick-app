@@ -24,6 +24,10 @@ namespace mar_sumaken_app.Services
                 _connection.CreateTableAsync<M_HandyMenuModel>().Wait();
                 // 仕入先かんばんデータテーブル
                 _connection.CreateTableAsync<M_SupplierKanbanModel>().Wait();
+                // 読取実績データテーブル
+                _connection.CreateTableAsync<D_ShipmentModel>().Wait();
+                // 出荷指示QRコードデータテーブル
+                _connection.CreateTableAsync<M_ShipmentScheduleQRCodeModel>().Wait();
                 // ハンディメニューデータテーブル
                 _connection.CreateTableAsync<R_HandyMenuSupplierKanbanModel>().Wait();
                 // 設定データテーブル
@@ -211,6 +215,63 @@ namespace mar_sumaken_app.Services
             return await _connection.Table<R_HandyMenuSupplierKanbanModel>().Where(x => x.HandyMenuID == handyMenuID).ToListAsync();
         }
         #endregion
+
+
+
+        #region  出荷実績テーブル操作
+        /// <summary>
+        ///  出荷実績一覧を取得
+        /// </summary>
+        public Task<List<D_ShipmentModel>> GetDShipmentAsync()
+        {
+            return _connection.Table<D_ShipmentModel>().OrderBy(x => x.ShipmentID).ToListAsync();
+        }
+
+        /// <summary>
+        ///  出荷実績を保存
+        /// </summary>
+        async public Task<int> SaveDShipmentAsync(D_ShipmentModel dShipmentModel)
+        {
+            return await _connection.InsertAsync(dShipmentModel);
+        }
+
+        /// <summary>
+        ///  出荷実績データを消す
+        /// </summary>
+        public async Task<int> ALLDeleteDShipmentAsync()
+        {
+            return await _connection.DeleteAllAsync<D_ShipmentModel>();
+        }
+        #endregion
+
+
+        #region  出荷実績テーブル操作
+        /// <summary>
+        ///  出荷指示QRコード一覧を取得
+        /// </summary>
+        public Task<List<M_ShipmentScheduleQRCodeModel>> GetMShipmentScheduleQRCodeAsync()
+        {
+            return _connection.Table<M_ShipmentScheduleQRCodeModel>().OrderBy(x => x.ShippingScheduleQRCodeID).ToListAsync();
+        }
+
+        /// <summary>
+        ///  出荷指示QRコードを保存
+        /// </summary>
+        async public Task<int> SaveMShipmentScheduleQRCodeAsync(M_ShipmentScheduleQRCodeModel mShipmentScheduleQRCode)
+        {
+            return await _connection.InsertAsync(mShipmentScheduleQRCode);
+        }
+
+        /// <summary>
+        ///  出荷指示QRコードデータを消す
+        /// </summary>
+        public async Task<int> ALLDeleteMShipmentScheduleQRCodeAsync()
+        {
+            return await _connection.DeleteAllAsync<M_ShipmentScheduleQRCodeModel>();
+        }
+        #endregion
+
+
 
     }
 }

@@ -91,7 +91,7 @@ namespace mar_sumaken_app.Models
         /// <summary>
         /// サブキー1開始位置
         /// </summary>
-        public int FirstSubProductKeyIndex { get; set; }
+        public int FirstSubProductKeyStartIndex { get; set; }
 
         /// <summary>
         /// サブキー2桁数
@@ -101,7 +101,7 @@ namespace mar_sumaken_app.Models
         /// <summary>
         /// サブキー2開始位置
         /// </summary>
-        public int SecondSubProductKeyIndex { get; set; }
+        public int SecondSubProductKeyStartIndex { get; set; }
 
         /// <summary>
         /// 枝番桁数

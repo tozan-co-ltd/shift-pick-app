@@ -5,33 +5,38 @@ using ProductDemo = mar_sumaken_app.Models.D_ReceiveModel;
 using Newtonsoft.Json;
 using static mar_sumaken_app.Models.ShipmentScheduleModel;
 using mar_sumaken_app.Models;
+using mar_sumaken_app.Common;
+using mar_sumaken_app.Services;
 
 namespace mar_sumaken_app.Views;
 
 public partial class DisplayShippingInstructionListPage : ContentPage
 {
-    private List<D_ShipmentSchedule> lstDShipmentSchedules;
     private int _itemsPerPage = 10;
+    public int handyMenuID;
     public int currentPage = 1;
-    public string currentDate = string.Empty;
+    public int companyID;
+    private string? _handyApiUrl;
+    private readonly LocalDbService _dbService;
     List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
+    private List<D_ShipmentSchedule> lstDShipmentSchedules = new List<D_ShipmentSchedule>();
 
-    public DisplayShippingInstructionListPage(string deliveryName, DateTime selectedDate, string selectedOption, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems, string deliverySlipNumber)
+    public DisplayShippingInstructionListPage(int menuID, int selectedCompanyID, string deliveryName, DateTime selectedDate, string deliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems, string deliverySlipNumber)
 	{
 		InitializeComponent();
+        _dbService = new LocalDbService();
         selectedDeliveryNameLabel.Text = $"{deliveryName}";
         selectedDateLabel.Text = $"{selectedDate.ToString("yyyy/MM/dd")}";
-        selectedDeliveryTimeClassLabel.Text = $"{selectedOption}";
-        currentDate = $"{selectedDate.ToShortDateString()}";
+        selectedDeliveryTimeClassLabel.Text = $"{deliveryTimeClass}";
         selectedDeliveryLocationLabel.Text = $"{deliveryLocation}";
         deliverySlipNumberLabel.Text = deliverySlipNumber;
         listMCompany = mCompanySqlLite;
         listProducts = listProductItems;
-        lstDShipmentSchedules = new List<D_ShipmentSchedule>();
-
-        // 箱数降順
-        lstDShipmentSchedules = new List<D_ShipmentSchedule>(shipmentScheduleList.OrderByDescending(p => p.NumberOfBoxes));
+        handyMenuID = menuID;
+        companyID = selectedCompanyID;
+        // 残りが0の行が表示されない, 箱数降順
+        lstDShipmentSchedules = shipmentScheduleList.Where(p => p.NumberOfBoxesRemaining != 0).OrderByDescending(p => p.NumberOfBoxes).ToList();
         // No昇順
         for (int i = 0; i < lstDShipmentSchedules.Count; i++)
             lstDShipmentSchedules[i].No = i+1;
@@ -137,7 +142,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
-        Application.Current.MainPage = new SearchShippingInstructionListPage(listMCompany, listProducts);
+        Application.Current.MainPage = new SearchShippingInstructionListPage(handyMenuID, listMCompany, listProducts);
     }
 
     /// <summary>
@@ -147,9 +152,50 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     {
         try
         {
-            Application.Current.MainPage = new LoadingPage();
-            await Task.Delay(200);
-            Application.Current.MainPage = new RegisterStoreOutPage((string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, listProducts, deliverySlipNumberLabel.Text);
+            // ローカルDBのハンディ設定情報取得
+            var settings = await _dbService.GetSetting();
+            if (settings.Count() > 0 && settings.Last() != null)
+                _handyApiUrl = settings.Last().HandyApiUrl;
+
+            if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
+            {
+                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+                return;
+            }
+            // ユーザー情報を取得
+            var loginUsers = await _dbService.GetLoginAsync();
+            var loginUserSqlLite = loginUsers.Last();
+
+            var shipmentScheduleSqlLite = new ShipmentScheduleModel.ShipmentScheduleRequestBody();
+
+            var shipmentScheduleRequestBody = new
+            {
+                CompanyID = companyID,
+                CompanyCode = loginUserSqlLite.CompanyCode,
+                CompanyPassword = loginUserSqlLite.CompanyPassword,
+                DepoID = loginUserSqlLite.DepoID,
+                DeliveryDate = selectedDateLabel.Text.Replace("/", "-"),
+                DeliveryTimeClass = selectedDeliveryTimeClassLabel.Text,
+                DeliveryLocation = selectedDeliveryLocationLabel.Text,
+            };
+
+            var jsonDataSend = JsonConvert.SerializeObject(shipmentScheduleRequestBody);
+
+            // 最新データを取得するため、もう一回APIにリクエストを送る
+            var response = await App.API.PostMethod(jsonDataSend, _handyApiUrl, "ShipmentSchedule/Find");
+            if (response.success)
+            {
+                // APIからコンテンツを取得
+                var contentFromApi = JsonConvert.DeserializeObject<ShipmentScheduleModel.ShipmentScheduelResponseBody>(response.content);
+                var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList; // 出荷指示
+                var dShipmentList = contentFromApi.D_ShipmentList; // 出荷実績
+                var mUserList = contentFromApi.M_UserList; // 出荷実績
+                Application.Current.MainPage = new LoadingPage();
+                await Task.Delay(200);
+                Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, companyID, (string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, shipmentScheduleList, dShipmentList, mUserList, listProducts, deliverySlipNumberLabel.Text);
+            }
+            else
+                await DisplayAlert("エラー", response.content, "OK");
         }
         catch (Exception ex)
         {

@@ -36,6 +36,8 @@ public partial class RegisterStoreOutPage : ContentPage
     public string deliveryScanContent = string.Empty;
     public string supplierScanContent = string.Empty;
     public string supplierIdentifyString = string.Empty;
+    private string? resultOkSound = string.Empty;
+    private string? resultErrorSound = string.Empty;
     private readonly LocalDbService _dbService;
     private LoginModel.LoginUserSqlLite _loginUserSqlLite;
     private HandySettingModel.HandySetting _handySetting;
@@ -148,6 +150,10 @@ public partial class RegisterStoreOutPage : ContentPage
 
         // ローカルで出荷指示QRコードデータを取得
         listMShipmentScheduleQRCode = await _dbService.GetMShipmentScheduleQRCodeAsync();
+
+        // サウンドパスを取得
+        resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
+        resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
     }
 
     /// <summary>
@@ -157,10 +163,6 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
-            // サウンドパスを取得
-            string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
-            string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
-
             //　QRコードのコンテンツを取得
             string clipboardContent = Clipboard.GetTextAsync().Result;
             // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
@@ -189,25 +191,22 @@ public partial class RegisterStoreOutPage : ContentPage
                 SetValueFromQrCode(clipboardContent);
 
                 //マスターのプロダクトリストに存在納入先品番をチェック
-                bool existsDeliveryProductNumber = listProducts.Any(product => product.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && product.LotQuantity == deliveryKanbanModel.LotQuantity);
-                if (!existsDeliveryProductNumber) { ShowErrorTextInLabel("E2015:納入先品番が存在しません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
+                bool existDeliveryProductNumber = listProducts.Any(product => product.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && product.LotQuantity == deliveryKanbanModel.LotQuantity);
+                // 納入先品番が存在をチェック
+                if (!existDeliveryProductNumber) { ShowErrorTextInLabel("E2015: 納入先品番が存在しません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
 
                 // 納入先品番をチェック
                 var dShipmentSchedule = ExistDeliveryProductNumberCheck(_loginUserSqlLite.DepoID, companyID, deliveryKanbanModel.DeliveryDate, deliveryKanbanModel.DeliveryTimeClass, deliveryKanbanModel.DeliveryLocation, deliveryKanbanModel.DeliverySlipNumber);
                 if (dShipmentSchedule == null) {
                     // 権限が作業者(解除要)であれば、[共通関数] 管理者エラー解除画面表示
+                    SoundPlayer.PlaySound(resultErrorSound);
                     errorMessengerLabel.Text = "E2015: 出荷指示リストに一致するデータがありません。";
                     registerStoreOut.IsVisible = false;
                     adminErrorCancel.IsVisible = true;
-                    ShowErrorTextInLabel("E2015: 出荷指示リストに一致するデータがありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); 
                     return; 
                 }
                 quantity = dShipmentSchedule.Quantity;
                 shipmentScheduleID = dShipmentSchedule.ShipmentScheduleID;
-
-                //-----サンプルデータ
-                //quantity = lstDShipmentSchedules.FirstOrDefault().Quantity;
-                //shipmentScheduleID = lstDShipmentSchedules.FirstOrDefault().ShipmentScheduleID;
 
                 // ローカルで読取実績モデルの出荷実績モデルに出荷指示IDとシリアル番号(かんばん識別番号)をチェック
                 bool isScanDuplicateInSqlLite = listDShipmentSqlLite.Any(item => item.ShipmentScheduleID == shipmentScheduleID && item.KanbanSerialNumber == deliveryKanbanModel.KanbanSerialNumber );
@@ -219,6 +218,7 @@ public partial class RegisterStoreOutPage : ContentPage
                     // 権限が作業者(解除要)であれば、[共通関数] 管理者エラー解除画面表示
                     if (_loginUserSqlLite.AuthorizedKubun == Const.C_AUTHORIZED_KUBUN_WORKER)
                     {
+                        SoundPlayer.PlaySound(resultErrorSound);
                         errorMessengerLabel.Text = "E2015: 既にスキャン済みの仕入先かんばんです。";
                         registerStoreOut.IsVisible = false;
                         adminErrorCancel.IsVisible = true;
@@ -252,13 +252,18 @@ public partial class RegisterStoreOutPage : ContentPage
                 int quantity = int.Parse(match.Value);
 
                 // マスターのプロダクトリストに存在仕入先品番をチェック
-                bool isExist = ExistSupplierProductNumberCheck(supplierIdentifyString, clipboardContent, quantity, deliveryKanbanModel.DeliveryProductNumber);
-                if (!isExist) {
+                var findListSupplierProduct= ExistSupplierProductNumberCheck(supplierIdentifyString, clipboardContent, quantity);
+                //マスターのプロダクトに仕入先品番が存在をチェック
+                if (findListSupplierProduct.Count <= 0) { ShowErrorTextInLabel("E2015:  仕入先品番が存在しません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
+                //納入先品番と仕入先品番一致をチェック
+                bool isMatchSupplierAndDeliveryProductNumber = listProducts.Any(product => product.SupplierProductNumber == findListSupplierProduct.FirstOrDefault().SupplierProductNumber && product.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && product.LotQuantity == quantity);
+
+                if (!isMatchSupplierAndDeliveryProductNumber) {
                     // 権限が作業者(解除要)であれば、[共通関数] 管理者エラー解除画面表示
-                    errorMessengerLabel.Text = "E2015: QRコードが正しくありません。";
+                    SoundPlayer.PlaySound(resultErrorSound);
+                    errorMessengerLabel.Text = "E2015: 納入先品番と仕入先品番は一致しません。";
                     registerStoreOut.IsVisible = false;
                     adminErrorCancel.IsVisible = true;
-                    ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); 
                     isScanDelivery = true;
                     return; 
                 }
@@ -287,9 +292,12 @@ public partial class RegisterStoreOutPage : ContentPage
                         // 権限が作業者(解除要)であれば、[共通関数] 管理者エラー解除画面表示
                         if (_loginUserSqlLite.AuthorizedKubun == Const.C_AUTHORIZED_KUBUN_WORKER)
                         {
+                            SoundPlayer.PlaySound(resultErrorSound);
                             errorMessengerLabel.Text = "E2015: 既にスキャン済みの仕入先かんばんです。";
                             registerStoreOut.IsVisible = false;
                             adminErrorCancel.IsVisible = true;
+                            isScanDelivery = true;
+                            return;
                         }
                         else
                         {
@@ -303,6 +311,7 @@ public partial class RegisterStoreOutPage : ContentPage
                 // 仕入先かんばん分解 (出荷実績に値を入れる)
                 if (mSupplierKanban.LotLength != 0)
                     dShipmentLocal.LotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex - 1, mSupplierKanban.LotLength).Trim();
+
                 dShipmentLocal.NumberOfBoxes = numberOfBoxes;
                 dShipmentLocal.Quantity = quantity;
                 dShipmentLocal.CreatedAt = DateTime.Now;
@@ -351,6 +360,7 @@ public partial class RegisterStoreOutPage : ContentPage
         // 出荷指示リスト更新
         var existDShipmentSchedule = lstDShipmentSchedules.Find(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
                                                      && d.DeliveryTimeClass == deliveryKanbanModel.DeliveryTimeClass && d.DeliveryLocation == deliveryKanbanModel.DeliveryLocation && d.DeliverySlipNumber == deliveryKanbanModel.DeliverySlipNumber);
+        
         if (existDShipmentSchedule != null && progressBar.Progress != 1)
         {
             existDShipmentSchedule.NumberOfBoxesRemaining--;
@@ -451,8 +461,9 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <param name="clipboardContent">クリップボードの内容</param>
     /// <param name="resultErrorSound"></param>
     /// <returns></returns>
-    public bool ExistSupplierProductNumberCheck(string supplierIdentifyString, string clipboardContent, int quantity ,string deliveryProductNumber) 
+    public List<M_ProductModel> ExistSupplierProductNumberCheck(string supplierIdentifyString, string clipboardContent, int quantity) 
     {
+        List<M_ProductModel> findListProduct = new List<M_ProductModel>();
         // ユーザー情報を取得
         string supplierProductNumberCheck = string.Empty;
         if (mSupplierKanban.IdentifyString == supplierIdentifyString && supplierIdentifyString.Length == mSupplierKanban.IdentifyString.Length) // 識別文字は11
@@ -465,11 +476,9 @@ public partial class RegisterStoreOutPage : ContentPage
                 supplierProductNumberCheck = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
         }
 
-        bool existsSupplierProductNumber = listProducts.Any(product => (product.SupplierProductNumber == supplierProductNumberCheck && product.DeliveryProductNumber == deliveryProductNumber) && product.LotQuantity == quantity);
-        if (!existsSupplierProductNumber)
-            return false;
+        findListProduct = listProducts.Where(product => product.SupplierProductNumber == supplierProductNumberCheck && product.LotQuantity == quantity).ToList();
 
-        return true;
+        return findListProduct;
     }
 
     /// <summary>
@@ -574,6 +583,27 @@ public partial class RegisterStoreOutPage : ContentPage
         d_HandyErrorMessageModel.CreatedBy = userName;
 
         return d_HandyErrorMessageModel;
+    }
+
+
+    /// <summary>
+    /// エラーメッセージを表示
+    /// </summary>
+    public void ShowErrorTextErrorCancel(string error, string resultErrorSound, int depoID, string userName)
+    {
+        // 既にスキャンしている場合はエラー
+        SoundPlayer.PlaySound(resultErrorSound);
+        scanTextResult.Text = error;
+        scanTextResult.IsVisible = true;
+        scanTextResult.TextColor = Colors.Red;
+        productNumberLabel.Text = string.Empty;
+        productNumberLabel.IsVisible = false;
+        statusScanLabel.Text = string.Empty;
+        statusScanLabel.IsVisible = false;
+
+        // 識別文字列が正しくない場合はエラー
+        d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, depoID, userName, error);
+        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
     }
 
 
@@ -794,8 +824,9 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <summary>
     /// 解除要求
     /// </summary>
-    async void OnErrorCancelClicked(object sender, EventArgs e)
+    private void OnErrorCancelClicked(object sender, EventArgs e)
     {
+
         var loginID = txtLoginId.Text;
         var password = txtPassword.Text;
 
@@ -808,20 +839,20 @@ public partial class RegisterStoreOutPage : ContentPage
         }
 
         // ログインIDは合致するデータがない
-        bool existUser= mUserList.Any(u => u.LoginID == loginID);
+        var listUser = mUserList.Where(u => u.LoginID == loginID).ToList();
 
-        if (!existUser)
+        if (listUser.Count <= 0)
         {
             DisplayAlert("エラー", "E2004: ログインIDが正しくありません。正しい値を入力してください。", "OK");
             return;
         }
 
         // 入力されたパスワードをハッシュ化
-        byte[] salt = Hashing.ConvertStringToBytes(_loginUserSqlLite.Salt);
+        byte[] salt = Hashing.ConvertStringToBytes(listUser.FirstOrDefault().Salt);
         string hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(password, salt);
 
         // ハッシュ化されたパスワードと一致するかチェック
-        if (!_loginUserSqlLite.Password.Equals(hashedPassword))
+        if (!listUser.FirstOrDefault().Password.Equals(hashedPassword))
         {
             DisplayAlert("エラー", "E2004: パスワードが間違っています。", "OK");
             return;
@@ -830,6 +861,14 @@ public partial class RegisterStoreOutPage : ContentPage
         // ハンディエラーメッセージ実績モデル
         d_HandyErrorMessageModel.UnlockedAt = DateTime.Now;
         d_HandyErrorMessageModel.UnlockedBy = _loginUserSqlLite.UserName;
+        d_HandyErrorMessageModel.DepoID = _loginUserSqlLite.DepoID;
+        d_HandyErrorMessageModel.HandyMenuID = handyMenuID;
+        d_HandyErrorMessageModel.FirstScanedString = deliveryScanContent;
+        d_HandyErrorMessageModel.SecondScanedString = supplierScanContent;
+        d_HandyErrorMessageModel.ErrorMessage = errorMessengerLabel.Text;
+        d_HandyErrorMessageModel.CreatedAt = DateTime.Now;
+        d_HandyErrorMessageModel.CreatedBy = _loginUserSqlLite.UserName;
+
         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
         // 出庫登録画面を表示
         registerStoreOut.IsVisible = true;

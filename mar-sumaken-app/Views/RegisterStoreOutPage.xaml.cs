@@ -183,7 +183,7 @@ public partial class RegisterStoreOutPage : ContentPage
             if (isScanDelivery) 
             {
                 // 一回目コードの形式と日付をチェックすし、データを取得する
-                var deliveryQrIdentifyMatchStringList = listMShipmentScheduleQRCode.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
+                var deliveryQrIdentifyMatchStringList = listMShipmentScheduleQRCode.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                 if(deliveryQrIdentifyMatchStringList.Count  <= 0 ) { ShowErrorTextInLabel("E2001: 納入先コードを読み取ってください。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
 
                 deliveryIdentifyString = deliveryQrIdentifyMatchStringList.FirstOrDefault().IdentifyString;
@@ -248,7 +248,7 @@ public partial class RegisterStoreOutPage : ContentPage
             else　
             {
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
-                var supplierIdentifyMatchStringList = listMSupplierKanban.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
+                var supplierIdentifyMatchStringList = listMSupplierKanban.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                if(supplierIdentifyMatchStringList.Count <= 0) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
 
                 supplierIdentifyString = supplierIdentifyMatchStringList.FirstOrDefault().IdentifyString;
@@ -273,8 +273,7 @@ public partial class RegisterStoreOutPage : ContentPage
                 }
 
                 dShipmentLocal.SupplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
-                if(dShipmentLocal.SupplierProductNumber.IndexOf("-") != -1) // -の後ろの文字を削除する
-                    dShipmentLocal.SupplierProductNumber = dShipmentLocal.SupplierProductNumber.Substring(0, dShipmentLocal.SupplierProductNumber.IndexOf('-'));
+                dShipmentLocal.SupplierProductNumber = Util.SubStringAfterDash(dShipmentLocal.SupplierProductNumber);
 
                 // 許可された重複チェック
                 if (!mSupplierKanban.AllowedDuplicatesFlag && mSupplierKanban.MainProductKeyLength != 0)
@@ -394,18 +393,6 @@ public partial class RegisterStoreOutPage : ContentPage
 
 
     /// <summary>
-    /// Qrコード値の部分文字列
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="stringLength"></param>
-    /// <param name="qr"></param>
-    public static string QrcodeValueSubstring(int index, int stringLength, string qr)
-    {
-        var value = qr.Substring(index - 1, stringLength).Replace(" ", "");
-        return value;
-    }
-
-    /// <summary>
     /// 納入先コードスキャンが成功した場合のラベル値を設定
     /// </summary>
     public void SetValueWhenSuccessScanForDelivery()
@@ -473,10 +460,7 @@ public partial class RegisterStoreOutPage : ContentPage
         {
             // 文字列をトリム
             var supplierProductNumberTrim = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).ToString().Trim();
-            if (supplierProductNumberTrim.IndexOf("-") != -1) // -の後ろの文字を削除する
-                supplierProductNumberCheck = supplierProductNumberTrim.Substring(0, supplierProductNumberTrim.IndexOf('-'));
-            else
-                supplierProductNumberCheck = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
+            supplierProductNumberCheck = Util.SubStringAfterDash(supplierProductNumberCheck);
         }
 
         findListProduct = listProducts.Where(product => product.SupplierProductNumber == supplierProductNumberCheck && product.LotQuantity == quantity).ToList();

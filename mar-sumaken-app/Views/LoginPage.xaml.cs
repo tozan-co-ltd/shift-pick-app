@@ -26,7 +26,7 @@ public partial class LoginPage : ContentPage
         _dbService = new LocalDbService();
         // ログインIDの設定
         SetLoginPage();
-     }
+    }
 
     /// <summary>
     /// ログインIDの設定
@@ -42,7 +42,7 @@ public partial class LoginPage : ContentPage
         if (Decimal.TryParse(AppInfo.VersionString, out decimal appVer))  // アプリバージョンチェック
             AppVersion = appVer;
         else
-            await Application.Current.MainPage.DisplayAlert("エラー", "E2000: 使用ハンディメニューが登録されていません。", "OK");
+            await DisplayAlert("エラー", "E2000: 使用ハンディメニューが登録されていません。", "OK");
 
         // ローカルDBのハンディ設定情報取得
         var settings = await _dbService.GetSetting();
@@ -74,7 +74,7 @@ public partial class LoginPage : ContentPage
             var settings = await _dbService.GetSetting();
             if (settings.Count() == 0)
             {
-                await Application.Current.MainPage.DisplayAlert("エラー", "「設定」から会社コードを登録してください。", "OK");
+                await DisplayAlert("エラー", "「設定」から会社コードを登録してください。", "OK");
                 hasOnLoginClick = false;
                 return;
             }
@@ -86,7 +86,7 @@ public partial class LoginPage : ContentPage
             // ネットワーク接続チェック
             if (!NetworkCheck.CheckNetworkConnection())
             {
-                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+                await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
                 hasOnLoginClick = false;
                 return;
             }
@@ -96,9 +96,12 @@ public partial class LoginPage : ContentPage
 
             // ログインIDチェック
             if (IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length || loginId.Length > 12))
-                await Application.Current.MainPage.DisplayAlert("エラー", "E2000: ログインIDが正しくありません。", "OK");
+                await DisplayAlert("エラー", "E2000: ログインIDが正しくありません。", "OK");
             else
             {
+                Application.Current.MainPage = new LoadingPage();
+                await Task.Delay(100);
+
                 loginError.Text = string.Empty;
                 var loginUserSqlLite = new LoginModel.LoginUserSqlLite();
                 var handyPages = new List<M_HandyMenuModel>();
@@ -116,7 +119,7 @@ public partial class LoginPage : ContentPage
                 if (response.success)
                 {
                     //エラーメッセージを消す
-                    loginError.Text = string.Empty;  
+                    loginError.Text = string.Empty;
                     // APIからコンテンツを取得
                     var contentFromApi = JsonConvert.DeserializeObject<LoginModel.LoginResponseBody>(response.content);
                     loginUserSqlLite.CompanyCode = _handySetting.CompanyCode;
@@ -141,12 +144,14 @@ public partial class LoginPage : ContentPage
                         await _dbService.SaveMenuAsync(page);
 
                     // メニュー画面表示
-                    Application.Current.MainPage = new LoadingPage();
-                    await Task.Delay(100);
                     Application.Current.MainPage = new MenuPage();
                 }
                 else
+                {
                     await DisplayAlert("エラー", response.content, "OK");
+                    hasOnLoginClick = false;
+                    Application.Current.MainPage = new LoginPage();
+                }
             }
 
             hasOnLoginClick = false;
@@ -155,7 +160,7 @@ public partial class LoginPage : ContentPage
         {
             await DisplayAlert("エラー", ex.Message, "OK");
             hasOnLoginClick = false;
-            return;
+            Application.Current.MainPage = new LoginPage();
         }
     }
 
@@ -174,7 +179,7 @@ public partial class LoginPage : ContentPage
     /// ハンディ設定画面表示
     /// </summary>
     /// <returns>ハンディ設定画面</returns>
-    private async void OnSettingClicked(object sender, EventArgs e)
+    private void OnSettingClicked(object sender, EventArgs e)
     {
         Application.Current.MainPage = new HandySettingPage();
     }

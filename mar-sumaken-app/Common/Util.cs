@@ -34,6 +34,45 @@ namespace mar_sumaken_app.Common
 
             return createUrl;
         }
+
+        /// <summary>
+        /// QRコードの部分文字列
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="stringLength"></param>
+        /// <param name="qr"></param>
+        /// <returns>抜き出した文字列</returns>
+        public static string QrcodeValueSubstring(int index, int stringLength, string qr)
+        {
+            var substr = "";
+
+            // 文字列を取得するための最小桁数
+            int minLength = index - 1 + stringLength;
+            if (qr.Length >= minLength)
+            {
+                substr = qr.Substring(index - 1, stringLength).Replace(" ", "");
+            }
+            return substr;
+        }
+
+        /// <summary>
+        /// ダッシュの後のサブ文字列
+        /// </summary>
+        /// <param name="supplierProductNumberTrim"></param>
+        /// <returns></returns>
+        public static string SubStringAfterDash(string supplierProductNumberTrim)
+        {
+            int indexDash = supplierProductNumberTrim.IndexOf('-');
+            if (indexDash != -1 && indexDash < supplierProductNumberTrim.Length - 1)
+            {
+                if (supplierProductNumberTrim.Length - indexDash - 1 == 1)
+                {
+                    return supplierProductNumberTrim.Substring(0, indexDash);
+                }
+            }
+            return supplierProductNumberTrim;
+        }
+
     }
 }
 

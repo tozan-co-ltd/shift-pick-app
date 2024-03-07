@@ -76,9 +76,6 @@
                 </Frame>
             </ScrollView>
         </StackLayout>
-        <StackLayout x:Name="loadingOverLay" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
-            <ActivityIndicator x:Name="loadingIndicator" IsVisible="False" Color="#FD5A00" />
-        </StackLayout>
     </VerticalStackLayout>
 
 </ContentPage>

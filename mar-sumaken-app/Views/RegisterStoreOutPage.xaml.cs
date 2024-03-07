@@ -43,6 +43,7 @@ public partial class RegisterStoreOutPage : ContentPage
     private HandySettingModel.HandySetting _handySetting;
     public M_SupplierKanbanModel mSupplierKanban;
     public List<D_ShipmentSchedule> lstDShipmentSchedules;
+    public List<D_ShipmentSchedule> lstDShipmentSchedulesForCheckDuplicate;
     public List<D_ShipmentSchedule> lstHistoryDShipmentSchedules;
     public List<M_SupplierKanbanModel> listMSupplierKanban;
     public List<M_SupplierKanbanModel> listMSupplierKanbanForCheckQRCode;
@@ -95,7 +96,11 @@ public partial class RegisterStoreOutPage : ContentPage
         totalNumberOfBoxes = dShipmentScheduleListSearch.Sum(obj => obj.NumberOfBoxes);
         UpdateProgressBar(totalNumberOfBoxes, totalNumberOfBoxesRemaining);
 
+        // 履歴一覧用
         lstHistoryDShipmentSchedules = dShipmentScheduleListSearch;
+
+        // 重複をチェック用
+        lstDShipmentSchedulesForCheckDuplicate = dShipmentScheduleListSearch;
 
         // 残りが0の行が表示されない, 箱数降順
         lstDShipmentSchedules = dShipmentScheduleListSearch.Where(p => p.NumberOfBoxesRemaining != 0).OrderByDescending(p => p.NumberOfBoxes).ToList();
@@ -265,7 +270,6 @@ public partial class RegisterStoreOutPage : ContentPage
                     registerStoreOut.IsVisible = false;
                     adminErrorCancel.IsVisible = true;
                     isScanDelivery = true;
-                    return; 
                 }
 
                 dShipmentLocal.SupplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
@@ -297,7 +301,6 @@ public partial class RegisterStoreOutPage : ContentPage
                             registerStoreOut.IsVisible = false;
                             adminErrorCancel.IsVisible = true;
                             isScanDelivery = true;
-                            return;
                         }
                         else
                         {
@@ -446,7 +449,7 @@ public partial class RegisterStoreOutPage : ContentPage
     public D_ShipmentSchedule ExistDeliveryProductNumberCheck(int depoID, int companyID, DateTime deliveryDate, int deliveryTimeClass, string deliveryLocation, string deliverySlipNumber)
     {
         var d_ShipmentSchedule = new D_ShipmentSchedule();
-         d_ShipmentSchedule = lstDShipmentSchedules.Where(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == depoID && d.CompanyID == companyID && 
+         d_ShipmentSchedule = lstDShipmentSchedulesForCheckDuplicate.Where(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == depoID && d.CompanyID == companyID && 
          d.DeliveryDate == deliveryDate && d.DeliveryTimeClass == deliveryTimeClass && d.DeliveryLocation == deliveryLocation && d.DeliverySlipNumber == deliverySlipNumber).FirstOrDefault();
         if (d_ShipmentSchedule != null)
             return d_ShipmentSchedule;
@@ -484,7 +487,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <summary>
     /// 内容を確認してリストを追加 スキャン発送
     /// </summary>
-    public async void CheckScanContentAndAddListScanShipment()
+    public void CheckScanContentAndAddListScanShipment()
     {
             statusScanLabel.Text = "②スキャンOK";
             isScanDelivery = true;
@@ -754,7 +757,7 @@ public partial class RegisterStoreOutPage : ContentPage
             }
 
             //テキスト値を設定し、成功登録後にラベルに表示されます
-            SetTextValueAndVisibleForLabelAfterRegister();
+            SetValueAndVisibleLabelAfterRegisterAndErrorCancel();
 
             // サウンドのパスを取得する
             string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
@@ -809,7 +812,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <summary>
     /// テキスト値を設定し、成功登録後にラベルに表示されます
     /// </summary>
-    public void SetTextValueAndVisibleForLabelAfterRegister()
+    public void SetValueAndVisibleLabelAfterRegisterAndErrorCancel()
     {
         productNumberLabel.Text = string.Empty;
         statusScanLabel.Text = string.Empty;
@@ -819,6 +822,8 @@ public partial class RegisterStoreOutPage : ContentPage
         scanTextResult.IsVisible = false;
         deliveryScanContent = string.Empty;
         supplierScanContent = string.Empty;
+        txtLoginId.Text = string.Empty;
+        txtPassword.Text = string.Empty;
     }
 
     /// <summary>
@@ -826,7 +831,6 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnErrorCancelClicked(object sender, EventArgs e)
     {
-
         var loginID = txtLoginId.Text;
         var password = txtPassword.Text;
 
@@ -838,7 +842,7 @@ public partial class RegisterStoreOutPage : ContentPage
             return;
         }
 
-        // ログインIDは合致するデータがない
+        //// ログインIDは合致するデータがない
         var listUser = mUserList.Where(u => u.LoginID == loginID).ToList();
 
         if (listUser.Count <= 0)
@@ -847,7 +851,7 @@ public partial class RegisterStoreOutPage : ContentPage
             return;
         }
 
-        // 入力されたパスワードをハッシュ化
+        //// 入力されたパスワードをハッシュ化
         byte[] salt = Hashing.ConvertStringToBytes(listUser.FirstOrDefault().Salt);
         string hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(password, salt);
 
@@ -870,6 +874,8 @@ public partial class RegisterStoreOutPage : ContentPage
         d_HandyErrorMessageModel.CreatedBy = _loginUserSqlLite.UserName;
 
         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+  
+        SetValueAndVisibleLabelAfterRegisterAndErrorCancel();
         // 出庫登録画面を表示
         registerStoreOut.IsVisible = true;
         adminErrorCancel.IsVisible = false;

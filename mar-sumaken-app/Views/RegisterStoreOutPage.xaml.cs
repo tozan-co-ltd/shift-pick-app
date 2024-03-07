@@ -182,6 +182,9 @@ public partial class RegisterStoreOutPage : ContentPage
             string deliveryIdentifyString = string.Empty;
             if (isScanDelivery) 
             {
+                //納入先かんばんをスキャンした時の文字列を格納
+                deliveryScanContent = clipboardContent;
+
                 // 一回目コードの形式と日付をチェックすし、データを取得する
                 var deliveryQrIdentifyMatchStringList = listMShipmentScheduleQRCode.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                 if(deliveryQrIdentifyMatchStringList.Count  <= 0 ) { ShowErrorTextInLabel("E2001: 納入先コードを読み取ってください。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
@@ -240,7 +243,7 @@ public partial class RegisterStoreOutPage : ContentPage
                 // 納入先コードスキャンが成功した場合のラベル値を設定
                 SetValueWhenSuccessScanForDelivery();                
 
-                deliveryScanContent = Clipboard.GetTextAsync().Result;
+                
                 // OKサウンド
                 SoundPlayer.PlaySound(resultOkSound);
 
@@ -248,6 +251,9 @@ public partial class RegisterStoreOutPage : ContentPage
             }
             else　
             {
+                //仕入先かんばんをスキャンしたときの文字列を格納
+                supplierScanContent = clipboardContent;
+
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
                 var supplierIdentifyMatchStringList = listMSupplierKanban.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                if(supplierIdentifyMatchStringList.Count <= 0) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
@@ -322,9 +328,7 @@ public partial class RegisterStoreOutPage : ContentPage
                 dShipmentLocal.Quantity = quantity;
                 dShipmentLocal.CreatedAt = DateTime.Now;
                 dShipmentLocal.CreatedBy = _loginUserSqlLite.UserName;
-                dShipmentLocal.KanbanSerialNumber = deliveryKanbanModel.KanbanSerialNumber ;
-
-                supplierScanContent = Clipboard.GetTextAsync().Result;
+                dShipmentLocal.KanbanSerialNumber = deliveryKanbanModel.KanbanSerialNumber ;               
 
                 // 読取実績モデル値を入れる
                 scanShipmentModel.d_ShipmentModel = dShipmentLocal;

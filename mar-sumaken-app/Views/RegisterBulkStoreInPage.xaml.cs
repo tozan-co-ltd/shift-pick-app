@@ -90,7 +90,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
             isItemTapped = true;
             if (_TotalNumberOfBoxesDisplay.Count() > 0)
             {
-                bool result = await Application.Current.MainPage.DisplayAlert("確認", "読み取ったデータは削除されますが、戻ってよろしいですか。", "OK", "キャンセル");
+                bool result = await DisplayAlert("確認", "読み取ったデータは削除されますが、戻ってよろしいですか。", "OK", "キャンセル");
                 if (result)
                     Application.Current.MainPage = new MenuPage();
             }
@@ -133,11 +133,23 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
                 listRHandyMenuSupplierKanban = await _dbService.GetRHandyMenuSupplierKanbanByHandyMenuID(handyMenuID);
                 listMSupplierKanbanForCheckQRCode = await _dbService.GetMSupplierKanbanByHandySupplierKanbanID(listRHandyMenuSupplierKanban.FirstOrDefault().SupplierKanbanID);
-                mSupplierKanban = listMSupplierKanbanForCheckQRCode.FirstOrDefault();
+                // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
+                var supplierIdentifyMatchStringList = listMSupplierKanbanForCheckQRCode.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
+                if (supplierIdentifyMatchStringList.Count <= 0)
+                {
+                    // 識別文字列が正しくない場合はエラー
+                    SoundPlayer.PlaySound(resultErrorSound);
+                    scanTextResult.Text = "E2001: QRコードが正しくありません。正しいQRコードを読み取ってください。";
+                    scanTextResult.TextColor = Colors.Red;
+                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
+                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    return;
+                }
 
-                // スキャンデータチェック
-                string[] substrings = clipboardContent.Split(' ');
-                if (substrings.First().Trim().IndexOf(mSupplierKanban.IdentifyString) != -1 && substrings.First().Trim().Length == mSupplierKanban.IdentifyString.Length) 
+                mSupplierKanban = supplierIdentifyMatchStringList.FirstOrDefault();
+
+                // 識別文字列チェック
+                if (clipboardContent.IndexOf(mSupplierKanban.IdentifyString) != -1 && mSupplierKanban.IdentifyStringStartIndex == 1)
                 {
                     // 文字列をトリム
                     var supplierProductNumberTrim = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).ToString().Trim();
@@ -196,6 +208,18 @@ public partial class RegisterBulkStoreInPage : ContentPage
             await DisplayAlert("エラー", ex.Message, "OK");
             return;
         }
+    }
+
+    /// <summary>
+    /// Qrコード値の部分文字列
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="stringLength"></param>
+    /// <param name="qr"></param>
+    public static string QrcodeValueSubstring(int index, int stringLength, string qr)
+    {
+        var value = qr.Substring(index - 1, stringLength).Replace(" ", "");
+        return value;
     }
 
     /// <summary>
@@ -447,7 +471,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 // OKサウンドを鳴らす
                 string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
                 SoundPlayer.PlaySound(resultOkSound);
-                await Application.Current.MainPage.DisplayAlert("完了", "データ登録が完了しました。", "OK");
+                await DisplayAlert("完了", "データ登録が完了しました。", "OK");
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
                 Application.Current.MainPage = new RegisterBulkStoreInPage(handyMenuID, listProducts);
@@ -457,7 +481,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 // ERRORサウンドを鳴らす
                 string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
                 SoundPlayer.PlaySound(resultErrorSound);
-                await Application.Current.MainPage.DisplayAlert("エラー", "E2016: 読取データがありません。", "OK");
+                await DisplayAlert("エラー", "E2016: 読取データがありません。", "OK");
             }
         }
         catch (Exception ex)

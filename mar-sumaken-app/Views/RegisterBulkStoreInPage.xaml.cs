@@ -379,15 +379,16 @@ public partial class RegisterBulkStoreInPage : ContentPage
     /// <param name="d_ReceiveModel">入荷実績モデル</param>
     /// <param name="supplierProductNumber">仕入先品番</param>
     /// <param name="userName">ユーザー名</param>
-    /// <param name="boxCout">箱数</param>
+    /// <param name="numOfBoxes">箱数</param>
     /// <param name="companyID">会社ID</param>
     /// <returns></returns>
-    public D_ReceiveModel SetDReceiveModel(D_ReceiveModel d_ReceiveModel, string supplierProductNumber, string userName, int boxCout, int companyID)
+    public D_ReceiveModel SetDReceiveModel(D_ReceiveModel d_ReceiveModel, string supplierProductNumber, string userName, int numOfBoxes, int companyID,int lotOfQuantity)
     {
         d_ReceiveModel.CompanyID = companyID;
+        d_ReceiveModel.Quantity = lotOfQuantity * numOfBoxes;
         d_ReceiveModel.ReceiveDatetime = DateTime.Now;
         d_ReceiveModel.SupplierProductNumber = supplierProductNumber;
-        d_ReceiveModel.Quantity = boxCout;
+        d_ReceiveModel.NumberOfBoxes = numOfBoxes;
         d_ReceiveModel.ScanedAt = DateTime.Now;
         d_ReceiveModel.CreatedAt = DateTime.Now;
         d_ReceiveModel.CreatedBy = userName;

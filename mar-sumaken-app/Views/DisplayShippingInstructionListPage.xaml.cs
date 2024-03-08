@@ -22,7 +22,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     private List<D_ShipmentSchedule> lstDShipmentSchedules = new List<D_ShipmentSchedule>();
 
-    public DisplayShippingInstructionListPage(int menuID, int selectedCompanyID, string deliveryName, DateTime selectedDate, string deliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems, string deliverySlipNumber)
+    public DisplayShippingInstructionListPage(int menuID, int selectedCompanyID, string deliveryName, DateTime selectedDate, string deliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  ObservableCollection<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems, string deliverySlipNumber)
 	{
 		InitializeComponent();
         _dbService = new LocalDbService();

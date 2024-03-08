@@ -42,9 +42,10 @@ public partial class RegisterStoreOutPage : ContentPage
     private LoginModel.LoginUserSqlLite _loginUserSqlLite;
     private HandySettingModel.HandySetting _handySetting;
     public M_SupplierKanbanModel mSupplierKanban;
-    public List<D_ShipmentSchedule> lstDShipmentSchedules;
-    public List<D_ShipmentSchedule> lstDShipmentSchedulesForCheckDuplicate;
-    public List<D_ShipmentSchedule> lstHistoryDShipmentSchedules;
+    public ObservableCollection<D_ShipmentSchedule> lstDShipmentSchedules;
+    public ObservableCollection<D_ShipmentSchedule> lstDShipmentSchedulesForCheckDuplicate;
+    public ObservableCollection<D_ShipmentSchedule> lstHistoryDShipmentSchedules;
+    public ObservableCollection<D_ShipmentSchedule> listHistoryForDisplay = new ObservableCollection<D_ShipmentSchedule>();
     public List<M_SupplierKanbanModel> listMSupplierKanban;
     public List<M_SupplierKanbanModel> listMSupplierKanbanForCheckQRCode;
     public List<R_HandyMenuSupplierKanbanModel> listRHandyMenuSupplierKanban;
@@ -62,7 +63,7 @@ public partial class RegisterStoreOutPage : ContentPage
     public D_HandyErrorMessageModel d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
     public D_StoreOutModel.StoreOutPostBody storeOutPostBody = new D_StoreOutModel.StoreOutPostBody();
 
-    public RegisterStoreOutPage(int menuID, int selectedCompanyID, string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch, List<D_ShipmentModel> dShipmentsListSearch, List<M_UserModel> mUserListSearch, List<M_ProductModel> listProductItems, string DeliverySlipNumber)
+    public RegisterStoreOutPage(int menuID, int selectedCompanyID, string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite, ObservableCollection<D_ShipmentSchedule> dShipmentScheduleListSearch, List<D_ShipmentModel> dShipmentsListSearch, List<M_UserModel> mUserListSearch, List<M_ProductModel> listProductItems, string DeliverySlipNumber)
     {
         InitializeComponent();
         selectedDeliveryNameLabel.Text = $"{deliveryName}";
@@ -96,13 +97,13 @@ public partial class RegisterStoreOutPage : ContentPage
         UpdateProgressBar(totalNumberOfBoxes, totalNumberOfBoxesRemaining);
 
         // 履歴一覧用
-        lstHistoryDShipmentSchedules = dShipmentScheduleListSearch;
-
+        lstHistoryDShipmentSchedules = new ObservableCollection<D_ShipmentSchedule>(dShipmentScheduleListSearch);
         // 重複をチェック用
-        lstDShipmentSchedulesForCheckDuplicate = dShipmentScheduleListSearch;
+        lstDShipmentSchedulesForCheckDuplicate = new ObservableCollection<D_ShipmentSchedule>(dShipmentScheduleListSearch);
 
         // 残りが0の行が表示されない, 箱数降順
-        lstDShipmentSchedules = dShipmentScheduleListSearch.Where(p => p.NumberOfBoxesRemaining != 0).OrderByDescending(p => p.NumberOfBoxes).ToList();
+        var lstDShipmentSchedulesSort = dShipmentScheduleListSearch.Where(p => p.NumberOfBoxesRemaining != 0).OrderByDescending(p => p.NumberOfBoxes);
+        lstDShipmentSchedules = new ObservableCollection<D_ShipmentSchedule>(lstDShipmentSchedulesSort);
 
         // No昇順
         for (int i = 0; i < lstDShipmentSchedules.Count; i++)
@@ -369,29 +370,25 @@ public partial class RegisterStoreOutPage : ContentPage
     public void UpdateListAndHistoryListDShipmentSchedules()
     {
         // 出荷指示リスト更新
-        var existDShipmentSchedule = lstDShipmentSchedules.Find(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
+        var existDShipmentSchedule = lstDShipmentSchedules.FirstOrDefault(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
                                                      && d.DeliveryTimeClass == deliveryKanbanModel.DeliveryTimeClass && d.DeliveryLocation == deliveryKanbanModel.DeliveryLocation && d.DeliverySlipNumber == deliveryKanbanModel.DeliverySlipNumber);
-        
         if (existDShipmentSchedule != null && progressBar.Progress != 1)
-        {
             existDShipmentSchedule.NumberOfBoxesRemaining--;
-            collectionView.ItemsSource = null;
-            collectionView.ItemsSource = lstDShipmentSchedules;
-        }
+
+         collectionView.ItemsSource = lstDShipmentSchedules;
+
 
         // 履歴一覧更新
-        var exitsHistoryDShipmentSchedule = lstHistoryDShipmentSchedules.Find(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
+        var exitsHistoryDShipmentSchedule = lstHistoryDShipmentSchedules.FirstOrDefault(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
                                                                && d.DeliveryTimeClass == deliveryKanbanModel.DeliveryTimeClass && d.DeliveryLocation == deliveryKanbanModel.DeliveryLocation && d.DeliverySlipNumber == deliveryKanbanModel.DeliverySlipNumber);
 
         // スキャン後、履歴一覧を表示
-        var listHistoryForDisplay = new List<D_ShipmentSchedule>();
         if(exitsHistoryDShipmentSchedule != null)
         {
             listHistoryForDisplay.Add(exitsHistoryDShipmentSchedule);
             exitsHistoryDShipmentSchedule.NumScan++;
             var numberOfBox = exitsHistoryDShipmentSchedule.NumScan + exitsHistoryDShipmentSchedule.NumberOfBoxesRemaining;
             exitsHistoryDShipmentSchedule.NumScanAndNumBoxRemaining = $"{exitsHistoryDShipmentSchedule.NumScan}/{numberOfBox}";
-            collectionViewHistory.ItemsSource = null;
             // No降順
             for (int i = 0; i < listHistoryForDisplay.Count; i++)
                 listHistoryForDisplay[i].No = (listHistoryForDisplay.Count - i);
@@ -399,7 +396,6 @@ public partial class RegisterStoreOutPage : ContentPage
 
         collectionViewHistory.ItemsSource = listHistoryForDisplay;
     }
-
 
     /// <summary>
     /// 納入先コードスキャンが成功した場合のラベル値を設定

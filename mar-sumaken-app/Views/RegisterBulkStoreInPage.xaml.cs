@@ -302,31 +302,38 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     var d_ReceiveModel = new D_ReceiveModel();
 
                     // 箱数
-                    int quantity = 0;
+                int numOfBoxes = ((enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0);
+                // 収容数
+                int lotOfQuantity = (int)double.Parse(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
 
                     // 箱数集計表示リスト内に同じ品番がある場合は、同一行の箱数を加算
                     if (existingProduct != null)
                     {
-                        quantity = ((enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0) + existingProduct.Quantity;
-                        _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel { SupplierProductNumber = supplierProductNumber, LotNumber = lotNumber, Quantity = ((enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0) + existingProduct.Quantity });
+                    //加算処理
+                    int numOfBoxesAccumlated = numOfBoxes + existingProduct.NumberOfBoxes;
+                    _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel { SupplierProductNumber = supplierProductNumber,
+                        LotNumber = lotNumber, NumberOfBoxes = numOfBoxesAccumlated ,Quantity = lotOfQuantity });
                         // 既存の製品を削除
                         _TotalNumberOfBoxesDisplay.Remove(existingProduct);
                         // 読取実績・入荷実績のデータを設定
                         scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                        scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, quantity, mSupplierKanban.CompanyID);
+                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity);
                     }
                     else
                     {
                         // 箱数集計表示リストに新しい行を追加
-                        quantity = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0;
-                        _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel { SupplierProductNumber = supplierProductNumber, LotNumber = lotNumber, Quantity = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
+                    _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel { SupplierProductNumber = supplierProductNumber, LotNumber = lotNumber, 
+                        NumberOfBoxes = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 ,
+                        Quantity = lotOfQuantity
+                    });
                         // 読取実績・入荷実績のデータを設定
                         scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                        scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, quantity, mSupplierKanban.CompanyID);
+                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity);
                     }
                     //  仕入先かんばんデータを設定
                     listScanReceive.Add(scanResultModel);
-                    _HistoryListDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, LotNumber = lotNumber, Quantity = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 });
+                _HistoryListDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, LotNumber = lotNumber, 
+                    NumberOfBoxes = (enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0 ,Quantity = lotOfQuantity});
 
                     // 箱数集計表示リスト追加
                     boxesCollectionView.ItemsSource = _TotalNumberOfBoxesDisplay.Reverse();

@@ -250,7 +250,8 @@ public partial class RegisterBulkStoreInPage : ContentPage
         if (!string.IsNullOrEmpty(enteredNumberLabel.Text))
         {
             errorLabel.Text = string.Empty;
-            enteredNumberLabel.Text = enteredNumberLabel.Text.Substring(0, enteredNumberLabel.Text.Length - 1);
+            //enteredNumberLabel.Text = enteredNumberLabel.Text.Substring(0, enteredNumberLabel.Text.Length - 1);
+            enteredNumberLabel.Text = string.Empty;
         }
     }
 

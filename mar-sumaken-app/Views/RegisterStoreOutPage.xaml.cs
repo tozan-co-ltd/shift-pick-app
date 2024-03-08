@@ -43,6 +43,7 @@ public partial class RegisterStoreOutPage : ContentPage
     private HandySettingModel.HandySetting _handySetting;
     public M_SupplierKanbanModel mSupplierKanban;
     public List<D_ShipmentSchedule> lstDShipmentSchedules;
+    public List<D_ShipmentSchedule> lstDShipmentSchedulesForCheckDuplicate;
     public List<D_ShipmentSchedule> lstHistoryDShipmentSchedules;
     public List<M_SupplierKanbanModel> listMSupplierKanban;
     public List<M_SupplierKanbanModel> listMSupplierKanbanForCheckQRCode;
@@ -50,7 +51,6 @@ public partial class RegisterStoreOutPage : ContentPage
     public List<D_ShipmentModel> listDShipment;
     public List<D_ShipmentModel> listDShipmentSqlLite = new List<D_ShipmentModel>();
     public List<M_UserModel> mUserList= new List<M_UserModel>();
-    public D_ShipmentModel dShipmentLocal = new D_ShipmentModel();
     public DeliveryKanbanModel deliveryKanbanModel = new DeliveryKanbanModel();
     public List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
@@ -95,7 +95,11 @@ public partial class RegisterStoreOutPage : ContentPage
         totalNumberOfBoxes = dShipmentScheduleListSearch.Sum(obj => obj.NumberOfBoxes);
         UpdateProgressBar(totalNumberOfBoxes, totalNumberOfBoxesRemaining);
 
+        // 履歴一覧用
         lstHistoryDShipmentSchedules = dShipmentScheduleListSearch;
+
+        // 重複をチェック用
+        lstDShipmentSchedulesForCheckDuplicate = dShipmentScheduleListSearch;
 
         // 残りが0の行が表示されない, 箱数降順
         lstDShipmentSchedules = dShipmentScheduleListSearch.Where(p => p.NumberOfBoxesRemaining != 0).OrderByDescending(p => p.NumberOfBoxes).ToList();
@@ -177,8 +181,11 @@ public partial class RegisterStoreOutPage : ContentPage
             string deliveryIdentifyString = string.Empty;
             if (isScanDelivery) 
             {
+                //納入先かんばんをスキャンした時の文字列を格納
+                deliveryScanContent = clipboardContent;
+
                 // 一回目コードの形式と日付をチェックすし、データを取得する
-                var deliveryQrIdentifyMatchStringList = listMShipmentScheduleQRCode.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
+                var deliveryQrIdentifyMatchStringList = listMShipmentScheduleQRCode.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                 if(deliveryQrIdentifyMatchStringList.Count  <= 0 ) { ShowErrorTextInLabel("E2001: 納入先コードを読み取ってください。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
 
                 deliveryIdentifyString = deliveryQrIdentifyMatchStringList.FirstOrDefault().IdentifyString;
@@ -222,6 +229,7 @@ public partial class RegisterStoreOutPage : ContentPage
                         errorMessengerLabel.Text = "E2015: 既にスキャン済みの納入先かんばんです。";
                         registerStoreOut.IsVisible = false;
                         adminErrorCancel.IsVisible = true;
+                        return;
                     }
                     else
                     {
@@ -234,7 +242,7 @@ public partial class RegisterStoreOutPage : ContentPage
                 // 納入先コードスキャンが成功した場合のラベル値を設定
                 SetValueWhenSuccessScanForDelivery();                
 
-                deliveryScanContent = Clipboard.GetTextAsync().Result;
+                
                 // OKサウンド
                 SoundPlayer.PlaySound(resultOkSound);
 
@@ -242,8 +250,16 @@ public partial class RegisterStoreOutPage : ContentPage
             }
             else　
             {
+                // 新しいオブジェクトを初期化
+                var _dShipmentLocal = new D_ShipmentModel();
+                var d_ScanResultModel = new D_ScanResultModel();
+                var _scanShipmentModel = new ScanShipmentModel();
+
+                //仕入先かんばんをスキャンしたときの文字列を格納
+                supplierScanContent = clipboardContent;
+
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
-                var supplierIdentifyMatchStringList = listMSupplierKanban.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
+                var supplierIdentifyMatchStringList = listMSupplierKanban.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                if(supplierIdentifyMatchStringList.Count <= 0) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
 
                 supplierIdentifyString = supplierIdentifyMatchStringList.FirstOrDefault().IdentifyString;
@@ -265,26 +281,26 @@ public partial class RegisterStoreOutPage : ContentPage
                     registerStoreOut.IsVisible = false;
                     adminErrorCancel.IsVisible = true;
                     isScanDelivery = true;
-                    return; 
+                    return;
                 }
 
-                dShipmentLocal.SupplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
-                if(dShipmentLocal.SupplierProductNumber.IndexOf("-") != -1) // -の後ろの文字を削除する
-                    dShipmentLocal.SupplierProductNumber = dShipmentLocal.SupplierProductNumber.Substring(0, dShipmentLocal.SupplierProductNumber.IndexOf('-'));
+                    // 仕入先かんばん分解 (出荷実績に値を入れる)
+                _dShipmentLocal.SupplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
+                _dShipmentLocal.SupplierProductNumber = Util.SubStringAfterDash(_dShipmentLocal.SupplierProductNumber);
 
                 // 許可された重複チェック
                 if (!mSupplierKanban.AllowedDuplicatesFlag && mSupplierKanban.MainProductKeyLength != 0)
                 {
                     // 仕入先かんばん分解 (出荷実績に値を入れる)
-                    dShipmentLocal.FirstSubProductKey = string.Empty;
-                    dShipmentLocal.SecondSubProductKey = string.Empty;
-                    dShipmentLocal.MainProductKey = clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
+                    _dShipmentLocal.FirstSubProductKey = string.Empty;
+                    _dShipmentLocal.SecondSubProductKey = string.Empty;
+                    _dShipmentLocal.MainProductKey = clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
                    
-                    var isDuplicates = listDShipment.Any(x => x.SupplierProductNumber == dShipmentLocal.SupplierProductNumber && x.MainProductKey == mainProductKey
-                                                                            && x.FirstSubProductKey == dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == dShipmentLocal.SecondSubProductKey);
+                    var isDuplicates = listDShipment.Any(x => x.SupplierProductNumber == _dShipmentLocal.SupplierProductNumber && x.MainProductKey == mainProductKey
+                                                                            && x.FirstSubProductKey == _dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == _dShipmentLocal.SecondSubProductKey);
                     // ローカルで仕入先品番重複チェック
-                    bool isScanDuplicateInSqlLite = listDShipmentSqlLite.Any(x => x.SupplierProductNumber == dShipmentLocal.SupplierProductNumber && x.MainProductKey == dShipmentLocal.MainProductKey &&
-                                                                                                        x.FirstSubProductKey == dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == dShipmentLocal.SecondSubProductKey);
+                    bool isScanDuplicateInSqlLite = listDShipmentSqlLite.Any(x => x.SupplierProductNumber == _dShipmentLocal.SupplierProductNumber && x.MainProductKey == _dShipmentLocal.MainProductKey &&
+                                                                                                        x.FirstSubProductKey == _dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == _dShipmentLocal.SecondSubProductKey);
 
                     if (isDuplicates || isScanDuplicateInSqlLite)  // 仕入先品番重複チェック
                     {
@@ -310,22 +326,18 @@ public partial class RegisterStoreOutPage : ContentPage
 
                 // 仕入先かんばん分解 (出荷実績に値を入れる)
                 if (mSupplierKanban.LotLength != 0)
-                    dShipmentLocal.LotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex - 1, mSupplierKanban.LotLength).Trim();
+                    _dShipmentLocal.LotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex - 1, mSupplierKanban.LotLength).Trim();
 
-                dShipmentLocal.NumberOfBoxes = numberOfBoxes;
-                dShipmentLocal.Quantity = quantity;
-                dShipmentLocal.CreatedAt = DateTime.Now;
-                dShipmentLocal.CreatedBy = _loginUserSqlLite.UserName;
-                dShipmentLocal.KanbanSerialNumber = deliveryKanbanModel.KanbanSerialNumber ;
-
-                supplierScanContent = Clipboard.GetTextAsync().Result;
-
+                _dShipmentLocal.NumberOfBoxes = numberOfBoxes;
+                _dShipmentLocal.Quantity = quantity;
+                _dShipmentLocal.CreatedAt = DateTime.Now;
+                _dShipmentLocal.CreatedBy = _loginUserSqlLite.UserName;
+                _dShipmentLocal.KanbanSerialNumber = deliveryKanbanModel.KanbanSerialNumber;
                 // 読取実績モデル値を入れる
-                scanShipmentModel.d_ShipmentModel = dShipmentLocal;
-                var d_ScanResultModel = new D_ScanResultModel();
+                _scanShipmentModel.d_ShipmentModel = _dShipmentLocal;
                 d_ScanResultModel = SetScanResultModel(d_ScanResultModel, mSupplierKanban.SupplierKanbanID,  _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
-                scanShipmentModel.d_ScanResultModel = d_ScanResultModel;
-                listScanShipment.Add(scanShipmentModel);
+                _scanShipmentModel.d_ScanResultModel = d_ScanResultModel;
+                listScanShipment.Add(_scanShipmentModel);
 
                 // スキャンが終わったら、出荷指示リストと履歴一覧を更新
                 UpdateListAndHistoryListDShipmentSchedules();
@@ -334,8 +346,8 @@ public partial class RegisterStoreOutPage : ContentPage
                 CheckScanContentAndAddListScanShipment();
 
                 // スキャン出来たら、ローカルで出荷実績モデルを保存
-                dShipmentLocal.ShipmentScheduleID = shipmentScheduleID;
-                await _dbService.SaveDShipmentAsync(dShipmentLocal);
+                _dShipmentLocal.ShipmentScheduleID = shipmentScheduleID;
+                await _dbService.SaveDShipmentAsync(_dShipmentLocal);
 
                 isScanDelivery = true;
                 // OKサウンド
@@ -350,7 +362,6 @@ public partial class RegisterStoreOutPage : ContentPage
             await DisplayAlert("エラー", ex.Message, "閉じる");
         }
     }
-
 
     /// <summary>
     /// 出荷指示リストと履歴一覧を更新
@@ -389,18 +400,6 @@ public partial class RegisterStoreOutPage : ContentPage
         collectionViewHistory.ItemsSource = listHistoryForDisplay;
     }
 
-
-    /// <summary>
-    /// Qrコード値の部分文字列
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="stringLength"></param>
-    /// <param name="qr"></param>
-    public static string QrcodeValueSubstring(int index, int stringLength, string qr)
-    {
-        var value = qr.Substring(index - 1, stringLength).Replace(" ", "");
-        return value;
-    }
 
     /// <summary>
     /// 納入先コードスキャンが成功した場合のラベル値を設定
@@ -446,7 +445,7 @@ public partial class RegisterStoreOutPage : ContentPage
     public D_ShipmentSchedule ExistDeliveryProductNumberCheck(int depoID, int companyID, DateTime deliveryDate, int deliveryTimeClass, string deliveryLocation, string deliverySlipNumber)
     {
         var d_ShipmentSchedule = new D_ShipmentSchedule();
-         d_ShipmentSchedule = lstDShipmentSchedules.Where(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == depoID && d.CompanyID == companyID && 
+         d_ShipmentSchedule = lstDShipmentSchedulesForCheckDuplicate.Where(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == depoID && d.CompanyID == companyID && 
          d.DeliveryDate == deliveryDate && d.DeliveryTimeClass == deliveryTimeClass && d.DeliveryLocation == deliveryLocation && d.DeliverySlipNumber == deliverySlipNumber).FirstOrDefault();
         if (d_ShipmentSchedule != null)
             return d_ShipmentSchedule;
@@ -470,10 +469,7 @@ public partial class RegisterStoreOutPage : ContentPage
         {
             // 文字列をトリム
             var supplierProductNumberTrim = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).ToString().Trim();
-            if (supplierProductNumberTrim.IndexOf("-") != -1) // -の後ろの文字を削除する
-                supplierProductNumberCheck = supplierProductNumberTrim.Substring(0, supplierProductNumberTrim.IndexOf('-'));
-            else
-                supplierProductNumberCheck = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
+            supplierProductNumberCheck = Util.SubStringAfterDash(supplierProductNumberTrim);
         }
 
         findListProduct = listProducts.Where(product => product.SupplierProductNumber == supplierProductNumberCheck && product.LotQuantity == quantity).ToList();
@@ -484,7 +480,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <summary>
     /// 内容を確認してリストを追加 スキャン発送
     /// </summary>
-    public async void CheckScanContentAndAddListScanShipment()
+    public void CheckScanContentAndAddListScanShipment()
     {
             statusScanLabel.Text = "②スキャンOK";
             isScanDelivery = true;
@@ -754,7 +750,7 @@ public partial class RegisterStoreOutPage : ContentPage
             }
 
             //テキスト値を設定し、成功登録後にラベルに表示されます
-            SetTextValueAndVisibleForLabelAfterRegister();
+            SetValueAndVisibleLabelAfterRegisterAndErrorCancel();
 
             // サウンドのパスを取得する
             string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
@@ -809,7 +805,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <summary>
     /// テキスト値を設定し、成功登録後にラベルに表示されます
     /// </summary>
-    public void SetTextValueAndVisibleForLabelAfterRegister()
+    public void SetValueAndVisibleLabelAfterRegisterAndErrorCancel()
     {
         productNumberLabel.Text = string.Empty;
         statusScanLabel.Text = string.Empty;
@@ -819,6 +815,8 @@ public partial class RegisterStoreOutPage : ContentPage
         scanTextResult.IsVisible = false;
         deliveryScanContent = string.Empty;
         supplierScanContent = string.Empty;
+        txtLoginId.Text = string.Empty;
+        txtPassword.Text = string.Empty;
     }
 
     /// <summary>
@@ -826,7 +824,6 @@ public partial class RegisterStoreOutPage : ContentPage
     /// </summary>
     private void OnErrorCancelClicked(object sender, EventArgs e)
     {
-
         var loginID = txtLoginId.Text;
         var password = txtPassword.Text;
 
@@ -838,7 +835,7 @@ public partial class RegisterStoreOutPage : ContentPage
             return;
         }
 
-        // ログインIDは合致するデータがない
+        //// ログインIDは合致するデータがない
         var listUser = mUserList.Where(u => u.LoginID == loginID).ToList();
 
         if (listUser.Count <= 0)
@@ -847,7 +844,7 @@ public partial class RegisterStoreOutPage : ContentPage
             return;
         }
 
-        // 入力されたパスワードをハッシュ化
+        //// 入力されたパスワードをハッシュ化
         byte[] salt = Hashing.ConvertStringToBytes(listUser.FirstOrDefault().Salt);
         string hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(password, salt);
 
@@ -870,6 +867,8 @@ public partial class RegisterStoreOutPage : ContentPage
         d_HandyErrorMessageModel.CreatedBy = _loginUserSqlLite.UserName;
 
         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+  
+        SetValueAndVisibleLabelAfterRegisterAndErrorCancel();
         // 出庫登録画面を表示
         registerStoreOut.IsVisible = true;
         adminErrorCancel.IsVisible = false;

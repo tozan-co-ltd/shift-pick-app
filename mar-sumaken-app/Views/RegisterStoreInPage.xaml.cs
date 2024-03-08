@@ -131,7 +131,7 @@ public partial class RegisterStoreInPage : ContentPage
                 listRHandyMenuSupplierKanban = await _dbService.GetRHandyMenuSupplierKanbanByHandyMenuID(handyMenuID);
                 listMSupplierKanbanForCheckQRCode = await _dbService.GetMSupplierKanbanByHandySupplierKanbanID(listRHandyMenuSupplierKanban.FirstOrDefault().SupplierKanbanID);
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
-                var supplierIdentifyMatchStringList = listMSupplierKanbanForCheckQRCode.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
+                var supplierIdentifyMatchStringList = listMSupplierKanbanForCheckQRCode.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                 if (supplierIdentifyMatchStringList.Count <= 0)
                 {
                     // 識別文字列が正しくない場合はエラー
@@ -250,17 +250,6 @@ public partial class RegisterStoreInPage : ContentPage
         }
     }
 
-    /// <summary>
-    /// Qrコード値の部分文字列
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="stringLength"></param>
-    /// <param name="qr"></param>
-    public static string QrcodeValueSubstring(int index, int stringLength, string qr)
-    {
-        var value = qr.Substring(index - 1, stringLength).Replace(" ", "");
-        return value;
-    }
 
     /// <summary>
     /// 読取実績モデル作成

@@ -134,7 +134,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 listRHandyMenuSupplierKanban = await _dbService.GetRHandyMenuSupplierKanbanByHandyMenuID(handyMenuID);
                 listMSupplierKanbanForCheckQRCode = await _dbService.GetMSupplierKanbanByHandySupplierKanbanID(listRHandyMenuSupplierKanban.FirstOrDefault().SupplierKanbanID);
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
-                var supplierIdentifyMatchStringList = listMSupplierKanbanForCheckQRCode.Where(x => x.IdentifyString == QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
+                var supplierIdentifyMatchStringList = listMSupplierKanbanForCheckQRCode.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                 if (supplierIdentifyMatchStringList.Count <= 0)
                 {
                     // 識別文字列が正しくない場合はエラー
@@ -153,9 +153,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 {
                     // 文字列をトリム
                     var supplierProductNumberTrim = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).ToString().Trim();
-                    if(supplierProductNumberTrim.IndexOf("-") != -1) // -の後ろの文字を削除する
-                        supplierProductNumberTrim = supplierProductNumberTrim.Substring(0, supplierProductNumberTrim.IndexOf('-'));
-                    supplierProductNumber = supplierProductNumberTrim;
+                    supplierProductNumber = Util.SubStringAfterDash(supplierProductNumberTrim);
                     // 仕入先品番が存在をチェック
                     bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
                     if(!existsSupplierProductNumber)
@@ -208,18 +206,6 @@ public partial class RegisterBulkStoreInPage : ContentPage
             await DisplayAlert("エラー", ex.Message, "OK");
             return;
         }
-    }
-
-    /// <summary>
-    /// Qrコード値の部分文字列
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="stringLength"></param>
-    /// <param name="qr"></param>
-    public static string QrcodeValueSubstring(int index, int stringLength, string qr)
-    {
-        var value = qr.Substring(index - 1, stringLength).Replace(" ", "");
-        return value;
     }
 
     /// <summary>

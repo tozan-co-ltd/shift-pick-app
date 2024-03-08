@@ -10,7 +10,7 @@ namespace mar_sumaken_app.Views;
 
 public partial class RegisterBulkStoreInPage : ContentPage
 {
-    int count = 0;
+    int countOfScaned = 0;
     bool isItemTapped = false;
     private string? _handyApiUrl;
     private bool _IsScanPageActive = false;
@@ -273,24 +273,24 @@ public partial class RegisterBulkStoreInPage : ContentPage
             {
                 errorLabel.Text = "最大3桁まで入力可能です。";
                 SoundPlayer.PlaySound(resultErrorSound);
+                return;
             }
-            else
-            {
+           
                 // 入力値が空または0の場合はエラー
                 if (enteredNumberLabel.Text == string.Empty)
                 {
                     errorLabel.Text = "0以上で入力してください。";
                     SoundPlayer.PlaySound(resultErrorSound);
+                return;
                 }
-                else if (enteredNumberLabel.Text != string.Empty && int.Parse(enteredNumberLabel.Text) == 0)
+            if (enteredNumberLabel.Text != string.Empty && int.Parse(enteredNumberLabel.Text) == 0)
                 {
                     errorLabel.Text = "0以上で入力してください。";
                     SoundPlayer.PlaySound(resultErrorSound);
+                return;
                 }
-                else
-                {
-                    count++;
-                    CounterBtn.Text = $"{count}";
+                countOfScaned++;
+                CounterBtn.Text = $"{countOfScaned}";
 
                     // 箱数集計表示リスト内の同じ品番を取得
                     D_ReceiveModel existingProduct =  _TotalNumberOfBoxesDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber).FirstOrDefault();
@@ -336,8 +336,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     bulkStockContent.IsVisible = true;
                     enteredNumberLabel.Text = string.Empty;
                     errorLabel.Text = string.Empty;
-                }
-            }
+              
         }
         catch (Exception ex)
         {

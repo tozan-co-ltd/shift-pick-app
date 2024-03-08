@@ -170,7 +170,8 @@ public partial class RegisterStoreInPage : ContentPage
                     }
 
                     // 収容数
-                    numberOfBoxes = int.Parse(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+                    lotOfQuantity = (int) double.Parse(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+
                     // キー
                     mainProductKey = clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
 

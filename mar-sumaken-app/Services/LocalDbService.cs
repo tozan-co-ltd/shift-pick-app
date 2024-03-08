@@ -178,6 +178,15 @@ namespace mar_sumaken_app.Services
         {
             return await _connection.Table<M_SupplierKanbanModel>().Where(x => x.SupplierKanbanID == supplierKanbanID).ToListAsync();
         }
+
+        /// <summary>
+        /// ハンディメニューに定められた仕入先かんばんデータを取得
+        /// </summary>
+        public  async Task<List<M_SupplierKanbanModel>> GetMSupplierKanbanByHandySupplierKanbanIDs(IEnumerable<int> supplierKanbanIDs)
+        {
+            // Where 条件で Contains を使用して複数の ID を検索
+            return await _connection.Table<M_SupplierKanbanModel>().Where(x => supplierKanbanIDs.Contains(x.SupplierKanbanID)).ToListAsync();
+        }
         #endregion
 
 

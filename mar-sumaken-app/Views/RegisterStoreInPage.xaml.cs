@@ -129,7 +129,8 @@ public partial class RegisterStoreInPage : ContentPage
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
                 listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
                 listRHandyMenuSupplierKanban = await _dbService.GetRHandyMenuSupplierKanbanByHandyMenuID(handyMenuID);
-                listMSupplierKanbanForCheckQRCode = await _dbService.GetMSupplierKanbanByHandySupplierKanbanID(listRHandyMenuSupplierKanban.FirstOrDefault().SupplierKanbanID);
+                //listMSupplierKanbanForCheckQRCode = await _dbService.GetMSupplierKanbanByHandySupplierKanbanID(listRHandyMenuSupplierKanban.FirstOrDefault().SupplierKanbanID);
+                listMSupplierKanbanForCheckQRCode = await _dbService.GetMSupplierKanbanByHandySupplierKanbanIDs(listRHandyMenuSupplierKanban.Select(item => item.SupplierKanbanID).ToList());
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
                 var supplierIdentifyMatchStringList = listMSupplierKanbanForCheckQRCode.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                 if (supplierIdentifyMatchStringList.Count <= 0)

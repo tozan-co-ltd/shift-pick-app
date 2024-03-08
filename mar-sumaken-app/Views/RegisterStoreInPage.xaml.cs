@@ -10,7 +10,8 @@ namespace mar_sumaken_app.Views;
 public partial class RegisterStoreInPage : ContentPage
 {
     int count = 0;
-    int quantity = 1;
+    //入庫箱数の単位は必ず1
+    int numOfBoxes = 1;
     bool isItemTapped = false;
     private string? _handyApiUrl;
     private bool _IsScanPageActive = false;
@@ -151,8 +152,8 @@ public partial class RegisterStoreInPage : ContentPage
                 {
                     // 文字列をトリム
                     string supplierProductNumber = string.Empty;
-                    int numberOfBoxes = 0;
-                    string mainProductKey = string.Empty;
+                    int lotOfQuantity = 0;
+                    
                     // 品番
                     supplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
                     // 仕入先品番が存在をチェック
@@ -191,21 +192,23 @@ public partial class RegisterStoreInPage : ContentPage
                         // 箱数集計表示リスト内に同じ品番がある場合は、同一行の箱数を加算
                         if (existingProduct != null)
                         {
-                            existingProduct.Quantity++;
-                            _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = numberOfBoxes, MainProductKey = mainProductKey, Quantity = existingProduct.Quantity });
+                            existingProduct.NumberOfBoxes++;
+                            _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = existingProduct.NumberOfBoxes, MainProductKey = mainProductKey, Quantity = lotOfQuantity });
                             // 既存のデータを削除
                             _TotalNumberOfBoxesDisplay.Remove(existingProduct);
                             // 読取実績・入荷実績のデータを設定
-                            scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, numberOfBoxes, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                            scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, numberOfBoxes, loginUser.Last().UserName,  existingProduct.Quantity, mSupplierKanban.CompanyID);
+                            scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, numOfBoxes, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
+                            scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber,
+                                numOfBoxes, loginUser.Last().UserName, lotOfQuantity, mSupplierKanban.CompanyID, mainProductKey, fisrtSubProductKey, secondSubProductKey);
                         }
                         else
                         {
                             // 箱数集計表示リストに新しい行を追加
-                            _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = numberOfBoxes, MainProductKey = mainProductKey, Quantity = quantity });
+                            _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = numOfBoxes, MainProductKey = mainProductKey, Quantity = lotOfQuantity });
                             // 読取実績・入荷実績のデータを設定
-                            scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, numberOfBoxes, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                            scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, numberOfBoxes, loginUser.Last().UserName, quantity, mSupplierKanban.CompanyID);
+                            scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, numOfBoxes, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
+                            scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber,
+                                numOfBoxes, loginUser.Last().UserName, lotOfQuantity, mSupplierKanban.CompanyID, mainProductKey, fisrtSubProductKey, secondSubProductKey);
                         }
                     }
                     else
@@ -229,7 +232,7 @@ public partial class RegisterStoreInPage : ContentPage
                     // 箱数集計表示リスト追加
                     boxesCollectionView.ItemsSource = _TotalNumberOfBoxesDisplay.Reverse();
                     // 履歴一覧表示リスト追加
-                    _HistoryListDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, MainProductKey = mainProductKey, NumberOfBoxes = numberOfBoxes });
+                    _HistoryListDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, MainProductKey = mainProductKey, Quantity = lotOfQuantity });
                     historyCollectionView.ItemsSource = _HistoryListDisplay.Reverse();
                 }
                 else

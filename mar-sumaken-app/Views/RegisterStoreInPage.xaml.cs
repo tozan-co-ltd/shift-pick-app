@@ -173,7 +173,15 @@ public partial class RegisterStoreInPage : ContentPage
                     lotOfQuantity = (int) double.Parse(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
 
                     // キー
-                    mainProductKey = clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
+                    string mainProductKey = string.Empty;
+                    string fisrtSubProductKey = string.Empty;
+                    string secondSubProductKey = string.Empty;
+                    if (mSupplierKanban.MainProductKeyLength != 0)
+                    {
+                        mainProductKey = mSupplierKanban.MainProductKeyLength == 0 ? string.Empty : clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
+                        fisrtSubProductKey = mSupplierKanban.FirstSubProductKeyLength == 0 ? string.Empty : clipboardContent.Substring(mSupplierKanban.FirstSubProductKeyStartIndex - 1, mSupplierKanban.FirstSubProductKeyLength).Trim();
+                        secondSubProductKey = mSupplierKanban.SecondSubProductKeyLength == 0 ? string.Empty : clipboardContent.Substring(mSupplierKanban.SecondSubProductKeyStartIndex - 1, mSupplierKanban.SecondSubProductKeyLength).Trim();
+                    }
 
                     // 箱数集計表示リスト内の同じ品番を取得
                     D_ReceiveModel existingProduct = _TotalNumberOfBoxesDisplay.FirstOrDefault(p => p.SupplierProductNumber == supplierProductNumber);
@@ -289,13 +297,17 @@ public partial class RegisterStoreInPage : ContentPage
     /// <param name="numberOfBoxes">入力箱数</param>
     /// <param name="quantity">数量</param>
     /// <returns></returns>
-    public D_ReceiveModel SetDReceiveModel(D_ReceiveModel d_ReceiveModel, string supplierProductNumber, int numberOfBoxes, string userName, int quantity , int companyID)
+    public D_ReceiveModel SetDReceiveModel(D_ReceiveModel d_ReceiveModel, string supplierProductNumber, int numberOfBoxes, string userName, 
+        int quantity , int companyID, string mainProductKey, string fisrtSubProductKey, string secondSubProductKey)
     {
         d_ReceiveModel.CompanyID = companyID;
         d_ReceiveModel.ReceiveDatetime = DateTime.Now;
         d_ReceiveModel.SupplierProductNumber = supplierProductNumber;
         d_ReceiveModel.NumberOfBoxes = numberOfBoxes;
         d_ReceiveModel.Quantity = quantity;
+        d_ReceiveModel.MainProductKey = mainProductKey;
+        d_ReceiveModel.FirstSubProductKey = fisrtSubProductKey;
+        d_ReceiveModel.SecondSubProductKey = secondSubProductKey;
         d_ReceiveModel.ScanedAt = DateTime.Now;
         d_ReceiveModel.CreatedAt = DateTime.Now;
         d_ReceiveModel.CreatedBy = userName;

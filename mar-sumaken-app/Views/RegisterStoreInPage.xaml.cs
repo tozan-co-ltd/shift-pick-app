@@ -9,7 +9,7 @@ namespace mar_sumaken_app.Views;
 
 public partial class RegisterStoreInPage : ContentPage
 {
-    int count = 0;
+    int countOfScaned = 0;
     //入庫箱数の単位は必ず1
     int numOfBoxes = 1;
     bool isItemTapped = false;
@@ -50,7 +50,7 @@ public partial class RegisterStoreInPage : ContentPage
     public RegisterStoreInPage(int menuID, List<M_ProductModel> listProductItems)
 	{
 		InitializeComponent();
-        CounterBtn.Text = $"{count}";
+        CounterBtn.Text = $"{countOfScaned}";
         handyMenuID = menuID;
         listProducts = listProductItems;
         Clipboard.ClipboardContentChanged += OnClipboardContentChanged;
@@ -195,8 +195,8 @@ public partial class RegisterStoreInPage : ContentPage
 
                     if (duplicateProduct == null)
                     {
-                        count++;
-                        CounterBtn.Text = $"{count}";
+                        countOfScaned++;
+                        CounterBtn.Text = $"{countOfScaned}";
 
                         // 箱数集計表示リスト内に同じ品番がある場合は、同一行の箱数を加算
                         if (existingProduct != null)

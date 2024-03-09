@@ -163,6 +163,9 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
+            //管理者エラー解除画面表示中はスキャンさせない。
+            if (adminErrorCancel.IsVisible) return;
+            
             //　QRコードのコンテンツを取得
             string clipboardContent = Clipboard.GetTextAsync().Result;
 

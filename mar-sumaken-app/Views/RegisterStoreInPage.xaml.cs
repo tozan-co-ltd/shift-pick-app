@@ -2,6 +2,7 @@ using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
 using mar_sumaken_app.ViewModels;
+using mar_sumaken_app.Properties;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 
@@ -120,7 +121,7 @@ public partial class RegisterStoreInPage : ContentPage
 
                 if (string.IsNullOrEmpty(clipboardContent))
                 {
-                    scanTextResult.Text = "E2015: QRコードの読取ができませんでした。再度スキャンしてください。";
+                    scanTextResult.Text = $"E2015: {ErrorMessagesResources.E2015}";
                     scanTextResult.TextColor = Colors.Red;
                     d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                     listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
@@ -138,7 +139,7 @@ public partial class RegisterStoreInPage : ContentPage
                 {
                     // 識別文字列が正しくない場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
-                    scanTextResult.Text = "E2001: QRコードが正しくありません。正しいQRコードを読み取ってください。";
+                    scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
                     scanTextResult.TextColor = Colors.Red;
                     d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                     listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
@@ -162,7 +163,7 @@ public partial class RegisterStoreInPage : ContentPage
                     {
                         // 識別文字列が正しくない場合はエラー
                         SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = "E2002: 品番マスターにデータがありません。";
+                        scanTextResult.Text = $"E2002: {string.Format(ErrorMessagesResources.E2002,"品番マスター")}";
                         scanTextResult.TextColor = Colors.Red;
                         d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
@@ -224,7 +225,7 @@ public partial class RegisterStoreInPage : ContentPage
                     {
                         // 既にスキャンしている場合はエラー
                         SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = "E1003: 既にスキャン済みの仕入先かんばんです。";
+                        scanTextResult.Text = $"E2017: {ErrorMessagesResources.E2017}";
                         scanTextResult.TextColor = Colors.Red;
                         d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
@@ -248,7 +249,7 @@ public partial class RegisterStoreInPage : ContentPage
                 {
                     // 識別文字列が正しくない場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
-                    scanTextResult.Text = "E2001: QRコードが正しくありません。正しいQRコードを読み取ってください。";
+                    scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
                     scanTextResult.TextColor = Colors.Red;
                     d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                     listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
@@ -356,7 +357,7 @@ public partial class RegisterStoreInPage : ContentPage
                 // ネットワーク接続チェック
                 if (!NetworkCheck.CheckNetworkConnection())
                 {
-                    await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+                    await DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK");
                     return;
                 }
 
@@ -382,7 +383,7 @@ public partial class RegisterStoreInPage : ContentPage
                 // ERRORサウンドを鳴らす
                 string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
                 SoundPlayer.PlaySound(resultErrorSound);
-                await Application.Current.MainPage.DisplayAlert("エラー", "E2016: 読取データがありません。", "OK");
+                await Application.Current.MainPage.DisplayAlert("エラー", $"E2016: {ErrorMessagesResources.E2016}", "OK");
             }
         }
         catch (Exception ex)

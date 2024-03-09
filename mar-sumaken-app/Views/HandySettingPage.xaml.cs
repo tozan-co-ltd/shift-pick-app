@@ -1,11 +1,13 @@
 using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
+using mar_sumaken_app.Properties;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using Android.Accounts;
 
 namespace mar_sumaken_app.Views;
 
@@ -101,7 +103,7 @@ public partial class HandySettingPage : ContentPage
             // ネットワーク接続チェック
             if (!NetworkCheck.CheckNetworkConnection())
             {
-                await DisplayAlert("エラー", "E3003: ネットワークが利用できません。", "OK");
+                await DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK");
                 hasRegiterClick = false;
                 return;
             }
@@ -121,20 +123,20 @@ public partial class HandySettingPage : ContentPage
             bool isValidUrl = Uri.TryCreate(txtUrlApi, UriKind.Absolute, out Uri result);
             if (string.IsNullOrWhiteSpace(txtUrlApi))
             {
-                await DisplayAlert("エラー", "E2000: 接続先を入力してください。", "OK");
+                await DisplayAlert("エラー", $"E2004: {ErrorMessagesResources.E2004}", "OK");
                 hasRegiterClick = false;
                 return;
             }
             if (!isValidUrl)
             {
-                await DisplayAlert("エラー", "E2000: 接続先URLにアクセスできません。正しいURLを入力してください。", "OK");
+                await DisplayAlert("エラー", $"E2005: {ErrorMessagesResources.E2005}", "OK");
                 hasRegiterClick = false;
                 return;
             }
        
             if (string.IsNullOrWhiteSpace(settingApiRequestBody.CompanyCode) || string.IsNullOrWhiteSpace(settingApiRequestBody.CompanyPassword))
             {
-                await DisplayAlert("エラー", "E2000: 会社コード・会社パスワードはセットで入力してください。", "OK");
+                await DisplayAlert("エラー", $"E2006: {ErrorMessagesResources.E2006}", "OK");
                 hasRegiterClick = false;
                 return;
             }
@@ -168,7 +170,7 @@ public partial class HandySettingPage : ContentPage
             }
             else if (response.content.Contains("<!DOCTYPE html>"))
             {
-                await DisplayAlert("エラー", "E2000: 接続先URLにアクセスできません", "OK");
+                await DisplayAlert("エラー", $"E2005: {ErrorMessagesResources.E2005}", "OK");
                 hasRegiterClick = false;
                 return;
             }

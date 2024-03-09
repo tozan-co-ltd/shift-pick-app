@@ -1,6 +1,7 @@
 using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
+using mar_sumaken_app.Properties;
 using Newtonsoft.Json;
 using System.Data.SqlTypes;
 using System.Text.RegularExpressions;
@@ -42,7 +43,7 @@ public partial class LoginPage : ContentPage
         if (Decimal.TryParse(AppInfo.VersionString, out decimal appVer))  // アプリバージョンチェック
             AppVersion = appVer;
         else
-            await DisplayAlert("エラー", "E2000: 使用ハンディメニューが登録されていません。", "OK");
+            await DisplayAlert("エラー", $"E2007:  {ErrorMessagesResources.E2007}", "OK");
 
         // ローカルDBのハンディ設定情報取得
         var settings = await _dbService.GetSetting();
@@ -74,7 +75,7 @@ public partial class LoginPage : ContentPage
             var settings = await _dbService.GetSetting();
             if (settings.Count() == 0)
             {
-                await DisplayAlert("エラー", "「設定」から会社コードを登録してください。", "OK");
+                await DisplayAlert("エラー", $"E2008:  {ErrorMessagesResources.E2008}", "OK");
                 hasOnLoginClick = false;
                 return;
             }
@@ -86,7 +87,7 @@ public partial class LoginPage : ContentPage
             // ネットワーク接続チェック
             if (!NetworkCheck.CheckNetworkConnection())
             {
-                await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+                await DisplayAlert("エラー", $"E3003:  {ErrorMessagesResources.E3003}", "OK");
                 hasOnLoginClick = false;
                 return;
             }
@@ -96,7 +97,7 @@ public partial class LoginPage : ContentPage
 
             // ログインIDチェック
             if (IsNotHalfWidthAlphanumeric(loginId) || (4 > loginId.Length || loginId.Length > 12))
-                await DisplayAlert("エラー", "E2000: ログインIDが正しくありません。", "OK");
+                await DisplayAlert("エラー", $"E2003:  {ErrorMessagesResources.E2003}", "OK");
             else
             {
                 Application.Current.MainPage = new LoadingPage();

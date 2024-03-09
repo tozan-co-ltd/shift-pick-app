@@ -619,8 +619,9 @@ public partial class RegisterStoreOutPage : ContentPage
         statusScanLabel.IsVisible = false;
 
         // 識別文字列が正しくない場合はエラー
-        d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, depoID, userName, error);
+        D_HandyErrorMessageModel  _d_HandyErrorMessag = SetHandyErrorMessage(d_HandyErrorMessageModel, depoID, userName, error);
         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+        d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
     }
 
 

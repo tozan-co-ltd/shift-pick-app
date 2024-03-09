@@ -632,7 +632,9 @@ public partial class RegisterStoreOutPage : ContentPage
                 await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
                 return;
             }
-
+            //ロード画面表示
+            Application.Current.MainPage = new LoadingPage();
+            await Task.Delay(200);
             var shipmentScheduleRequestBody = new
             {
                 CompanyID = companyID,
@@ -645,6 +647,7 @@ public partial class RegisterStoreOutPage : ContentPage
             };
             var jsonDataShipmentScheduleSend = JsonConvert.SerializeObject(shipmentScheduleRequestBody);
 
+
             // 最新データを取得するため、もう一回APIにリクエストを送る
             var responseShipmentSchedule = await App.API.PostMethod(jsonDataShipmentScheduleSend, _handyApiUrl, "ShipmentSchedule/Find");
 
@@ -656,6 +659,7 @@ public partial class RegisterStoreOutPage : ContentPage
             }
             else
                 await DisplayAlert("エラー", responseShipmentSchedule.content, "OK");
+
 
             Application.Current.MainPage = new DisplayShippingInstructionListPage(handyMenuID, companyID, selectedDeliveryNameLabel.Text, selectedDate, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, listProducts, deliverySlipNumberLabel.Text);
 

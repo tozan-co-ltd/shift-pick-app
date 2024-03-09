@@ -28,8 +28,6 @@ public partial class RegisterStoreOutPage : ContentPage
     public int companyID;
     public int handyMenuID;
     public int numberOfBoxes = 1;
-    public string mainProductKey;
-    public int quantity;
     public int shipmentScheduleID;
     int totalNumberOfBoxes;
     int totalNumberOfBoxesRemaining;
@@ -48,7 +46,6 @@ public partial class RegisterStoreOutPage : ContentPage
     public ObservableCollection<D_ShipmentSchedule> lstHistoryDShipmentSchedules;
     public ObservableCollection<D_ShipmentSchedule> listHistoryForDisplay = new ObservableCollection<D_ShipmentSchedule>();
     public List<M_SupplierKanbanModel> listMSupplierKanban;
-    public List<M_SupplierKanbanModel> listMSupplierKanbanForCheckQRCode;
     public List<R_HandyMenuSupplierKanbanModel> listRHandyMenuSupplierKanban;
     public List<D_ShipmentModel> listDShipment;
     public List<D_ShipmentModel> listDShipmentSqlLite = new List<D_ShipmentModel>();
@@ -57,10 +54,8 @@ public partial class RegisterStoreOutPage : ContentPage
     public List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     public List<D_HandyErrorMessageModel> listDHandyErrorMessage = new List<D_HandyErrorMessageModel>();
-    public ScanShipmentModel scanShipmentModel = new ScanShipmentModel();
     public List<ScanShipmentModel> listScanShipment = new List<ScanShipmentModel>();
     public List<M_ShipmentScheduleQRCodeModel> listMShipmentScheduleQRCode = new List<M_ShipmentScheduleQRCodeModel>();
-    public List<ScanReceiveModel> listScanReceive = new List<ScanReceiveModel>();
     public D_HandyErrorMessageModel d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
     public D_StoreOutModel.StoreOutPostBody storeOutPostBody = new D_StoreOutModel.StoreOutPostBody();
 
@@ -217,7 +212,7 @@ public partial class RegisterStoreOutPage : ContentPage
                     adminErrorCancel.IsVisible = true;
                     return; 
                 }
-                quantity = dShipmentSchedule.Quantity;
+                
                 shipmentScheduleID = dShipmentSchedule.ShipmentScheduleID;
 
                 // ローカルで読取実績モデルの出荷実績モデルに出荷指示IDとシリアル番号(かんばん識別番号)をチェック
@@ -301,7 +296,7 @@ public partial class RegisterStoreOutPage : ContentPage
                     _dShipmentLocal.SecondSubProductKey = string.Empty;
                     _dShipmentLocal.MainProductKey = clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
                    
-                    var isDuplicates = listDShipment.Any(x => x.SupplierProductNumber == _dShipmentLocal.SupplierProductNumber && x.MainProductKey == mainProductKey
+                    var isDuplicates = listDShipment.Any(x => x.SupplierProductNumber == _dShipmentLocal.SupplierProductNumber && x.MainProductKey == _dShipmentLocal.MainProductKey
                                                                             && x.FirstSubProductKey == _dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == _dShipmentLocal.SecondSubProductKey);
                     // ローカルで仕入先品番重複チェック
                     bool isScanDuplicateInSqlLite = listDShipmentSqlLite.Any(x => x.SupplierProductNumber == _dShipmentLocal.SupplierProductNumber && x.MainProductKey == _dShipmentLocal.MainProductKey &&

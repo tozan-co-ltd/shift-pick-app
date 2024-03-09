@@ -21,6 +21,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public partial class RegisterStoreOutPage : ContentPage
 {
+    bool isItemTapped = false;
     public DateTime selectedDate;
     private string? _handyApiUrl;
     public int overallProgress;
@@ -627,6 +628,18 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
+            if (!isItemTapped)
+            {
+                isItemTapped = true;
+                if (listScanShipment.Count() > 0)
+                {
+                   bool confirm = await DisplayAlert("確認", "読み取ったデータは削除されますが、戻ってよろしいですか。", "OK", "キャンセル");
+                    isItemTapped = false;
+                    if (!confirm) return;                        
+                }
+                isItemTapped = false;
+            }
+
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
                 await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");

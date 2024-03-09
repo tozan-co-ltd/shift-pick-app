@@ -387,17 +387,31 @@ public partial class RegisterStoreOutPage : ContentPage
         // スキャン後、履歴一覧を表示
         if(exitsHistoryDShipmentSchedule != null)
         {
-            listHistoryForDisplay.Add(exitsHistoryDShipmentSchedule);
+            //listHistoryForDisplay.Add(exitsHistoryDShipmentSchedule);
+            listHistoryForDisplay.Insert(0, exitsHistoryDShipmentSchedule);
             exitsHistoryDShipmentSchedule.NumScan++;
             var numberOfBox = exitsHistoryDShipmentSchedule.NumScan + exitsHistoryDShipmentSchedule.NumberOfBoxesRemaining;
             exitsHistoryDShipmentSchedule.NumScanAndNumBoxRemaining = $"{exitsHistoryDShipmentSchedule.NumScan}/{numberOfBox}";
+            // 既存のデータを削除
+            var existingDeliveryProductNumber = listHistoryForDisplay.Where(p => p.DeliveryProductNumber == exitsHistoryDShipmentSchedule.DeliveryProductNumber);
+            if (existingDeliveryProductNumber.Count() > 1)
+                listHistoryForDisplay.Remove(exitsHistoryDShipmentSchedule);
             // No降順
-            for (int i = 0; i < listHistoryForDisplay.Count; i++)
-                listHistoryForDisplay[i].No = (listHistoryForDisplay.Count - i);
+            UpdateNo();
         }
 
         collectionViewHistory.ItemsSource = listHistoryForDisplay;
     }
+
+
+    public void UpdateNo()
+    {
+        for (int i = 0; i < listHistoryForDisplay.Count; i++)
+        {
+            listHistoryForDisplay[i].No = i + 1;
+        }
+    }
+
 
     /// <summary>
     /// 納入先コードスキャンが成功した場合のラベル値を設定

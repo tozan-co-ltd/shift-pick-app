@@ -149,57 +149,45 @@ public partial class RegisterBulkStoreInPage : ContentPage
 
                 mSupplierKanban = supplierIdentifyMatchStringList.FirstOrDefault();
 
-                // 識別文字列チェック
-                if (clipboardContent.IndexOf(mSupplierKanban.IdentifyString) != -1 && mSupplierKanban.IdentifyStringStartIndex == 1)
-                {
-                    // 文字列をトリム
-                    var supplierProductNumberTrim = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).ToString().Trim();
-                    supplierProductNumber = Util.SubStringAfterDash(supplierProductNumberTrim);
-                    // 仕入先品番が存在をチェック
-                    bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
-                    if(!existsSupplierProductNumber)
-                    {
-                        // 識別文字列が正しくない場合はエラー
-                        SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = $"E2002: {string.Format(ErrorMessagesResources.E2002, "品番マスター")}";
-                        scanTextResult.TextColor = Colors.Red;
-                        d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
-                        return;
-                    }
-
-                    lotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex-1, mSupplierKanban.LotLength).Trim();
-
-                    // 履歴一覧表示リスト内の同じ品番・キーを取得
-                    D_ReceiveModel duplicateProduct = _HistoryListDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
-                    if (duplicateProduct != null)
-                    {
-                        // 既にスキャンしている場合はエラー
-                        SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = $"E2017: {ErrorMessagesResources.E2017}";
-                        scanTextResult.TextColor = Colors.Red;
-                        d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
-                        return;
-                    }
-
-                    // OKサウンド
-                    SoundPlayer.PlaySound(resultOkSound);
-                    scanTextResult.Text = "スキャンOK";
-                    scanTextResult.TextColor = Colors.Black;
-                    numberInputModal.IsVisible = true;
-                    bulkStockContent.IsVisible = false;
-                }
-                else
+                
+                // 文字列をトリム
+                var supplierProductNumberTrim = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).ToString().Trim();
+                supplierProductNumber = Util.SubStringAfterDash(supplierProductNumberTrim);
+                // 仕入先品番が存在をチェック
+                bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
+                if(!existsSupplierProductNumber)
                 {
                     // 識別文字列が正しくない場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
-                    scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
+                    scanTextResult.Text = $"E2002: {string.Format(ErrorMessagesResources.E2002, "品番マスター")}";
                     scanTextResult.TextColor = Colors.Red;
                     d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel); 
+                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
                     return;
                 }
+
+                lotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex-1, mSupplierKanban.LotLength).Trim();
+
+                // 履歴一覧表示リスト内の同じ品番・キーを取得
+                D_ReceiveModel duplicateProduct = _HistoryListDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
+                if (duplicateProduct != null)
+                {
+                    // 既にスキャンしている場合はエラー
+                    SoundPlayer.PlaySound(resultErrorSound);
+                    scanTextResult.Text = $"E2017: {ErrorMessagesResources.E2017}";
+                    scanTextResult.TextColor = Colors.Red;
+                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
+                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    return;
+                }
+
+                // OKサウンド
+                SoundPlayer.PlaySound(resultOkSound);
+                scanTextResult.Text = "スキャンOK";
+                scanTextResult.TextColor = Colors.Black;
+                numberInputModal.IsVisible = true;
+                bulkStockContent.IsVisible = false;
+               
             }
         }
         catch (Exception ex)

@@ -306,7 +306,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     _TotalNumberOfBoxesDisplay.Remove(existingProduct);
                     // 読取実績・入荷実績のデータを設定
                     scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity);
+                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity,lotNumber);
                 }
                 else
                 {
@@ -317,7 +317,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     });
                     // 読取実績・入荷実績のデータを設定
                     scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity);
+                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity, lotNumber);
                 }
                 //  仕入先かんばんデータを設定
                 listScanReceive.Add(scanResultModel);
@@ -371,13 +371,14 @@ public partial class RegisterBulkStoreInPage : ContentPage
     /// <param name="numOfBoxes">箱数</param>
     /// <param name="companyID">会社ID</param>
     /// <returns></returns>
-    public D_ReceiveModel SetDReceiveModel(D_ReceiveModel d_ReceiveModel, string supplierProductNumber, string userName, int numOfBoxes, int companyID,int lotOfQuantity)
+    public D_ReceiveModel SetDReceiveModel(D_ReceiveModel d_ReceiveModel, string supplierProductNumber, string userName, int numOfBoxes, int companyID,int lotOfQuantity,string lotNumber)
     {
         d_ReceiveModel.CompanyID = companyID;
         d_ReceiveModel.Quantity = lotOfQuantity * numOfBoxes;
         d_ReceiveModel.ReceiveDatetime = DateTime.Now;
         d_ReceiveModel.SupplierProductNumber = supplierProductNumber;
         d_ReceiveModel.NumberOfBoxes = numOfBoxes;
+        d_ReceiveModel.LotNumber = lotNumber;
         d_ReceiveModel.ScanedAt = DateTime.Now;
         d_ReceiveModel.CreatedAt = DateTime.Now;
         d_ReceiveModel.CreatedBy = userName;

@@ -82,12 +82,7 @@ public partial class RegisterStoreOutPage : ContentPage
         handyMenuID = menuID;
         companyID = selectedCompanyID;
         _dbService = new LocalDbService();
-        // 未検品の出荷指示が無い
-        if (dShipmentScheduleListSearch.Count == 0)
-        {
-            shippingListTable.IsVisible = false;
-            emptyLabel.IsVisible = true;
-        }
+      
 
         // 出庫画面の設定
         SetRegisterStoreOutPage();
@@ -109,6 +104,13 @@ public partial class RegisterStoreOutPage : ContentPage
         // No昇順
         for (int i = 0; i < lstDShipmentSchedules.Count; i++)
             lstDShipmentSchedules[i].No = i + 1;
+
+        // 未検品の出荷指示が無い
+        if (lstDShipmentSchedulesSort.Count() == 0)
+        {
+            shippingListTable.IsVisible = false;
+            emptyLabel.IsVisible = true;
+        }
 
     }
 

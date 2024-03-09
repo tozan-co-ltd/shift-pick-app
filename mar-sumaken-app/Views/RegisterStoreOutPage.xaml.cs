@@ -295,10 +295,13 @@ public partial class RegisterStoreOutPage : ContentPage
                 // 許可された重複チェック
                 if (!mSupplierKanban.AllowedDuplicatesFlag && mSupplierKanban.MainProductKeyLength != 0)
                 {
-                    // 仕入先かんばん分解 (出荷実績に値を入れる)
-                    _dShipmentLocal.FirstSubProductKey = string.Empty;
-                    _dShipmentLocal.SecondSubProductKey = string.Empty;
-                    _dShipmentLocal.MainProductKey = clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
+                    // キー
+                    if (mSupplierKanban.MainProductKeyLength != 0)
+                    {
+                        _dShipmentLocal.MainProductKey = mSupplierKanban.MainProductKeyLength == 0 ? string.Empty : clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
+                        _dShipmentLocal.FirstSubProductKey = mSupplierKanban.FirstSubProductKeyLength == 0 ? string.Empty : clipboardContent.Substring(mSupplierKanban.FirstSubProductKeyStartIndex - 1, mSupplierKanban.FirstSubProductKeyLength).Trim();
+                        _dShipmentLocal.SecondSubProductKey = mSupplierKanban.SecondSubProductKeyLength == 0 ? string.Empty : clipboardContent.Substring(mSupplierKanban.SecondSubProductKeyStartIndex - 1, mSupplierKanban.SecondSubProductKeyLength).Trim();
+                    }                  
                    
                     var isDuplicates = listDShipment.Any(x => x.SupplierProductNumber == _dShipmentLocal.SupplierProductNumber && x.MainProductKey == _dShipmentLocal.MainProductKey
                                                                             && x.FirstSubProductKey == _dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == _dShipmentLocal.SecondSubProductKey);

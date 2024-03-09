@@ -186,41 +186,17 @@ public partial class RegisterStoreInPage : ContentPage
                 D_ReceiveModel existingProduct = _TotalNumberOfBoxesDisplay.FirstOrDefault(p => p.SupplierProductNumber == supplierProductNumber);
 
                 // 履歴一覧表示リスト内の同じ品番・キーを取得
-                D_ReceiveModel duplicateProduct = _HistoryListDisplay.FirstOrDefault(p => p.SupplierProductNumber == supplierProductNumber && p.MainProductKey == mainProductKey);
+                //D_ReceiveModel duplicateProduct = _HistoryListDisplay.FirstOrDefault(p => p.SupplierProductNumber == supplierProductNumber && p.MainProductKey == mainProductKey);
+                
+                // ローカルで仕入先品番重複チェック
+                bool isKeyDuplicated = listScanReceive.Select(item=>item.d_ReceiveModel).ToList().Any(x => x.SupplierProductNumber == supplierProductNumber && x.MainProductKey == mainProductKey &&
+                                                                                                    x.FirstSubProductKey == fisrtSubProductKey && x.SecondSubProductKey == secondSubProductKey);
 
                 var scanResultModel = new ScanReceiveModel();
                 var d_ScanResultModel = new D_ScanResultModel();
                 var d_ReceiveModel = new D_ReceiveModel();
 
-                if (duplicateProduct == null)
-                {
-                    countOfScaned++;
-                    CounterBtn.Text = $"{countOfScaned}";
-
-                    // 箱数集計表示リスト内に同じ品番がある場合は、同一行の箱数を加算
-                    if (existingProduct != null)
-                    {
-                        existingProduct.NumberOfBoxes++;
-                        _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = existingProduct.NumberOfBoxes, MainProductKey = mainProductKey, Quantity = lotOfQuantity });
-                        // 既存のデータを削除
-                        _TotalNumberOfBoxesDisplay.Remove(existingProduct);
-                        // 読取実績・入荷実績のデータを設定
-                        scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, numOfBoxes, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                        scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber,
-                            numOfBoxes, loginUser.Last().UserName, lotOfQuantity, mSupplierKanban.CompanyID, mainProductKey, fisrtSubProductKey, secondSubProductKey);
-                    }
-                    else
-                    {
-                        // 箱数集計表示リストに新しい行を追加
-                        _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = numOfBoxes, MainProductKey = mainProductKey, Quantity = lotOfQuantity });
-                        // 読取実績・入荷実績のデータを設定
-                        scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, numOfBoxes, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                        scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber,
-                            numOfBoxes, loginUser.Last().UserName, lotOfQuantity, mSupplierKanban.CompanyID, mainProductKey, fisrtSubProductKey, secondSubProductKey);
-                    }
-                }
-                else
-                {
+                if (isKeyDuplicated){
                     // 既にスキャンしている場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2017: {ErrorMessagesResources.E2017}";
@@ -229,6 +205,34 @@ public partial class RegisterStoreInPage : ContentPage
                     listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
                     return;
                 }
+
+
+                countOfScaned++;
+                CounterBtn.Text = $"{countOfScaned}";
+
+                // 箱数集計表示リスト内に同じ品番がある場合は、同一行の箱数を加算
+                if (existingProduct != null)
+                {
+                    existingProduct.NumberOfBoxes++;
+                    _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = existingProduct.NumberOfBoxes, MainProductKey = mainProductKey, Quantity = lotOfQuantity });
+                    // 既存のデータを削除
+                    _TotalNumberOfBoxesDisplay.Remove(existingProduct);
+                    // 読取実績・入荷実績のデータを設定
+                    scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, numOfBoxes, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
+                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber,
+                        numOfBoxes, loginUser.Last().UserName, lotOfQuantity, mSupplierKanban.CompanyID, mainProductKey, fisrtSubProductKey, secondSubProductKey);
+                }
+                else
+                {
+                    // 箱数集計表示リストに新しい行を追加
+                    _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, NumberOfBoxes = numOfBoxes, MainProductKey = mainProductKey, Quantity = lotOfQuantity });
+                    // 読取実績・入荷実績のデータを設定
+                    scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, numOfBoxes, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
+                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber,
+                        numOfBoxes, loginUser.Last().UserName, lotOfQuantity, mSupplierKanban.CompanyID, mainProductKey, fisrtSubProductKey, secondSubProductKey);
+                }
+             
+               
                 // 仕入先かんばんデータを設定
                 listScanReceive.Add(scanResultModel);
 

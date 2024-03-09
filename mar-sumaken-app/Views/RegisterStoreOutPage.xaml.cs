@@ -21,14 +21,13 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public partial class RegisterStoreOutPage : ContentPage
 {
+    bool isItemTapped = false;
     public DateTime selectedDate;
     private string? _handyApiUrl;
     public int overallProgress;
     public int companyID;
     public int handyMenuID;
     public int numberOfBoxes = 1;
-    public string mainProductKey;
-    public int quantity;
     public int shipmentScheduleID;
     int totalNumberOfBoxes;
     int totalNumberOfBoxesRemaining;
@@ -42,11 +41,11 @@ public partial class RegisterStoreOutPage : ContentPage
     private LoginModel.LoginUserSqlLite _loginUserSqlLite;
     private HandySettingModel.HandySetting _handySetting;
     public M_SupplierKanbanModel mSupplierKanban;
-    public List<D_ShipmentSchedule> lstDShipmentSchedules;
-    public List<D_ShipmentSchedule> lstDShipmentSchedulesForCheckDuplicate;
-    public List<D_ShipmentSchedule> lstHistoryDShipmentSchedules;
+    public ObservableCollection<D_ShipmentSchedule> lstDShipmentSchedules;
+    public ObservableCollection<D_ShipmentSchedule> lstDShipmentSchedulesForCheckDuplicate;
+    public ObservableCollection<D_ShipmentSchedule> lstHistoryDShipmentSchedules;
+    public ObservableCollection<D_ShipmentSchedule> listHistoryForDisplay = new ObservableCollection<D_ShipmentSchedule>();
     public List<M_SupplierKanbanModel> listMSupplierKanban;
-    public List<M_SupplierKanbanModel> listMSupplierKanbanForCheckQRCode;
     public List<R_HandyMenuSupplierKanbanModel> listRHandyMenuSupplierKanban;
     public List<D_ShipmentModel> listDShipment;
     public List<D_ShipmentModel> listDShipmentSqlLite = new List<D_ShipmentModel>();
@@ -55,14 +54,12 @@ public partial class RegisterStoreOutPage : ContentPage
     public List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     public List<D_HandyErrorMessageModel> listDHandyErrorMessage = new List<D_HandyErrorMessageModel>();
-    public ScanShipmentModel scanShipmentModel = new ScanShipmentModel();
     public List<ScanShipmentModel> listScanShipment = new List<ScanShipmentModel>();
     public List<M_ShipmentScheduleQRCodeModel> listMShipmentScheduleQRCode = new List<M_ShipmentScheduleQRCodeModel>();
-    public List<ScanReceiveModel> listScanReceive = new List<ScanReceiveModel>();
     public D_HandyErrorMessageModel d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
     public D_StoreOutModel.StoreOutPostBody storeOutPostBody = new D_StoreOutModel.StoreOutPostBody();
 
-    public RegisterStoreOutPage(int menuID, int selectedCompanyID, string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  List<D_ShipmentSchedule> dShipmentScheduleListSearch, List<D_ShipmentModel> dShipmentsListSearch, List<M_UserModel> mUserListSearch, List<M_ProductModel> listProductItems, string DeliverySlipNumber)
+    public RegisterStoreOutPage(int menuID, int selectedCompanyID, string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite, ObservableCollection<D_ShipmentSchedule> dShipmentScheduleListSearch, List<D_ShipmentModel> dShipmentsListSearch, List<M_UserModel> mUserListSearch, List<M_ProductModel> listProductItems, string DeliverySlipNumber)
     {
         InitializeComponent();
         selectedDeliveryNameLabel.Text = $"{deliveryName}";
@@ -80,12 +77,7 @@ public partial class RegisterStoreOutPage : ContentPage
         handyMenuID = menuID;
         companyID = selectedCompanyID;
         _dbService = new LocalDbService();
-        // 未検品の出荷指示が無い
-        if (dShipmentScheduleListSearch.Count == 0)
-        {
-            shippingListTable.IsVisible = false;
-            emptyLabel.IsVisible = true;
-        }
+      
 
         // 出庫画面の設定
         SetRegisterStoreOutPage();
@@ -96,17 +88,24 @@ public partial class RegisterStoreOutPage : ContentPage
         UpdateProgressBar(totalNumberOfBoxes, totalNumberOfBoxesRemaining);
 
         // 履歴一覧用
-        lstHistoryDShipmentSchedules = dShipmentScheduleListSearch;
-
+        lstHistoryDShipmentSchedules = new ObservableCollection<D_ShipmentSchedule>(dShipmentScheduleListSearch);
         // 重複をチェック用
-        lstDShipmentSchedulesForCheckDuplicate = dShipmentScheduleListSearch;
+        lstDShipmentSchedulesForCheckDuplicate = new ObservableCollection<D_ShipmentSchedule>(dShipmentScheduleListSearch);
 
         // 残りが0の行が表示されない, 箱数降順
-        lstDShipmentSchedules = dShipmentScheduleListSearch.Where(p => p.NumberOfBoxesRemaining != 0).OrderByDescending(p => p.NumberOfBoxes).ToList();
+        var lstDShipmentSchedulesSort = dShipmentScheduleListSearch.Where(p => p.NumberOfBoxesRemaining != 0).OrderByDescending(p => p.NumberOfBoxes);
+        lstDShipmentSchedules = new ObservableCollection<D_ShipmentSchedule>(lstDShipmentSchedulesSort);
 
         // No昇順
         for (int i = 0; i < lstDShipmentSchedules.Count; i++)
             lstDShipmentSchedules[i].No = i + 1;
+
+        // 未検品の出荷指示が無い
+        if (lstDShipmentSchedulesSort.Count() == 0)
+        {
+            shippingListTable.IsVisible = false;
+            emptyLabel.IsVisible = true;
+        }
 
     }
 
@@ -164,13 +163,17 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
+            //管理者エラー解除画面表示中はスキャンさせない。
+            if (adminErrorCancel.IsVisible) return;
+            
             //　QRコードのコンテンツを取得
             string clipboardContent = Clipboard.GetTextAsync().Result;
+
             // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
             listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
 
             // 未検品の出荷指示がないためスキャンできません
-            if (progressBar.Progress == 1) { ShowErrorTextInLabel("E2001: 未検品の出荷指示がないためスキャンできません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);  return; }
+            if (progressBar.Progress == 1 || totalNumberOfBoxesRemaining == 0) { ShowErrorTextInLabel("E2001: 未検品の出荷指示がないためスキャンできません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);  return; }
 
             if (string.IsNullOrEmpty(clipboardContent))
                 ShowErrorTextInLabel("E2001: QRコードが読めません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
@@ -181,9 +184,9 @@ public partial class RegisterStoreOutPage : ContentPage
             string deliveryIdentifyString = string.Empty;
             if (isScanDelivery) 
             {
+
                 //納入先かんばんをスキャンした時の文字列を格納
                 deliveryScanContent = clipboardContent;
-
                 // 一回目コードの形式と日付をチェックすし、データを取得する
                 var deliveryQrIdentifyMatchStringList = listMShipmentScheduleQRCode.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                 if(deliveryQrIdentifyMatchStringList.Count  <= 0 ) { ShowErrorTextInLabel("E2001: 納入先コードを読み取ってください。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
@@ -212,7 +215,7 @@ public partial class RegisterStoreOutPage : ContentPage
                     adminErrorCancel.IsVisible = true;
                     return; 
                 }
-                quantity = dShipmentSchedule.Quantity;
+                
                 shipmentScheduleID = dShipmentSchedule.ShipmentScheduleID;
 
                 // ローカルで読取実績モデルの出荷実績モデルに出荷指示IDとシリアル番号(かんばん識別番号)をチェック
@@ -296,7 +299,7 @@ public partial class RegisterStoreOutPage : ContentPage
                     _dShipmentLocal.SecondSubProductKey = string.Empty;
                     _dShipmentLocal.MainProductKey = clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
                    
-                    var isDuplicates = listDShipment.Any(x => x.SupplierProductNumber == _dShipmentLocal.SupplierProductNumber && x.MainProductKey == mainProductKey
+                    var isDuplicates = listDShipment.Any(x => x.SupplierProductNumber == _dShipmentLocal.SupplierProductNumber && x.MainProductKey == _dShipmentLocal.MainProductKey
                                                                             && x.FirstSubProductKey == _dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == _dShipmentLocal.SecondSubProductKey);
                     // ローカルで仕入先品番重複チェック
                     bool isScanDuplicateInSqlLite = listDShipmentSqlLite.Any(x => x.SupplierProductNumber == _dShipmentLocal.SupplierProductNumber && x.MainProductKey == _dShipmentLocal.MainProductKey &&
@@ -369,35 +372,44 @@ public partial class RegisterStoreOutPage : ContentPage
     public void UpdateListAndHistoryListDShipmentSchedules()
     {
         // 出荷指示リスト更新
-        var existDShipmentSchedule = lstDShipmentSchedules.Find(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
+        var existDShipmentSchedule = lstDShipmentSchedules.FirstOrDefault(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
                                                      && d.DeliveryTimeClass == deliveryKanbanModel.DeliveryTimeClass && d.DeliveryLocation == deliveryKanbanModel.DeliveryLocation && d.DeliverySlipNumber == deliveryKanbanModel.DeliverySlipNumber);
-        
         if (existDShipmentSchedule != null && progressBar.Progress != 1)
-        {
             existDShipmentSchedule.NumberOfBoxesRemaining--;
-            collectionView.ItemsSource = null;
-            collectionView.ItemsSource = lstDShipmentSchedules;
-        }
+
+         collectionView.ItemsSource = lstDShipmentSchedules;
+
 
         // 履歴一覧更新
-        var exitsHistoryDShipmentSchedule = lstHistoryDShipmentSchedules.Find(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
+        var exitsHistoryDShipmentSchedule = lstHistoryDShipmentSchedules.FirstOrDefault(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
                                                                && d.DeliveryTimeClass == deliveryKanbanModel.DeliveryTimeClass && d.DeliveryLocation == deliveryKanbanModel.DeliveryLocation && d.DeliverySlipNumber == deliveryKanbanModel.DeliverySlipNumber);
 
         // スキャン後、履歴一覧を表示
-        var listHistoryForDisplay = new List<D_ShipmentSchedule>();
         if(exitsHistoryDShipmentSchedule != null)
         {
-            listHistoryForDisplay.Add(exitsHistoryDShipmentSchedule);
+            //listHistoryForDisplay.Add(exitsHistoryDShipmentSchedule);
+            listHistoryForDisplay.Insert(0, exitsHistoryDShipmentSchedule);
             exitsHistoryDShipmentSchedule.NumScan++;
             var numberOfBox = exitsHistoryDShipmentSchedule.NumScan + exitsHistoryDShipmentSchedule.NumberOfBoxesRemaining;
             exitsHistoryDShipmentSchedule.NumScanAndNumBoxRemaining = $"{exitsHistoryDShipmentSchedule.NumScan}/{numberOfBox}";
-            collectionViewHistory.ItemsSource = null;
+            // 既存のデータを削除
+            var existingDeliveryProductNumber = listHistoryForDisplay.Where(p => p.DeliveryProductNumber == exitsHistoryDShipmentSchedule.DeliveryProductNumber);
+            if (existingDeliveryProductNumber.Count() > 1)
+                listHistoryForDisplay.Remove(exitsHistoryDShipmentSchedule);
             // No降順
-            for (int i = 0; i < listHistoryForDisplay.Count; i++)
-                listHistoryForDisplay[i].No = (listHistoryForDisplay.Count - i);
+            UpdateNo();
         }
 
         collectionViewHistory.ItemsSource = listHistoryForDisplay;
+    }
+
+
+    public void UpdateNo()
+    {
+        for (int i = 0; i < listHistoryForDisplay.Count; i++)
+        {
+            listHistoryForDisplay[i].No = i + 1;
+        }
     }
 
 
@@ -619,8 +631,9 @@ public partial class RegisterStoreOutPage : ContentPage
         statusScanLabel.IsVisible = false;
 
         // 識別文字列が正しくない場合はエラー
-        d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, depoID, userName, error);
+        D_HandyErrorMessageModel  _d_HandyErrorMessag = SetHandyErrorMessage(d_HandyErrorMessageModel, depoID, userName, error);
         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+        d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
     }
 
 
@@ -631,12 +644,26 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
+            if (!isItemTapped)
+            {
+                isItemTapped = true;
+                if (listScanShipment.Count() > 0)
+                {
+                   bool confirm = await DisplayAlert("確認", "読み取ったデータは削除されますが、戻ってよろしいですか。", "OK", "キャンセル");
+                    isItemTapped = false;
+                    if (!confirm) return;                        
+                }
+                isItemTapped = false;
+            }
+
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
                 await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
                 return;
             }
-
+            //ロード画面表示
+            Application.Current.MainPage = new LoadingPage();
+            await Task.Delay(200);
             var shipmentScheduleRequestBody = new
             {
                 CompanyID = companyID,
@@ -649,6 +676,7 @@ public partial class RegisterStoreOutPage : ContentPage
             };
             var jsonDataShipmentScheduleSend = JsonConvert.SerializeObject(shipmentScheduleRequestBody);
 
+
             // 最新データを取得するため、もう一回APIにリクエストを送る
             var responseShipmentSchedule = await App.API.PostMethod(jsonDataShipmentScheduleSend, _handyApiUrl, "ShipmentSchedule/Find");
 
@@ -660,6 +688,7 @@ public partial class RegisterStoreOutPage : ContentPage
             }
             else
                 await DisplayAlert("エラー", responseShipmentSchedule.content, "OK");
+
 
             Application.Current.MainPage = new DisplayShippingInstructionListPage(handyMenuID, companyID, selectedDeliveryNameLabel.Text, selectedDate, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, lstDShipmentSchedules, listProducts, deliverySlipNumberLabel.Text);
 
@@ -726,6 +755,13 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
+            if (listScanShipment.Count() <=0) { 
+                // ERRORサウンドを鳴らす
+                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
+                SoundPlayer.PlaySound(resultErrorSound);
+                await Application.Current.MainPage.DisplayAlert("エラー", "E2016: 読取データがありません。", "OK");
+                return;
+            }
             //ストアアウトポストボディ設定
             storeOutPostBody.CompanyCode = _loginUserSqlLite.CompanyCode;
             storeOutPostBody.CompanyPassword = _loginUserSqlLite.CompanyPassword;
@@ -733,7 +769,7 @@ public partial class RegisterStoreOutPage : ContentPage
             storeOutPostBody.HandyErrorMessage = listDHandyErrorMessage;
             var jsonDataSend = JsonConvert.SerializeObject(storeOutPostBody);
 
-            // ネットワーク接続チェック
+            
             if (!NetworkCheck.CheckNetworkConnection())
             {
                 await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
@@ -829,7 +865,7 @@ public partial class RegisterStoreOutPage : ContentPage
 
         //ログインIDまたはパスワードが空欄
         //パスワードが4桁未満、または10桁を超える場合
-        if (string.IsNullOrWhiteSpace(loginID) || (4 > password.Length || password.Length > 10))
+        if (string.IsNullOrWhiteSpace(loginID) || string.IsNullOrWhiteSpace(password) || (4 > password.Length || password.Length > 12))
         {
             DisplayAlert("エラー", "E2011: ログインIDまたはパスワードが正しくありません。", "OK");
             return;

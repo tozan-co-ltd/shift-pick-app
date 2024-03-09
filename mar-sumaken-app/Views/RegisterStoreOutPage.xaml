@@ -87,7 +87,7 @@
                         <StackLayout x:Name="shippingList"  Margin="0">
                             <Frame Padding="0" Margin="0" HasShadow="False">
                                 <StackLayout HorizontalOptions="Center">
-                                    <Label x:Name="emptyLabel" Text="未検品の出荷指示がないためスキャンできません。" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" Margin="0, 60, 0, 0" TextColor="Gray" IsVisible="False"/>
+                                    <Label x:Name="emptyLabel" Text="未検品の出荷指示はありません。" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" Margin="0, 60, 0, 0" TextColor="Gray" IsVisible="False"/>
                                     <Grid RowDefinitions="40, *" Padding="5, 5, 5, 0" ColumnSpacing="5" x:Name="shippingListTable">
                                         <Grid ColumnDefinitions="40, 90, 70, 50, 50, 50" Grid.Row="0" BackgroundColor="#008080">
                                             <Label Text="No." Grid.Row="0" Grid.Column="0" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"/>

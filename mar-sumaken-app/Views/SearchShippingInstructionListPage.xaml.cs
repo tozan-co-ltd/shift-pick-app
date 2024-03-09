@@ -116,6 +116,9 @@ public partial class SearchShippingInstructionListPage : ContentPage
                 await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
                 return;
             }
+            //ロード画面表示
+            Application.Current.MainPage = new LoadingPage();
+            await Task.Delay(200);
 
             hasOnSearchClick = true;
             // ユーザー情報を取得
@@ -146,10 +149,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
                 var contentFromApi = JsonConvert.DeserializeObject<ShipmentScheduleModel.ShipmentScheduelResponseBody>(response.content);
                 var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList;
                 // 納入書番号
-                var deliverySlipNumber = shipmentScheduleList.FirstOrDefault().DeliverySlipNumber;
-
-                Application.Current.MainPage = new LoadingPage();
-                await Task.Delay(200);
+                var deliverySlipNumber = shipmentScheduleList.FirstOrDefault().DeliverySlipNumber;            
                 Application.Current.MainPage = new DisplayShippingInstructionListPage(handyMenuID, selectedCompanyID, (string)deliveryName.SelectedItem,selectedDate, chosedDeliveryTimeClass, (string)deliveryLocation.SelectedItem, listMCompany, shipmentScheduleList, listProducts, deliverySlipNumber);
             }
             else

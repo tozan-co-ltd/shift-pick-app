@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +20,7 @@ namespace mar_sumaken_app.Models
             public string DeliveryLocation { get; set; }
 
         }
-        public class D_ShipmentSchedule
+        public class D_ShipmentSchedule : ObservableObject
         {
             /// <summary>
             /// No
@@ -186,7 +188,13 @@ namespace mar_sumaken_app.Models
             /// <summary>
             /// 残箱数
             /// </summary>
-            public int NumberOfBoxesRemaining { get; set; }
+            private int numberOfBoxesRemaining;
+
+            public int NumberOfBoxesRemaining
+            {
+                get => numberOfBoxesRemaining;
+                set => SetProperty(ref numberOfBoxesRemaining, value);
+            }
 
             /// <summary>
             /// 残箱数
@@ -204,7 +212,7 @@ namespace mar_sumaken_app.Models
             /// <summary>
             /// 出荷指示
             /// </summary>
-            public List<D_ShipmentSchedule> D_ShipmentScheduleList { get; set; }
+            public ObservableCollection<D_ShipmentSchedule> D_ShipmentScheduleList { get; set; }
 
             /// <summary>
             /// 出荷実績

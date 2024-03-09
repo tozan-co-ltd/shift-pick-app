@@ -73,6 +73,25 @@ namespace mar_sumaken_app.Common
             return supplierProductNumberTrim;
         }
 
+        /// <summary>
+        /// 翌日(土日を除く)の日付を取得
+        /// </summary>
+        /// <param name="today">本日</param>
+        public static DateTime GetNextday(DateTime today)
+        {
+            var nextday = today.AddDays(1);
+
+            if (nextday.DayOfWeek == DayOfWeek.Saturday)
+            {
+                nextday = nextday.AddDays(2);
+            }
+            else if (nextday.DayOfWeek == DayOfWeek.Sunday)
+            {
+                nextday = nextday.AddDays(1);
+            }
+            return nextday;
+        }
+
     }
 }
 

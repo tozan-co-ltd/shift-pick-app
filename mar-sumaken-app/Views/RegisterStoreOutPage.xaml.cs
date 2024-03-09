@@ -825,7 +825,7 @@ public partial class RegisterStoreOutPage : ContentPage
 
         //ログインIDまたはパスワードが空欄
         //パスワードが4桁未満、または10桁を超える場合
-        if (string.IsNullOrWhiteSpace(loginID) || (4 > password.Length || password.Length > 10))
+        if (string.IsNullOrWhiteSpace(loginID) || string.IsNullOrWhiteSpace(password) || (4 > password.Length || password.Length > 12))
         {
             DisplayAlert("エラー", "E2011: ログインIDまたはパスワードが正しくありません。", "OK");
             return;

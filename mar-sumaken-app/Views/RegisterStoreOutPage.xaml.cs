@@ -58,7 +58,6 @@ public partial class RegisterStoreOutPage : ContentPage
     public List<ScanShipmentModel> listScanShipment = new List<ScanShipmentModel>();
     public List<M_ShipmentScheduleQRCodeModel> listMShipmentScheduleQRCode = new List<M_ShipmentScheduleQRCodeModel>();
     public D_HandyErrorMessageModel d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
-    public D_StoreOutModel.StoreOutPostBody storeOutPostBody = new D_StoreOutModel.StoreOutPostBody();
 
     public RegisterStoreOutPage(int menuID, int selectedCompanyID, string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite, ObservableCollection<D_ShipmentSchedule> dShipmentScheduleListSearch, List<D_ShipmentModel> dShipmentsListSearch, List<M_UserModel> mUserListSearch, List<M_ProductModel> listProductItems, string DeliverySlipNumber)
     {
@@ -766,7 +765,8 @@ public partial class RegisterStoreOutPage : ContentPage
                 await DisplayAlert("エラー", $"E2016: {ErrorMessagesResources.E2016}", "OK");
                 return;
             }
-            //ストアアウトポストボディ設定
+            D_StoreOutModel.StoreOutPostBody storeOutPostBody = new D_StoreOutModel.StoreOutPostBody();
+            //出庫API送信用model設定
             storeOutPostBody.CompanyCode = _loginUserSqlLite.CompanyCode;
             storeOutPostBody.CompanyPassword = _loginUserSqlLite.CompanyPassword;
             storeOutPostBody.ScanShipmentModel = listScanShipment;

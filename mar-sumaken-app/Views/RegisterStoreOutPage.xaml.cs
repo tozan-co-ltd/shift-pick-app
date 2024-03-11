@@ -92,6 +92,10 @@ public partial class RegisterStoreOutPage : ContentPage
 
         // 残りが0の行が表示されない, 箱数降順
         var lstDShipmentSchedulesSort = dShipmentScheduleListSearch.Where(p => p.NumberOfBoxesRemaining != 0).OrderByDescending(p => p.NumberOfBoxes);
+        //残り箱数の初期値を箱数に代入
+        foreach (var item in lstDShipmentSchedulesSort) {
+            item.NumberOfBoxes = item.NumberOfBoxesRemaining;
+        }
         lstDShipmentSchedules = new ObservableCollection<D_ShipmentSchedule>(lstDShipmentSchedulesSort);
 
         // No昇順

@@ -100,15 +100,10 @@ public partial class HandySettingPage : ContentPage
 
             hasRegiterClick = true;
 
-            var settingApiRequestBody = new HandySettingModel.SettingPostBody();
-            companyCode = txtCompanyCode.Text;
-            companyPassword = txtCompanyPassword.Text;
-            loginID = txtLoginId.Text;
-            settingApiRequestBody.CompanyCode = companyCode == null ? "" : companyCode.Trim();
-            settingApiRequestBody.CompanyPassword = companyPassword == null ? "" : companyPassword.Trim();
-            settingApiRequestBody.LoginID = loginID == null ? "" : loginID.Trim();
             string txtUrlApi = txtUrl.Text;
-            
+            // // APIリクエストボディの設定
+            var settingApiRequestBody = SettingApiRequestBody();
+
             // 入力値チェック
             bool isValidUrl = Uri.TryCreate(txtUrlApi, UriKind.Absolute, out Uri result);
             if (string.IsNullOrWhiteSpace(txtUrlApi)) { await DisplayAlert("エラー", $"E2004: {ErrorMessagesResources.E2004}", "OK"); hasRegiterClick = false; return; }
@@ -164,6 +159,22 @@ public partial class HandySettingPage : ContentPage
             await DisplayAlert("エラー", ex.Message, "OK");
             Application.Current.MainPage = new HandySettingPage();
         }
+    }
+
+    /// <summary>
+    /// APIリクエストボディの設定
+    /// </summary>
+    public HandySettingModel.SettingPostBody SettingApiRequestBody()
+    {
+        var settingApiRequestBody = new HandySettingModel.SettingPostBody();
+        companyCode = txtCompanyCode.Text;
+        companyPassword = txtCompanyPassword.Text;
+        loginID = txtLoginId.Text;
+        settingApiRequestBody.CompanyCode = companyCode == null ? "" : companyCode.Trim();
+        settingApiRequestBody.CompanyPassword = companyPassword == null ? "" : companyPassword.Trim();
+        settingApiRequestBody.LoginID = loginID == null ? "" : loginID.Trim();
+
+        return settingApiRequestBody;
     }
 
     /// <summary>

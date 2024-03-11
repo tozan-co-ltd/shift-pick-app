@@ -381,8 +381,8 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         try
         {
-
-            int quantity = int.Parse(valueCheck);
+            Match match = Regex.Match(valueCheck, @"^\d+");
+            int quantity = int.Parse(match.Value);            
             return (true, quantity);
         }
         catch (Exception ex)

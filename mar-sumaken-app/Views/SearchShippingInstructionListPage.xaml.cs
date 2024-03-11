@@ -153,14 +153,17 @@ public partial class SearchShippingInstructionListPage : ContentPage
                 Application.Current.MainPage = new DisplayShippingInstructionListPage(handyMenuID, selectedCompanyID, (string)deliveryName.SelectedItem,selectedDate, chosedDeliveryTimeClass, (string)deliveryLocation.SelectedItem, listMCompany, shipmentScheduleList, listProducts, deliverySlipNumber);
             }
             else
+            {
                 await DisplayAlert("エラー", response.content, "OK");
+                Application.Current.MainPage = new SearchShippingInstructionListPage(handyMenuID, listMCompany, listProducts);
+            }
 
             hasOnSearchClick = false;
         }
         catch (Exception ex)
         {
             await DisplayAlert("エラー", ex.Message, "閉じる");
-            return;
+            Application.Current.MainPage = new SearchShippingInstructionListPage(handyMenuID, listMCompany, listProducts);
         }
     }
 }

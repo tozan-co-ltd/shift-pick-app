@@ -99,8 +99,7 @@ public partial class RegisterStoreOutPage : ContentPage
         lstDShipmentSchedules = new ObservableCollection<D_ShipmentSchedule>(lstDShipmentSchedulesSort);
 
         // No昇順
-        for (int i = 0; i < lstDShipmentSchedules.Count; i++)
-            lstDShipmentSchedules[i].No = i + 1;
+        UpdateListDShipmentSchedulesNo();
 
         // 未検品の出荷指示が無い
         if (lstDShipmentSchedulesSort.Count() == 0)
@@ -199,8 +198,9 @@ public partial class RegisterStoreOutPage : ContentPage
                 productNumberLabel.Text = string.Empty;
                 statusScanLabel.Text = string.Empty;
   
-                // QR中身を制御コードで区切れるよう変換する
-                SetValueFromQrCode(clipboardContent);
+                // QR中身を制御コードで区切れるよう変換するのをチェック用
+                bool isInValidateDelivery =  SetValueFromQrCode(clipboardContent);
+                if (!isInValidateDelivery) { ShowErrorTextInLabel($"E2015: {ErrorMessagesResources.E2015}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
 
                 //マスターのプロダクトリストに存在納入先品番をチェック
                 bool existDeliveryProductNumber = listProducts.Any(product => product.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && product.LotQuantity == deliveryKanbanModel.LotQuantity);
@@ -269,11 +269,13 @@ public partial class RegisterStoreOutPage : ContentPage
 
                 supplierIdentifyString = supplierIdentifyMatchStringList.FirstOrDefault().IdentifyString;
                 mSupplierKanban = supplierIdentifyMatchStringList.FirstOrDefault();
-                Match match = Regex.Match(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim(), @"^\d+");
-                int quantity = int.Parse(match.Value);
+                // intへの変換ができるかチェック用
+                string quantityCheck = clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim();
+                if (!CheckIntType(quantityCheck).isInt){ ShowErrorTextInLabel($"E2015: {ErrorMessagesResources.E2015}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
+                int quantity = CheckIntType(quantityCheck).value;
 
                 // マスターのプロダクトリストに存在仕入先品番をチェック
-                var findListSupplierProduct= ExistSupplierProductNumberCheck(supplierIdentifyString, clipboardContent, quantity);
+                var findListSupplierProduct = ExistSupplierProductNumberCheck(supplierIdentifyString, clipboardContent, quantity);
                 //マスターのプロダクトに仕入先品番が存在をチェック
                 if (findListSupplierProduct.Count <= 0) { ShowErrorTextInLabel($"E2002: {string.Format(ErrorMessagesResources.E2002, "品番マスター")}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
                 //納入先品番と仕入先品番一致をチェック
@@ -372,6 +374,41 @@ public partial class RegisterStoreOutPage : ContentPage
     }
 
     /// <summary>
+    ///  intへの変換ができるかチェック用
+    /// </summary>
+    /// <param name="valueCheck"></param>
+    public (bool isInt, int value) CheckIntType(string valueCheck)
+    {
+        try
+        {
+
+            int quantity = int.Parse(valueCheck);
+            return (true, quantity);
+        }
+        catch (Exception ex)
+        {
+            return (false, 0);
+        }
+    }
+
+    /// <summary>
+    ///  日付への変換ができるかチェック用
+    /// </summary>
+    /// <param name="deliveryDateString"></param>
+    public (bool isDate, DateTime dateTime) CheckDateTimeType(string deliveryDateString)
+    {
+        try
+        {
+            DateTime dateTime = DateTime.ParseExact(deliveryDateString, "yyyyMMdd", CultureInfo.InvariantCulture);
+            return (true, dateTime);
+        }
+        catch (Exception ex)
+        {
+            return (false, DateTime.Now);
+        }
+    }
+
+    /// <summary>
     /// 出荷指示リストと履歴一覧を更新
     /// </summary>
     public void UpdateListAndHistoryListDShipmentSchedules()
@@ -380,10 +417,17 @@ public partial class RegisterStoreOutPage : ContentPage
         var existDShipmentSchedule = lstDShipmentSchedules.FirstOrDefault(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
                                                      && d.DeliveryTimeClass == deliveryKanbanModel.DeliveryTimeClass && d.DeliveryLocation == deliveryKanbanModel.DeliveryLocation && d.DeliverySlipNumber == deliveryKanbanModel.DeliverySlipNumber);
         if (existDShipmentSchedule != null && progressBar.Progress != 1)
+        {
             existDShipmentSchedule.NumberOfBoxesRemaining--;
+            if (existDShipmentSchedule.NumberOfBoxesRemaining == 0) // 残りが0の行が表示されない
+            {
+                lstDShipmentSchedules.Remove(existDShipmentSchedule);
+                UpdateListDShipmentSchedulesNo();
+            }
+        }
 
-         collectionView.ItemsSource = lstDShipmentSchedules;
-
+        // 残りが0の行が表示されない, 箱数降順
+        collectionView.ItemsSource = lstDShipmentSchedules;
 
         // 履歴一覧更新
         var exitsHistoryDShipmentSchedule = lstHistoryDShipmentSchedules.FirstOrDefault(d => d.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && d.DepoID == _loginUserSqlLite.DepoID && d.CompanyID == companyID && d.DeliveryDate == deliveryKanbanModel.DeliveryDate
@@ -392,29 +436,39 @@ public partial class RegisterStoreOutPage : ContentPage
         // スキャン後、履歴一覧を表示
         if(exitsHistoryDShipmentSchedule != null)
         {
-            //listHistoryForDisplay.Add(exitsHistoryDShipmentSchedule);
-            listHistoryForDisplay.Insert(0, exitsHistoryDShipmentSchedule);
             exitsHistoryDShipmentSchedule.NumScan++;
             var numberOfBox = exitsHistoryDShipmentSchedule.NumScan + exitsHistoryDShipmentSchedule.NumberOfBoxesRemaining;
             exitsHistoryDShipmentSchedule.NumScanAndNumBoxRemaining = $"{exitsHistoryDShipmentSchedule.NumScan}/{numberOfBox}";
             // 既存のデータを削除
             var existingDeliveryProductNumber = listHistoryForDisplay.Where(p => p.DeliveryProductNumber == exitsHistoryDShipmentSchedule.DeliveryProductNumber);
-            if (existingDeliveryProductNumber.Count() > 1)
-                listHistoryForDisplay.Remove(exitsHistoryDShipmentSchedule);
+            if (existingDeliveryProductNumber.Count() == 0)
+                listHistoryForDisplay.Insert(0, exitsHistoryDShipmentSchedule);
+
             // No降順
-            UpdateNo();
+            UpdateHistoryDShipmentSchedulesNo();
         }
 
         collectionViewHistory.ItemsSource = listHistoryForDisplay;
     }
 
 
-    public void UpdateNo()
+    /// <summary>
+    /// 出荷指示リストでNo降順
+    /// </summary>
+    public void UpdateListDShipmentSchedulesNo()
+    {
+        for (int i = 0; i < lstDShipmentSchedules.Count; i++)
+           lstDShipmentSchedules[i].No = i + 1;
+    }
+
+
+    /// <summary>
+    /// 履歴一覧でNo降順
+    /// </summary>
+    public void UpdateHistoryDShipmentSchedulesNo()
     {
         for (int i = 0; i < listHistoryForDisplay.Count; i++)
-        {
-            listHistoryForDisplay[i].No = i + 1;
-        }
+           listHistoryForDisplay[i].No = listHistoryForDisplay.Count - i;
     }
 
 
@@ -434,19 +488,28 @@ public partial class RegisterStoreOutPage : ContentPage
     /// QR中身を制御コードで区切れるよう変換する
     /// </summary>
     /// <param name="clipboardContent"></param>
-    public void SetValueFromQrCode(string clipboardContent)
+    public bool SetValueFromQrCode(string clipboardContent)
     {
         string[] changeCodeResult = GetQrcode(clipboardContent);
-        deliveryKanbanModel.DeliveryLocation = Regex.Replace(changeCodeResult[5], @"^+" + StartIndexString.Location1Index, "");
-        deliveryKanbanModel.DeliveryTimeClass = Int32.Parse(Regex.Replace(changeCodeResult[9], @"^+" + StartIndexString.DeliveryTimeClassIndex, ""));
-        deliveryKanbanModel.ProductAbbreviation = Regex.Replace(changeCodeResult[11], @"^+" + StartIndexString.ProductAbbreviationIndex, "");
-        deliveryKanbanModel.KanbanSerialNumber  = Int32.Parse(Regex.Replace(changeCodeResult[15], @"^+" + StartIndexString.KanbanSerialNumberIndex, ""));
+        string stringDeliveryTimeClass = Regex.Replace(changeCodeResult[9], @"^+" + StartIndexString.DeliveryTimeClassIndex, "");
+        string stringKanbanSerialNumber = Regex.Replace(changeCodeResult[15], @"^+" + StartIndexString.KanbanSerialNumberIndex, "");
         var deliverySlipNumberAndPage = Regex.Replace(changeCodeResult[10], @"^+" + StartIndexString.DeliverySlipNumber, "");
-        deliveryKanbanModel.DeliverySlipNumber = deliverySlipNumberAndPage.Substring(0, deliverySlipNumberAndPage.Length - 4);
         var deliveryDateString = Regex.Replace(changeCodeResult[8], @"^+" + StartIndexString.DeliveryDateIndex, "");
-        deliveryKanbanModel.DeliveryDate = DateTime.ParseExact(deliveryDateString, "yyyyMMdd", CultureInfo.InvariantCulture);
+        string stringLotQuantity = Regex.Replace(changeCodeResult[13], @"^+" + StartIndexString.QuantityIndex, "");
+        // intやdatetimeへの変換できるようにチェック用
+        if (!CheckIntType(stringDeliveryTimeClass).isInt || !CheckIntType(stringKanbanSerialNumber).isInt || !CheckIntType(stringLotQuantity).isInt || !CheckDateTimeType(deliveryDateString).isDate)
+            return false;
+
+        deliveryKanbanModel.DeliveryLocation = Regex.Replace(changeCodeResult[5], @"^+" + StartIndexString.Location1Index, "");
+        deliveryKanbanModel.DeliveryTimeClass = CheckIntType(stringDeliveryTimeClass).value;
+        deliveryKanbanModel.ProductAbbreviation = Regex.Replace(changeCodeResult[11], @"^+" + StartIndexString.ProductAbbreviationIndex, "");
+        deliveryKanbanModel.KanbanSerialNumber = CheckIntType(stringKanbanSerialNumber).value;
+        deliveryKanbanModel.DeliverySlipNumber = deliverySlipNumberAndPage.Substring(0, deliverySlipNumberAndPage.Length - 4);
+        deliveryKanbanModel.DeliveryDate = CheckDateTimeType(deliveryDateString).dateTime;
         deliveryKanbanModel.DeliveryProductNumber = Regex.Replace(changeCodeResult[12], @"^+" + StartIndexString.ProductCodeIndex, "");
-        deliveryKanbanModel.LotQuantity =int.Parse(Regex.Replace(changeCodeResult[13], @"^+" + StartIndexString.QuantityIndex, ""));
+        deliveryKanbanModel.LotQuantity = CheckIntType(stringLotQuantity).value;
+
+        return true;
     }
 
     /// <summary>

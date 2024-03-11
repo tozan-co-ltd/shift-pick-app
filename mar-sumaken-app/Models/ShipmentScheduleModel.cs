@@ -199,7 +199,13 @@ namespace mar_sumaken_app.Models
             /// <summary>
             /// 残箱数
             /// </summary>
-            public string NumScanAndNumBoxRemaining { get; set; }
+            private string _numScanAndNumBoxRemaining;
+
+            public string NumScanAndNumBoxRemaining
+            {
+                get => _numScanAndNumBoxRemaining;
+                set => SetProperty(ref _numScanAndNumBoxRemaining, value);
+            }
 
             /// <summary>
             /// スキャン数

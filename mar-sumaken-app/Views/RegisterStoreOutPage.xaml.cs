@@ -1,6 +1,7 @@
 using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
+using mar_sumaken_app.Properties;
 using mar_sumaken_app.ViewModels;
 using Microsoft.CodeAnalysis;
 using Microsoft.Maui;
@@ -57,7 +58,6 @@ public partial class RegisterStoreOutPage : ContentPage
     public List<ScanShipmentModel> listScanShipment = new List<ScanShipmentModel>();
     public List<M_ShipmentScheduleQRCodeModel> listMShipmentScheduleQRCode = new List<M_ShipmentScheduleQRCodeModel>();
     public D_HandyErrorMessageModel d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
-    public D_StoreOutModel.StoreOutPostBody storeOutPostBody = new D_StoreOutModel.StoreOutPostBody();
 
     public RegisterStoreOutPage(int menuID, int selectedCompanyID, string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite, ObservableCollection<D_ShipmentSchedule> dShipmentScheduleListSearch, List<D_ShipmentModel> dShipmentsListSearch, List<M_UserModel> mUserListSearch, List<M_ProductModel> listProductItems, string DeliverySlipNumber)
     {
@@ -173,10 +173,10 @@ public partial class RegisterStoreOutPage : ContentPage
             listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
 
             // 未検品の出荷指示がないためスキャンできません
-            if (progressBar.Progress == 1 || totalNumberOfBoxesRemaining == 0) { ShowErrorTextInLabel("E2001: 未検品の出荷指示がないためスキャンできません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);  return; }
+            if (progressBar.Progress == 1 || totalNumberOfBoxesRemaining == 0) { ShowErrorTextInLabel($"E2025: {ErrorMessagesResources.E2025}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);  return; }
 
             if (string.IsNullOrEmpty(clipboardContent))
-                ShowErrorTextInLabel("E2001: QRコードが読めません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
+                ShowErrorTextInLabel($"E2015: {ErrorMessagesResources.E2015}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
 
             //ローカルで出荷実績一覧を取得
             listDShipmentSqlLite = await _dbService.GetDShipmentAsync();
@@ -189,7 +189,7 @@ public partial class RegisterStoreOutPage : ContentPage
                 deliveryScanContent = clipboardContent;
                 // 一回目コードの形式と日付をチェックすし、データを取得する
                 var deliveryQrIdentifyMatchStringList = listMShipmentScheduleQRCode.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
-                if(deliveryQrIdentifyMatchStringList.Count  <= 0 ) { ShowErrorTextInLabel("E2001: 納入先コードを読み取ってください。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
+                if(deliveryQrIdentifyMatchStringList.Count  <= 0 ) { ShowErrorTextInLabel($"E2001: {ErrorMessagesResources.E2001}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
 
                 deliveryIdentifyString = deliveryQrIdentifyMatchStringList.FirstOrDefault().IdentifyString;
 
@@ -203,14 +203,14 @@ public partial class RegisterStoreOutPage : ContentPage
                 //マスターのプロダクトリストに存在納入先品番をチェック
                 bool existDeliveryProductNumber = listProducts.Any(product => product.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && product.LotQuantity == deliveryKanbanModel.LotQuantity);
                 // 納入先品番が存在をチェック
-                if (!existDeliveryProductNumber) { ShowErrorTextInLabel("E2015: 納入先品番が存在しません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
+                if (!existDeliveryProductNumber) { ShowErrorTextInLabel($"E2002: {string.Format(ErrorMessagesResources.E2002, "品番マスター")}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
 
                 // 納入先品番をチェック
                 var dShipmentSchedule = ExistDeliveryProductNumberCheck(_loginUserSqlLite.DepoID, companyID, deliveryKanbanModel.DeliveryDate, deliveryKanbanModel.DeliveryTimeClass, deliveryKanbanModel.DeliveryLocation, deliveryKanbanModel.DeliverySlipNumber);
                 if (dShipmentSchedule == null) {
                     // 権限が作業者(解除要)であれば、[共通関数] 管理者エラー解除画面表示
                     SoundPlayer.PlaySound(resultErrorSound);
-                    errorMessengerLabel.Text = "E2015: 出荷指示リストに一致するデータがありません。";
+                    errorMessengerLabel.Text = $"E2024: {ErrorMessagesResources.E2024}";
                     registerStoreOut.IsVisible = false;
                     adminErrorCancel.IsVisible = true;
                     return; 
@@ -229,14 +229,14 @@ public partial class RegisterStoreOutPage : ContentPage
                     if (_loginUserSqlLite.AuthorizedKubun == Const.C_AUTHORIZED_KUBUN_WORKER)
                     {
                         SoundPlayer.PlaySound(resultErrorSound);
-                        errorMessengerLabel.Text = "E2015: 既にスキャン済みの納入先かんばんです。";
+                        errorMessengerLabel.Text = $"E2022: {ErrorMessagesResources.E2022}";
                         registerStoreOut.IsVisible = false;
                         adminErrorCancel.IsVisible = true;
                         return;
                     }
                     else
                     {
-                        ShowErrorTextInLabel("E2015: 既にスキャン済みの仕入先かんばんです。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
+                        ShowErrorTextInLabel($"E2022: {ErrorMessagesResources.E2022}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
                         isScanDelivery = true;
                         return;
                     }
@@ -263,7 +263,7 @@ public partial class RegisterStoreOutPage : ContentPage
 
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
                 var supplierIdentifyMatchStringList = listMSupplierKanban.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
-               if(supplierIdentifyMatchStringList.Count <= 0) { ShowErrorTextInLabel("E2015: QRコードが正しくありません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
+               if(supplierIdentifyMatchStringList.Count <= 0) { ShowErrorTextInLabel($"E2001: {ErrorMessagesResources.E2001}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
 
                 supplierIdentifyString = supplierIdentifyMatchStringList.FirstOrDefault().IdentifyString;
                 mSupplierKanban = supplierIdentifyMatchStringList.FirstOrDefault();
@@ -273,14 +273,14 @@ public partial class RegisterStoreOutPage : ContentPage
                 // マスターのプロダクトリストに存在仕入先品番をチェック
                 var findListSupplierProduct= ExistSupplierProductNumberCheck(supplierIdentifyString, clipboardContent, quantity);
                 //マスターのプロダクトに仕入先品番が存在をチェック
-                if (findListSupplierProduct.Count <= 0) { ShowErrorTextInLabel("E2015:  仕入先品番が存在しません。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
+                if (findListSupplierProduct.Count <= 0) { ShowErrorTextInLabel($"E2002: {string.Format(ErrorMessagesResources.E2002, "品番マスター")}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); isScanDelivery = true; return; }
                 //納入先品番と仕入先品番一致をチェック
                 bool isMatchSupplierAndDeliveryProductNumber = listProducts.Any(product => product.SupplierProductNumber == findListSupplierProduct.FirstOrDefault().SupplierProductNumber && product.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && product.LotQuantity == quantity);
 
                 if (!isMatchSupplierAndDeliveryProductNumber) {
                     // 権限が作業者(解除要)であれば、[共通関数] 管理者エラー解除画面表示
                     SoundPlayer.PlaySound(resultErrorSound);
-                    errorMessengerLabel.Text = "E2015: 納入先品番と仕入先品番は一致しません。";
+                    errorMessengerLabel.Text = $"E2023: {ErrorMessagesResources.E2023}";
                     registerStoreOut.IsVisible = false;
                     adminErrorCancel.IsVisible = true;
                     isScanDelivery = true;
@@ -294,10 +294,13 @@ public partial class RegisterStoreOutPage : ContentPage
                 // 許可された重複チェック
                 if (!mSupplierKanban.AllowedDuplicatesFlag && mSupplierKanban.MainProductKeyLength != 0)
                 {
-                    // 仕入先かんばん分解 (出荷実績に値を入れる)
-                    _dShipmentLocal.FirstSubProductKey = string.Empty;
-                    _dShipmentLocal.SecondSubProductKey = string.Empty;
-                    _dShipmentLocal.MainProductKey = clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
+                    // キー
+                    if (mSupplierKanban.MainProductKeyLength != 0)
+                    {
+                        _dShipmentLocal.MainProductKey = mSupplierKanban.MainProductKeyLength == 0 ? string.Empty : clipboardContent.Substring(mSupplierKanban.MainProductKeyStartIndex - 1, mSupplierKanban.MainProductKeyLength).Trim();
+                        _dShipmentLocal.FirstSubProductKey = mSupplierKanban.FirstSubProductKeyLength == 0 ? string.Empty : clipboardContent.Substring(mSupplierKanban.FirstSubProductKeyStartIndex - 1, mSupplierKanban.FirstSubProductKeyLength).Trim();
+                        _dShipmentLocal.SecondSubProductKey = mSupplierKanban.SecondSubProductKeyLength == 0 ? string.Empty : clipboardContent.Substring(mSupplierKanban.SecondSubProductKeyStartIndex - 1, mSupplierKanban.SecondSubProductKeyLength).Trim();
+                    }                  
                    
                     var isDuplicates = listDShipment.Any(x => x.SupplierProductNumber == _dShipmentLocal.SupplierProductNumber && x.MainProductKey == _dShipmentLocal.MainProductKey
                                                                             && x.FirstSubProductKey == _dShipmentLocal.FirstSubProductKey && x.SecondSubProductKey == _dShipmentLocal.SecondSubProductKey);
@@ -312,7 +315,7 @@ public partial class RegisterStoreOutPage : ContentPage
                         if (_loginUserSqlLite.AuthorizedKubun == Const.C_AUTHORIZED_KUBUN_WORKER)
                         {
                             SoundPlayer.PlaySound(resultErrorSound);
-                            errorMessengerLabel.Text = "E2015: 既にスキャン済みの仕入先かんばんです。";
+                            errorMessengerLabel.Text = $"E2017: {ErrorMessagesResources.E2017}";
                             registerStoreOut.IsVisible = false;
                             adminErrorCancel.IsVisible = true;
                             isScanDelivery = true;
@@ -320,7 +323,7 @@ public partial class RegisterStoreOutPage : ContentPage
                         }
                         else
                         {
-                            ShowErrorTextInLabel("E2015: 既にスキャン済みの仕入先かんばんです。", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
+                            ShowErrorTextInLabel($"E2017: {ErrorMessagesResources.E2017}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName);
                             isScanDelivery = true;
                             return;
                         }
@@ -658,7 +661,7 @@ public partial class RegisterStoreOutPage : ContentPage
 
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
-                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+                await DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK");
                 return;
             }
             //ロード画面表示
@@ -695,7 +698,7 @@ public partial class RegisterStoreOutPage : ContentPage
         }
         catch (Exception)
         {
-            await DisplayAlert("エラー", "E9999: 予期せぬエラーが発生しました。", "OK");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}", "OK");
         }
     }
 
@@ -759,10 +762,11 @@ public partial class RegisterStoreOutPage : ContentPage
                 // ERRORサウンドを鳴らす
                 string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
                 SoundPlayer.PlaySound(resultErrorSound);
-                await Application.Current.MainPage.DisplayAlert("エラー", "E2016: 読取データがありません。", "OK");
+                await DisplayAlert("エラー", $"E2016: {ErrorMessagesResources.E2016}", "OK");
                 return;
             }
-            //ストアアウトポストボディ設定
+            D_StoreOutModel.StoreOutPostBody storeOutPostBody = new D_StoreOutModel.StoreOutPostBody();
+            //出庫API送信用model設定
             storeOutPostBody.CompanyCode = _loginUserSqlLite.CompanyCode;
             storeOutPostBody.CompanyPassword = _loginUserSqlLite.CompanyPassword;
             storeOutPostBody.ScanShipmentModel = listScanShipment;
@@ -772,7 +776,7 @@ public partial class RegisterStoreOutPage : ContentPage
             
             if (!NetworkCheck.CheckNetworkConnection())
             {
-                await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+                await DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK");
                 return;
             }
 
@@ -787,21 +791,67 @@ public partial class RegisterStoreOutPage : ContentPage
 
             //テキスト値を設定し、成功登録後にラベルに表示されます
             SetValueAndVisibleLabelAfterRegisterAndErrorCancel();
+                   
+            //APIの戻り値によって、表示内容を変える
+            string registeredMessage = CreateRegisteredMessage(response.content);
 
             // サウンドのパスを取得する
             string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
             // OKサウンド
             SoundPlayer.PlaySound(resultOkSound);
-
-            await Application.Current.MainPage.DisplayAlert("完了", "データ登録が完了しました", "OK");
+            await DisplayAlert("完了", registeredMessage, "OK");
 
             // 送信後は再度ShipmentSchduleのAPIに再度接続して情報を最新化
             CallBackApiToUpdateDataAfterRegistered();
         }
         catch (Exception)
         {
-            await DisplayAlert("エラー", "E9999: 予期せぬエラーが発生しました。", "OK");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}", "OK");
         }
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="responceContent"></param>
+    /// <returns></returns>
+    private string CreateRegisteredMessage(string responceContent) {
+        string defaultMessage = "データ登録が完了しました";
+        try
+        {
+            // contentをJSONオブジェクトにデシリアライズ
+            var storeOutResponseContent = JsonConvert.DeserializeObject<StoreOutRegisterModel.StoreOutResponseContent>(responceContent);
+            if (storeOutResponseContent != null)
+            {
+                string minusStockProduct = string.Empty;
+                string strDuplicateProduct = string.Empty;
+                if (storeOutResponseContent.ProductsWithMinusNumberOfBoxes != null ) {
+                    //在庫マイナス品番を羅列
+                    // productWithMinusNumberOfBoxesからSupplierProductNumberのみを抽出して結合
+                    minusStockProduct = "【在庫がマイナスになった品番】\n ";
+                    minusStockProduct += string.Join("\n", storeOutResponseContent.ProductsWithMinusNumberOfBoxes.Select(p => p.SupplierProductNumber));// 改行で結合
+                }
+
+                if (storeOutResponseContent.ScanShipmentDuplicateData != null )
+                {
+                    strDuplicateProduct = "【重複があった品番】 \n";
+                    //重複したかんばんシリアルと納入先品番を羅列                    
+                    var duplicateProduct = storeOutResponseContent.ScanShipmentDuplicateData
+                    .Select(p => p.d_ShipmentModel).Select(p => new { p.KanbanSerialNumber, p.SupplierProductNumber }).ToList();                   
+                    // 結果の表示
+                    foreach (var product in duplicateProduct)
+                    {
+                        strDuplicateProduct += $"かんばんシリアル: {product.KanbanSerialNumber}, 仕入先品番: {product.SupplierProductNumber}" + "\n";
+                    }
+                }
+                return defaultMessage + '\n' + storeOutResponseContent.Message +  '\n' + minusStockProduct + '\n' + strDuplicateProduct;
+            }
+            return defaultMessage;
+        }
+        catch (JsonException)
+        {
+            return defaultMessage;
+        }    
     }
 
     /// <summary>
@@ -820,6 +870,8 @@ public partial class RegisterStoreOutPage : ContentPage
             DeliveryLocation = selectedDeliveryLocationLabel.Text,
         };
         var jsonDataShipmentScheduleSend = JsonConvert.SerializeObject(shipmentScheduleRequestBody);
+        Application.Current.MainPage = new LoadingPage();
+        await Task.Delay(200);
 
         // 最新データを取得するため、もう一回APIにリクエストを送る
         var responseShipmentSchedule = await App.API.PostMethod(jsonDataShipmentScheduleSend, _handyApiUrl, "ShipmentSchedule/Find");
@@ -830,8 +882,7 @@ public partial class RegisterStoreOutPage : ContentPage
             var contentFromApi = JsonConvert.DeserializeObject<ShipmentScheduelResponseBody>(responseShipmentSchedule.content);
             var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList; // 出荷指示
             var dShipmentList = contentFromApi.D_ShipmentList; // 出荷実績
-            Application.Current.MainPage = new LoadingPage();
-            await Task.Delay(200);
+
             Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, companyID, (string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, shipmentScheduleList, dShipmentList, mUserList, listProducts, deliverySlipNumberLabel.Text);
         }
         else
@@ -867,7 +918,7 @@ public partial class RegisterStoreOutPage : ContentPage
         //パスワードが4桁未満、または10桁を超える場合
         if (string.IsNullOrWhiteSpace(loginID) || string.IsNullOrWhiteSpace(password) || (4 > password.Length || password.Length > 12))
         {
-            DisplayAlert("エラー", "E2011: ログインIDまたはパスワードが正しくありません。", "OK");
+            DisplayAlert("エラー", $"E1023: {string.Format(ErrorMessagesResources.E1023, "ログインID・パスワード",12,4)}", "OK");
             return;
         }
 
@@ -876,7 +927,7 @@ public partial class RegisterStoreOutPage : ContentPage
 
         if (listUser.Count <= 0)
         {
-            DisplayAlert("エラー", "E2004: ログインIDが正しくありません。正しい値を入力してください。", "OK");
+            DisplayAlert("エラー", $"E2003: {ErrorMessagesResources.E2003}", "OK");
             return;
         }
 
@@ -887,7 +938,7 @@ public partial class RegisterStoreOutPage : ContentPage
         // ハッシュ化されたパスワードと一致するかチェック
         if (!listUser.FirstOrDefault().Password.Equals(hashedPassword))
         {
-            DisplayAlert("エラー", "E2004: パスワードが間違っています。", "OK");
+            DisplayAlert("エラー", $"E2026: {ErrorMessagesResources.E2026}", "OK");
             return;
         }
 

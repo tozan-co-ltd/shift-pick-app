@@ -48,7 +48,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
 
         deliveryLocation.ItemsSource = placeList;
         deliveryLocation.SelectedItem = "E5";
-        datePicker.Date = CustomDatePicker.SetDisplayDatePicker();
+        datePicker.Date = Util.GetNextday(DateTime.Now);
     }
 
     /// <summary>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
+using mar_sumaken_app.Properties;
 using mar_sumaken_app.Services;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Xaml;
@@ -48,7 +49,7 @@ public partial class MenuPage : FlyoutPage
             if (listHandyMenu.Count > 0)
                 myListView.ItemsSource = listHandyMenu;
             else
-                await DisplayAlert("エラー", "E2000: メニューが登録されていません。", "閉じる");
+                await DisplayAlert("エラー", $"E2013:  {ErrorMessagesResources.E2013}", "閉じる");
 
             // ローカルDBのユーザー情報取得
             loginUsers = await _dbService.GetLoginAsync();
@@ -137,7 +138,7 @@ public partial class MenuPage : FlyoutPage
             // ネットワーク接続チェック
             if (!NetworkCheck.CheckNetworkConnection())
             {
-                await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+                await DisplayAlert("エラー", $"E3003:  {ErrorMessagesResources.E3003}", "OK");
                 Application.Current.MainPage = new MenuPage();
                 return;
             }
@@ -216,7 +217,7 @@ public partial class MenuPage : FlyoutPage
         // ネットワーク接続チェック
         if (!NetworkCheck.CheckNetworkConnection())
         {
-            await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+            await DisplayAlert("エラー", $"E3003:  {ErrorMessagesResources.E3003}", "OK");
             Application.Current.MainPage = new MenuPage();
             return (mCompanySqlLite, false);
         }
@@ -231,7 +232,7 @@ public partial class MenuPage : FlyoutPage
         }
         else
         {
-            await DisplayAlert("エラー", "E2000: 接続先URLにアクセスできません。", "OK");
+            await DisplayAlert("エラー", response.content, "OK");
             Application.Current.MainPage = new MenuPage();
             return (mCompanySqlLite, false);
         }

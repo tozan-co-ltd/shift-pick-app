@@ -3,6 +3,7 @@ using mar_sumaken_app.ViewModels;
 using System.Collections.ObjectModel;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
+using mar_sumaken_app.Properties;
 using System.Linq.Expressions;
 using Newtonsoft.Json;
 
@@ -122,7 +123,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
 
                 if (string.IsNullOrEmpty(clipboardContent))
                 {
-                    scanTextResult.Text = "E2015: QRコードの読取ができませんでした。再度スキャンしてください。";
+                    scanTextResult.Text = $"E2015: {ErrorMessagesResources.E2015}";
                     scanTextResult.TextColor = Colors.Red;
                     d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                     listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
@@ -139,7 +140,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 {
                     // 識別文字列が正しくない場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
-                    scanTextResult.Text = "E2001: QRコードが正しくありません。正しいQRコードを読み取ってください。";
+                    scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
                     scanTextResult.TextColor = Colors.Red;
                     d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                     listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
@@ -148,57 +149,45 @@ public partial class RegisterBulkStoreInPage : ContentPage
 
                 mSupplierKanban = supplierIdentifyMatchStringList.FirstOrDefault();
 
-                // 識別文字列チェック
-                if (clipboardContent.IndexOf(mSupplierKanban.IdentifyString) != -1 && mSupplierKanban.IdentifyStringStartIndex == 1)
-                {
-                    // 文字列をトリム
-                    var supplierProductNumberTrim = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).ToString().Trim();
-                    supplierProductNumber = Util.SubStringAfterDash(supplierProductNumberTrim);
-                    // 仕入先品番が存在をチェック
-                    bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
-                    if(!existsSupplierProductNumber)
-                    {
-                        // 識別文字列が正しくない場合はエラー
-                        SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = "E2002: 品番マスターにデータがありません。";
-                        scanTextResult.TextColor = Colors.Red;
-                        d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
-                        return;
-                    }
-
-                    lotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex-1, mSupplierKanban.LotLength).Trim();
-
-                    // 履歴一覧表示リスト内の同じ品番・キーを取得
-                    D_ReceiveModel duplicateProduct = _HistoryListDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
-                    if (duplicateProduct != null)
-                    {
-                        // 既にスキャンしている場合はエラー
-                        SoundPlayer.PlaySound(resultErrorSound);
-                        scanTextResult.Text = "E1003: 既にスキャン済みの仕入先かんばんです。";
-                        scanTextResult.TextColor = Colors.Red;
-                        d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
-                        return;
-                    }
-
-                    // OKサウンド
-                    SoundPlayer.PlaySound(resultOkSound);
-                    scanTextResult.Text = "スキャンOK";
-                    scanTextResult.TextColor = Colors.Black;
-                    numberInputModal.IsVisible = true;
-                    bulkStockContent.IsVisible = false;
-                }
-                else
+                
+                // 文字列をトリム
+                var supplierProductNumberTrim = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).ToString().Trim();
+                supplierProductNumber = Util.SubStringAfterDash(supplierProductNumberTrim);
+                // 仕入先品番が存在をチェック
+                bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
+                if(!existsSupplierProductNumber)
                 {
                     // 識別文字列が正しくない場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
-                    scanTextResult.Text = "E2001: QRコードが正しくありません。正しいQRコードを読み取ってください。";
+                    scanTextResult.Text = $"E2002: {string.Format(ErrorMessagesResources.E2002, "品番マスター")}";
                     scanTextResult.TextColor = Colors.Red;
                     d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel); 
+                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
                     return;
                 }
+
+                lotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex-1, mSupplierKanban.LotLength).Trim();
+
+                // 履歴一覧表示リスト内の同じ品番・キーを取得
+                D_ReceiveModel duplicateProduct = _HistoryListDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
+                if (duplicateProduct != null)
+                {
+                    // 既にスキャンしている場合はエラー
+                    SoundPlayer.PlaySound(resultErrorSound);
+                    scanTextResult.Text = $"E2017: {ErrorMessagesResources.E2017}";
+                    scanTextResult.TextColor = Colors.Red;
+                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
+                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    return;
+                }
+
+                // OKサウンド
+                SoundPlayer.PlaySound(resultOkSound);
+                scanTextResult.Text = "スキャンOK";
+                scanTextResult.TextColor = Colors.Black;
+                numberInputModal.IsVisible = true;
+                bulkStockContent.IsVisible = false;
+               
             }
         }
         catch (Exception ex)
@@ -317,7 +306,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     _TotalNumberOfBoxesDisplay.Remove(existingProduct);
                     // 読取実績・入荷実績のデータを設定
                     scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity);
+                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity,lotNumber);
                 }
                 else
                 {
@@ -328,7 +317,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     });
                     // 読取実績・入荷実績のデータを設定
                     scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity);
+                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity, lotNumber);
                 }
                 //  仕入先かんばんデータを設定
                 listScanReceive.Add(scanResultModel);
@@ -382,13 +371,14 @@ public partial class RegisterBulkStoreInPage : ContentPage
     /// <param name="numOfBoxes">箱数</param>
     /// <param name="companyID">会社ID</param>
     /// <returns></returns>
-    public D_ReceiveModel SetDReceiveModel(D_ReceiveModel d_ReceiveModel, string supplierProductNumber, string userName, int numOfBoxes, int companyID,int lotOfQuantity)
+    public D_ReceiveModel SetDReceiveModel(D_ReceiveModel d_ReceiveModel, string supplierProductNumber, string userName, int numOfBoxes, int companyID,int lotOfQuantity,string lotNumber)
     {
         d_ReceiveModel.CompanyID = companyID;
         d_ReceiveModel.Quantity = lotOfQuantity * numOfBoxes;
         d_ReceiveModel.ReceiveDatetime = DateTime.Now;
         d_ReceiveModel.SupplierProductNumber = supplierProductNumber;
         d_ReceiveModel.NumberOfBoxes = numOfBoxes;
+        d_ReceiveModel.LotNumber = lotNumber;
         d_ReceiveModel.ScanedAt = DateTime.Now;
         d_ReceiveModel.CreatedAt = DateTime.Now;
         d_ReceiveModel.CreatedBy = userName;
@@ -449,7 +439,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 // ネットワーク接続チェック
                 if (!NetworkCheck.CheckNetworkConnection())
                 {
-                    await DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+                    await DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK");
                     return;
                 }
 
@@ -475,7 +465,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 // ERRORサウンドを鳴らす
                 string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
                 SoundPlayer.PlaySound(resultErrorSound);
-                await DisplayAlert("エラー", "E2016: 読取データがありません。", "OK");
+                await DisplayAlert("エラー", $"E2016: {ErrorMessagesResources.E2016}", "OK");
             }
         }
         catch (Exception ex)

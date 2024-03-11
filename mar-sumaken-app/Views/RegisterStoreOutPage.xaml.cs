@@ -30,7 +30,6 @@ public partial class RegisterStoreOutPage : ContentPage
     public int handyMenuID;
     public int numberOfBoxes = 1;
     public int shipmentScheduleID;
-    int totalNumberOfBoxes;
     int totalNumberOfBoxesRemaining;
     public bool isScanDelivery = true;
     public string deliveryScanContent = string.Empty;
@@ -83,9 +82,8 @@ public partial class RegisterStoreOutPage : ContentPage
         SetRegisterStoreOutPage();
 
         // 進捗を数える
-        totalNumberOfBoxesRemaining = dShipmentScheduleListSearch.Sum(obj => obj.NumberOfBoxesRemaining);
-        totalNumberOfBoxes = dShipmentScheduleListSearch.Sum(obj => obj.NumberOfBoxes);
-        UpdateProgressBar(totalNumberOfBoxes, totalNumberOfBoxesRemaining);
+        totalNumberOfBoxesRemaining = dShipmentScheduleListSearch.Sum(obj => obj.NumberOfBoxesRemaining);        
+        UpdateProgressBar( totalNumberOfBoxesRemaining);
 
         // 履歴一覧用
         lstHistoryDShipmentSchedules = new ObservableCollection<D_ShipmentSchedule>(dShipmentScheduleListSearch);
@@ -705,7 +703,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <summary>
     /// プログレスバーを更新する
     /// </summary>
-    private async void UpdateProgressBar(int totalNumberOfBoxes, int totalNumberOfBoxesRemaining)
+    private async void UpdateProgressBar(int totalNumberOfBoxesRemaining)
     {
         try
         {

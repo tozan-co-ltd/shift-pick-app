@@ -3,11 +3,6 @@ using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
 using mar_sumaken_app.Properties;
 using Newtonsoft.Json;
-using System.Collections.ObjectModel;
-using System.Net.Http.Json;
-using System.Text;
-using System.Text.RegularExpressions;
-using Android.Accounts;
 
 namespace mar_sumaken_app.Views;
 
@@ -101,12 +96,7 @@ public partial class HandySettingPage : ContentPage
                 return;
 
             // ネットワーク接続チェック
-            if (!NetworkCheck.CheckNetworkConnection())
-            {
-                await DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK");
-                hasRegiterClick = false;
-                return;
-            }
+            if (!NetworkCheck.CheckNetworkConnection()) { await DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK"); hasRegiterClick = false; return; }
 
             hasRegiterClick = true;
 
@@ -121,18 +111,9 @@ public partial class HandySettingPage : ContentPage
             
             // 入力値チェック
             bool isValidUrl = Uri.TryCreate(txtUrlApi, UriKind.Absolute, out Uri result);
-            if (string.IsNullOrWhiteSpace(txtUrlApi))
-            {
-                await DisplayAlert("エラー", $"E2004: {ErrorMessagesResources.E2004}", "OK");
-                hasRegiterClick = false;
-                return;
-            }
-            if (!isValidUrl)
-            {
-                await DisplayAlert("エラー", $"E2005: {ErrorMessagesResources.E2005}", "OK");
-                hasRegiterClick = false;
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(txtUrlApi)) { await DisplayAlert("エラー", $"E2004: {ErrorMessagesResources.E2004}", "OK"); hasRegiterClick = false; return; }
+
+            if (!isValidUrl) { await DisplayAlert("エラー", $"E2005: {ErrorMessagesResources.E2005}", "OK"); hasRegiterClick = false; return; }
        
             if (string.IsNullOrWhiteSpace(settingApiRequestBody.CompanyCode) || string.IsNullOrWhiteSpace(settingApiRequestBody.CompanyPassword))
             {
@@ -141,44 +122,39 @@ public partial class HandySettingPage : ContentPage
                 return;
             }
 
+            // ロード中を表示
+            Application.Current.MainPage = new LoadingPage();
+            await Task.Delay(100);
+
             // API接続
             var jsonDataSend = JsonConvert.SerializeObject(settingApiRequestBody);
             var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "HandySetting/Validate");
             if (response.success)
             {
-                await _dbService.Create(new HandySettingModel.HandySetting
-                {
-                    HandyApiUrl = txtUrlApi,
-                    CompanyCode = settingApiRequestBody.CompanyCode,
-                    CompanyPassword = settingApiRequestBody.CompanyPassword,
-                    LoginID = settingApiRequestBody.LoginID,
-                    ScanMode = (string)scanMode.SelectedItem,
-                    ScanOkSound = (string)scanOkSound.SelectedItem,
-                    ScanErrorSound = (string)scanErrorSound.SelectedItem
-                });
+                // ハンディな設定 Sqlite を作成する
+                CreateHandySettingSqlLite(settingApiRequestBody, txtUrlApi);
 
                 // 保存したOKサウンドのパスを取得する
                 string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
                 // OKサウンドを鳴らす
                 SoundPlayer.PlaySound(resultOkSound);
+                // ローカルデータの削除
+                RemoveLocalData();
+
                 await DisplayAlert("完了", "登録が完了しました。", "OK");
 
                 // ログイン画面表示
-                Application.Current.MainPage = new LoadingPage();
-                await Task.Delay(100);
                 Application.Current.MainPage = new LoginPage();
             }
             else if (response.content.Contains("<!DOCTYPE html>"))
             {
                 await DisplayAlert("エラー", $"E2005: {ErrorMessagesResources.E2005}", "OK");
-                hasRegiterClick = false;
-                return;
+                Application.Current.MainPage = new HandySettingPage();
             }
             else
             {
                 await DisplayAlert("エラー", response.content, "OK");
-                hasRegiterClick = false;
-                return;
+                Application.Current.MainPage = new HandySettingPage();
             }
 
             hasRegiterClick = false;
@@ -186,8 +162,35 @@ public partial class HandySettingPage : ContentPage
         catch (Exception ex)
         {
             await DisplayAlert("エラー", ex.Message, "OK");
-            throw;
+            Application.Current.MainPage = new HandySettingPage();
         }
+    }
+
+    /// <summary>
+    /// ローカルデータの削除
+    /// </summary>
+    public void RemoveLocalData()
+    {
+        companyCode = string.Empty;
+        companyPassword = string.Empty;
+        loginID = string.Empty;
+    }
+
+    /// <summary>
+    /// ハンディな設定 Sqlite を作成する
+    /// </summary>
+    public async void CreateHandySettingSqlLite(HandySettingModel.SettingPostBody settingApiRequestBody, string txtUrlApi)
+    {
+        await _dbService.Create(new HandySettingModel.HandySetting
+        {
+            HandyApiUrl = txtUrlApi,
+            CompanyCode = settingApiRequestBody.CompanyCode,
+            CompanyPassword = settingApiRequestBody.CompanyPassword,
+            LoginID = settingApiRequestBody.LoginID,
+            ScanMode = (string)scanMode.SelectedItem,
+            ScanOkSound = (string)scanOkSound.SelectedItem,
+            ScanErrorSound = (string)scanErrorSound.SelectedItem
+        });
     }
 
     /// <summary>

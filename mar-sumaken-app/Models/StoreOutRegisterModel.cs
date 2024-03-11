@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,17 @@ namespace mar_sumaken_app.Models
             /// ハンディエラーメッセージ実績
             /// </summary>
             public List<D_HandyErrorMessageModel> HandyErrorMessage { get; set; }
+        }
+        public class StoreOutResponseContent
+        {
+            [JsonProperty("message")]
+            public string Message { get; set; }
+
+            [JsonProperty("productWithMinusNumberOfBoxes")]
+            public List<M_ProductModel> ProductsWithMinusNumberOfBoxes { get; set; }
+
+            [JsonProperty("scanShipmentDuplicateData")]
+            public List<ScanShipmentModel> ScanShipmentDuplicateData { get; set; }
         }
     }
 }

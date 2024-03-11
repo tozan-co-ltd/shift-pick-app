@@ -791,13 +791,15 @@ public partial class RegisterStoreOutPage : ContentPage
 
             //テキスト値を設定し、成功登録後にラベルに表示されます
             SetValueAndVisibleLabelAfterRegisterAndErrorCancel();
+                   
+            //APIの戻り値によって、表示内容を変える
+            string registeredMessage = CreateRegisteredMessage(response.content);
 
             // サウンドのパスを取得する
             string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
             // OKサウンド
             SoundPlayer.PlaySound(resultOkSound);
-
-            await Application.Current.MainPage.DisplayAlert("完了", "データ登録が完了しました", "OK");
+            await DisplayAlert("完了", registeredMessage, "OK");
 
             // 送信後は再度ShipmentSchduleのAPIに再度接続して情報を最新化
             CallBackApiToUpdateDataAfterRegistered();
@@ -806,6 +808,50 @@ public partial class RegisterStoreOutPage : ContentPage
         {
             await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}", "OK");
         }
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="responceContent"></param>
+    /// <returns></returns>
+    private string CreateRegisteredMessage(string responceContent) {
+        string defaultMessage = "データ登録が完了しました";
+        try
+        {
+            // contentをJSONオブジェクトにデシリアライズ
+            var storeOutResponseContent = JsonConvert.DeserializeObject<StoreOutRegisterModel.StoreOutResponseContent>(responceContent);
+            if (storeOutResponseContent != null)
+            {
+                string minusStockProduct = string.Empty;
+                string strDuplicateProduct = string.Empty;
+                if (storeOutResponseContent.ProductsWithMinusNumberOfBoxes != null ) {
+                    //在庫マイナス品番を羅列
+                    // productWithMinusNumberOfBoxesからSupplierProductNumberのみを抽出して結合
+                    minusStockProduct = "【在庫がマイナスになった品番】\n ";
+                    minusStockProduct += string.Join("\n", storeOutResponseContent.ProductsWithMinusNumberOfBoxes.Select(p => p.SupplierProductNumber));// 改行で結合
+                }
+
+                if (storeOutResponseContent.ScanShipmentDuplicateData != null )
+                {
+                    strDuplicateProduct = "【重複があった品番】 \n";
+                    //重複したかんばんシリアルと納入先品番を羅列                    
+                    var duplicateProduct = storeOutResponseContent.ScanShipmentDuplicateData
+                    .Select(p => p.d_ShipmentModel).Select(p => new { p.KanbanSerialNumber, p.SupplierProductNumber }).ToList();                   
+                    // 結果の表示
+                    foreach (var product in duplicateProduct)
+                    {
+                        strDuplicateProduct += $"かんばんシリアル: {product.KanbanSerialNumber}, 仕入先品番: {product.SupplierProductNumber}" + "\n";
+                    }
+                }
+                return defaultMessage + '\n' + storeOutResponseContent.Message +  '\n' + minusStockProduct + '\n' + strDuplicateProduct;
+            }
+            return defaultMessage;
+        }
+        catch (JsonException)
+        {
+            return defaultMessage;
+        }    
     }
 
     /// <summary>
@@ -824,6 +870,8 @@ public partial class RegisterStoreOutPage : ContentPage
             DeliveryLocation = selectedDeliveryLocationLabel.Text,
         };
         var jsonDataShipmentScheduleSend = JsonConvert.SerializeObject(shipmentScheduleRequestBody);
+        Application.Current.MainPage = new LoadingPage();
+        await Task.Delay(200);
 
         // 最新データを取得するため、もう一回APIにリクエストを送る
         var responseShipmentSchedule = await App.API.PostMethod(jsonDataShipmentScheduleSend, _handyApiUrl, "ShipmentSchedule/Find");
@@ -834,8 +882,7 @@ public partial class RegisterStoreOutPage : ContentPage
             var contentFromApi = JsonConvert.DeserializeObject<ShipmentScheduelResponseBody>(responseShipmentSchedule.content);
             var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList; // 出荷指示
             var dShipmentList = contentFromApi.D_ShipmentList; // 出荷実績
-            Application.Current.MainPage = new LoadingPage();
-            await Task.Delay(200);
+
             Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, companyID, (string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, shipmentScheduleList, dShipmentList, mUserList, listProducts, deliverySlipNumberLabel.Text);
         }
         else

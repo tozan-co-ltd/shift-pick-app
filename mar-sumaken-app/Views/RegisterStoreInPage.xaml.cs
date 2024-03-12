@@ -251,7 +251,7 @@ public partial class RegisterStoreInPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}" + ex.Message, "OK");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
             return;
         }
     }
@@ -380,7 +380,7 @@ public partial class RegisterStoreInPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}" + ex.Message, "OK");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
             return;
         }
     }

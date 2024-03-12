@@ -177,7 +177,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 lotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex-1, mSupplierKanban.LotLength).Trim();
 
                 // 履歴一覧表示リスト内の同じ品番・キーを取得
-                D_ReceiveModel duplicateProduct = _HistoryListDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
+                var duplicateProduct = _HistoryListDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
                 if (duplicateProduct != null)
                 {
                     // 既にスキャンしている場合はエラー

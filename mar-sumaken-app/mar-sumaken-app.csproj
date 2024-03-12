@@ -59,17 +59,11 @@
 	<ItemGroup>
 		<EmbeddedResource Include="Resources\Raw\ScanErrorSound\ScanErrorSound1.mp3" />
 		<EmbeddedResource Include="Resources\Raw\ScanErrorSound\ScanErrorSound2.mp3" />
-		<EmbeddedResource Include="Resources\Raw\ScanErrorSound\ScanErrorSound3.mp3" />
 		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound1.mp3" />
-		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound10.mp3" />
+		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound5.mp3" />
 		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound2.mp3" />
 		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound3.mp3" />
 		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound4.mp3" />
-		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound5.mp3" />
-		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound6.mp3" />
-		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound7.mp3" />
-		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound8.mp3" />
-		<EmbeddedResource Include="Resources\Raw\ScanOkeySound\ScanOkeySound9.mp3" />
 	</ItemGroup>
 
 	<ItemGroup>

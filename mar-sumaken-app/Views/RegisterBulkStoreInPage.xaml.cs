@@ -107,8 +107,9 @@ public partial class RegisterBulkStoreInPage : ContentPage
     /// </summary>
     protected async void OnClipboardContentChanged(object sender, EventArgs e)
     {
-        try
-        {
+        //箱数入力画面表示中は操作させない
+        if (numberInputModal.IsVisible) return;
+
             var settings = await _dbService.GetSetting();
             _handyApiUrl = settings.Last().HandyApiUrl;
             var loginUser = await _dbService.GetLoginAsync();

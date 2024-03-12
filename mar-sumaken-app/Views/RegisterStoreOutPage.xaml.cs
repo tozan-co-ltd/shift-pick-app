@@ -364,6 +364,11 @@ public partial class RegisterStoreOutPage : ContentPage
                 SoundPlayer.PlaySound(resultOkSound);
             }
         }
+        catch (ArgumentOutOfRangeException arg)
+        {
+            await DisplayAlert("エラー", $"E2001: {ErrorMessagesResources.E2001}" + arg.Message, "OK");
+            return;
+        }
         catch (Exception ex)
         {
             // 全てコンテンツを消す

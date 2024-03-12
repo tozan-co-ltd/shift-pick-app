@@ -249,6 +249,11 @@ public partial class RegisterStoreInPage : ContentPage
               
             }
         }
+        catch (ArgumentOutOfRangeException arg)
+        {
+            await DisplayAlert("エラー", $"E2001: {ErrorMessagesResources.E2001}" + arg.Message, "OK");
+            return;
+        }
         catch (Exception ex)
         {
             await DisplayAlert("エラー", ex.Message, "OK");

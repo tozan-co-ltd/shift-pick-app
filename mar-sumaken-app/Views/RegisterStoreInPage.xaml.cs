@@ -105,28 +105,25 @@ public partial class RegisterStoreInPage : ContentPage
     /// </summary>
     protected async void OnClipboardContentChanged(object sender, EventArgs e)
     {
+        var settings = await _dbService.GetSetting();
+        _handyApiUrl = settings.Last().HandyApiUrl;
+        var loginUser = await _dbService.GetLoginAsync();
+        var d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
+        // サウンドパスを取得
+        string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
+        string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
+        string clipboardContent = Clipboard.GetTextAsync().Result ?? string.Empty;
         try
-        {
-            var settings = await _dbService.GetSetting();
-            _handyApiUrl = settings.Last().HandyApiUrl;
-            var loginUser = await _dbService.GetLoginAsync();
-            var d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
-
+        {            
             if (_IsScanPageActive)
-            {
-                // サウンドパスを取得
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
-                string clipboardContent = Clipboard.GetTextAsync().Result;
-
+            {                
                 if (string.IsNullOrEmpty(clipboardContent))
                 {
                     scanTextResult.Text = $"E2015: {ErrorMessagesResources.E2015}";
-                    scanTextResult.TextColor = Colors.Red;
+                    scanTextResult.TextColor = Colors.Red;                    
                     listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent ?? string.Empty, scanTextResult.Text));
                     return;
                 }
-
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
                 listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
                 listRHandyMenuSupplierKanban = await _dbService.GetRHandyMenuSupplierKanbanByHandyMenuID(handyMenuID);
@@ -139,18 +136,15 @@ public partial class RegisterStoreInPage : ContentPage
                     // 識別文字列が正しくない場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
-                    scanTextResult.TextColor = Colors.Red;
+                    scanTextResult.TextColor = Colors.Red;                    
                     listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
                 mSupplierKanban = supplierIdentifyMatchStringList.FirstOrDefault();
-
-               
+                
                 // 文字列をトリム
-                string supplierProductNumber = string.Empty;
-                int lotOfQuantity = 0;
-                    
+                string supplierProductNumber = string.Empty;                    
                 // 品番
                 supplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
                 // 仕入先品番が存在をチェック
@@ -208,7 +202,7 @@ public partial class RegisterStoreInPage : ContentPage
                     // 既にスキャンしている場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2017: {ErrorMessagesResources.E2017}";
-                    scanTextResult.TextColor = Colors.Red;
+                    scanTextResult.TextColor = Colors.Red;                    
                     listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
@@ -256,9 +250,13 @@ public partial class RegisterStoreInPage : ContentPage
               
             }
         }
-        catch (ArgumentOutOfRangeException arg)
+        catch (ArgumentOutOfRangeException argException)
         {
-            await DisplayAlert("エラー", $"E2001: {ErrorMessagesResources.E2001}\n" + arg.Message, "OK");
+            // 識別文字列が正しくない場合はエラー
+            SoundPlayer.PlaySound(resultErrorSound);
+            scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
+            scanTextResult.TextColor = Colors.Red;
+            listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));           
             return;
         }
         catch (Exception ex)

@@ -126,8 +126,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 {
                     scanTextResult.Text = $"E2015: {ErrorMessagesResources.E2015}";
                     scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
@@ -143,8 +142,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
                     scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
@@ -162,8 +160,9 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2002: {string.Format(ErrorMessagesResources.E2002, "品番マスター")}";
                     scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
+                    return;
+                }
                 var intCheckResult = Util.CheckIntType(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
                 if (!intCheckResult.isInt)
                 {
@@ -185,8 +184,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2017: {ErrorMessagesResources.E2017}";
                     scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage( loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
@@ -219,8 +217,9 @@ public partial class RegisterBulkStoreInPage : ContentPage
     /// <param name="clipboardContent">クリップボードの内容</param>
     /// <param name="scanTextError">スキャンテキストエラー</param>
     /// <returns></returns>
-    public D_HandyErrorMessageModel SetHandyErrorMessage(D_HandyErrorMessageModel d_HandyErrorMessageModel, List<LoginModel.LoginUserSqlLite> loginUser, string clipboardContent, string scanTextError)
+    public D_HandyErrorMessageModel SetHandyErrorMessage(List<LoginModel.LoginUserSqlLite> loginUser, string clipboardContent, string scanTextError)
     {
+        D_HandyErrorMessageModel d_HandyErrorMessageModel = new();
         d_HandyErrorMessageModel.DepoID = loginUser.Last().DepoID;
         d_HandyErrorMessageModel.HandyMenuID = handyMenuID;
         d_HandyErrorMessageModel.FirstScanedString = clipboardContent;

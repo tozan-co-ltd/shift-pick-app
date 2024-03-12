@@ -7,7 +7,6 @@ using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.RegularExpressions;
-using Android.Accounts;
 
 namespace mar_sumaken_app.Views;
 

@@ -200,7 +200,7 @@ public partial class RegisterStoreOutPage : ContentPage
   
                 // QR中身を制御コードで区切れるよう変換するのをチェック用
                 bool isInValidateDelivery =  SetValueFromQrCode(clipboardContent);
-                if (!isInValidateDelivery) { ShowErrorTextInLabel($"E2015: {ErrorMessagesResources.E2015}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
+                if (!isInValidateDelivery) { ShowErrorTextInLabel($"E2001 : {ErrorMessagesResources.E2001}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
 
                 //マスターのプロダクトリストに存在納入先品番をチェック
                 bool existDeliveryProductNumber = listProducts.Any(product => product.DeliveryProductNumber == deliveryKanbanModel.DeliveryProductNumber && product.LotQuantity == deliveryKanbanModel.LotQuantity);

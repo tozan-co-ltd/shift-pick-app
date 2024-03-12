@@ -43,7 +43,7 @@ namespace mar_sumaken_app.Common
             if (scanAndSoundList.Count > 0)
             {
                 handySetting = scanAndSoundList.Last();
-                errorSoundNumber = new string(handySetting.ScanOkSound.Where(char.IsDigit).ToArray());
+                errorSoundNumber = new string(handySetting.ScanErrorSound.Where(char.IsDigit).ToArray());
             }
             else
             {

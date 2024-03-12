@@ -126,6 +126,8 @@ public partial class HandySettingPage : ContentPage
             var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "HandySetting/Validate");
             if (response.success)
             {
+                // 古いメニューデータを消す
+                await _dbService.ALLDeleteHandySettingAsync();
                 // ハンディな設定 Sqlite を作成する
                 CreateHandySettingSqlLite(settingApiRequestBody, txtUrlApi);
 

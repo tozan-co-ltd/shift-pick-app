@@ -74,6 +74,14 @@ namespace mar_sumaken_app.Services
         {
             await _connection.DeleteAsync(handySetting);
         }
+
+        /// <summary>
+        /// 古いハンディ設定ーデータを消す
+        /// </summary>
+        public async Task<int> ALLDeleteHandySettingAsync()
+        {
+            return await _connection.DeleteAllAsync<HandySettingModel.HandySetting>();
+        }
         #endregion
 
 

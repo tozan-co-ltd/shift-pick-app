@@ -1,26 +1,21 @@
-using System;
-using System.Collections.ObjectModel;
 using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Properties;
 using mar_sumaken_app.Services;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Xaml;
 using Newtonsoft.Json;
-using Plugin.Maui.Audio;
 
 namespace mar_sumaken_app.Views;
 
 public partial class MenuPage : FlyoutPage
 {
+    bool isItemTapped = false;
     private readonly LocalDbService _dbService;
     private LoginModel.LoginUserSqlLite _loginUserSqlLite;
     public List<M_HandyMenuModel> listHandyMenu;
     private HandySettingModel.HandySetting _handySetting;
     public List<M_SupplierKanbanModel> listMSupplierKanban;
-    public List<R_HandyMenuSupplierKanbanModel> listRHandyMenuSupplierKanban;
-    bool isItemTapped = false;
     public List<LoginModel.LoginUserSqlLite> loginUsers;
+    public List<R_HandyMenuSupplierKanbanModel> listRHandyMenuSupplierKanban;
 
     /// <summary>
     /// メニュー画面表示
@@ -115,16 +110,17 @@ public partial class MenuPage : FlyoutPage
         catch (Exception ex)
         {
             await DisplayAlert("エラー", ex.Message, "OK");
-            return;
+            Application.Current.MainPage = new MenuPage();
         }
     }
 
     /// <summary>
     /// ナビゲーション
     /// </summary>
-    /// <param name="title">string</param>
+    /// <param name="handyMenuName">string</param>
+    /// <param name="handyMenuID">int</param>
     /// <returns>対応画面</returns>
-    private async Task PerformNavigation(string title, int handyMenuID)
+    private async Task PerformNavigation(string handyMenuName, int handyMenuID)
     {
         try
         {
@@ -136,12 +132,7 @@ public partial class MenuPage : FlyoutPage
             var jsonDataSend = JsonConvert.SerializeObject(latestMastersPostBody);
 
             // ネットワーク接続チェック
-            if (!NetworkCheck.CheckNetworkConnection())
-            {
-                await DisplayAlert("エラー", $"E3003:  {ErrorMessagesResources.E3003}", "OK");
-                Application.Current.MainPage = new MenuPage();
-                return;
-            }
+            if (!NetworkCheck.CheckNetworkConnection()) { await DisplayAlert("エラー", $"E3003:  {ErrorMessagesResources.E3003}", "OK"); Application.Current.MainPage = new MenuPage(); return; }
 
             // API接続
             var response = await App.API.PostMethod(jsonDataSend, _handySetting.HandyApiUrl, "LatestMasters/Fetch");
@@ -152,23 +143,8 @@ public partial class MenuPage : FlyoutPage
                 var listlatestMastersSqlLite =  new List<M_SupplierKanbanModel>();
                 listlatestMastersSqlLite = contentFromApi.M_SupplierKanbanList;
                 listProducts = contentFromApi.M_ProductList;
-                var listShipmentScheduleQRCode = contentFromApi.M_ShipmentScheduleQRCodeList;
-                // ローカルDBの古いメニューを削除
-                await _dbService.ALLDeleteMSupplierKanbanAsync();
-                foreach (var latestMastersSqlLite in listlatestMastersSqlLite)
-                    await _dbService.SaveMSupplierKanbanAsync(latestMastersSqlLite);
-
-                var listRHandyMenuSupplierKanbanSqlLite = new List<R_HandyMenuSupplierKanbanModel>();
-                listRHandyMenuSupplierKanbanSqlLite = contentFromApi.R_HandyMenuSupplierKanbanList;
-                // ローカルDBの古いハンディメニューを削除
-                await _dbService.ALLDeleteRHandyMenuSupplierKanbanAsync();
-                foreach (var rHandyMenuSupplierKanbanSqlLite in listRHandyMenuSupplierKanbanSqlLite)
-                    await _dbService.SaveRHandyMenuSupplierKanbanAsync(rHandyMenuSupplierKanbanSqlLite);
-
-                // ローカルDBの古い出荷指示QRコーを削除
-                await _dbService.ALLDeleteMShipmentScheduleQRCodeAsync();
-                foreach (var shipmentScheduleQRCodeSqlLite in listShipmentScheduleQRCode)
-                    await _dbService.SaveMShipmentScheduleQRCodeAsync(shipmentScheduleQRCodeSqlLite);
+                // 削除して Sqlite に保存
+                DeleteAndSaveToSqlLite(listlatestMastersSqlLite, response.content);
             }
             else
             {
@@ -177,27 +153,66 @@ public partial class MenuPage : FlyoutPage
                 return;
             }
 
-            // 入庫
-            if (title == Const.C_REGISTER_STORE_IN_PAGE)
-            {
-                Application.Current.MainPage = new RegisterStoreInPage(handyMenuID, listProducts);
-            }
-            else if (title == Const.C_REGISTER_BULK_STORE_IN_PAGE)
-                Application.Current.MainPage = new RegisterBulkStoreInPage(handyMenuID, listProducts);
-
-            // 出庫
-            else if (title == Const.C_SEARCH_SHIPPING_INSTRUCTION_IN_PAGE)
-            {
-                // API接続
-                var listCompanyResult = await GetListCompanyFromApi();
-                if (listCompanyResult.success) 
-                    Application.Current.MainPage = new SearchShippingInstructionListPage(handyMenuID, listCompanyResult.mCompanySqlLite, listProducts);
-            }
+            // ハンディメニューIDによるナビゲーション
+            NavigationByHandyMenuTitle(handyMenuName, handyMenuID, listProducts);
         }
         catch (Exception)
         {
             throw;
         }
+    }
+
+    /// <summary>
+    ///  ハンディメニューIDによるナビゲーション
+    /// </summary>
+    /// <param name="listProducts">List<M_ProductModel></param>
+    /// <param name="handyMenuID">string</param>
+    /// <param name="handyMenuTitle">string</param>
+    public async void NavigationByHandyMenuTitle(string handyMenuTitle, int handyMenuID,  List<M_ProductModel> listProducts)
+    {
+        // 入庫
+        if (handyMenuTitle == Const.C_REGISTER_STORE_IN_PAGE)
+            Application.Current.MainPage = new RegisterStoreInPage(handyMenuID, listProducts);
+        else if (handyMenuTitle == Const.C_REGISTER_BULK_STORE_IN_PAGE)
+            Application.Current.MainPage = new RegisterBulkStoreInPage(handyMenuID, listProducts);
+
+        // 出庫
+        else if (handyMenuTitle == Const.C_SEARCH_SHIPPING_INSTRUCTION_IN_PAGE)
+        {
+            // API接続
+            var listCompanyResult = await GetListCompanyFromApi();
+            if (listCompanyResult.success)
+                Application.Current.MainPage = new SearchShippingInstructionListPage(handyMenuID, listCompanyResult.mCompanySqlLite, listProducts);
+        }
+    }
+
+
+    /// <summary>
+    ///  削除して Sqlite に保存
+    /// </summary>
+    /// <param name="listlatestMastersSqlLite">List<M_SupplierKanbanModel></param>
+    /// <param name="content">string</param>
+    public async void DeleteAndSaveToSqlLite(List<M_SupplierKanbanModel> listlatestMastersSqlLite, string content)
+    {
+        var contentFromApi = JsonConvert.DeserializeObject<LatestMastersModel.LatestMastersPostBackContent>(content);
+
+        var listShipmentScheduleQRCode = contentFromApi.M_ShipmentScheduleQRCodeList;
+        // ローカルDBの古いメニューを削除
+        await _dbService.ALLDeleteMSupplierKanbanAsync();
+        foreach (var latestMastersSqlLite in listlatestMastersSqlLite)
+            await _dbService.SaveMSupplierKanbanAsync(latestMastersSqlLite);
+
+        var listRHandyMenuSupplierKanbanSqlLite = new List<R_HandyMenuSupplierKanbanModel>();
+        listRHandyMenuSupplierKanbanSqlLite = contentFromApi.R_HandyMenuSupplierKanbanList;
+        // ローカルDBの古いハンディメニューを削除
+        await _dbService.ALLDeleteRHandyMenuSupplierKanbanAsync();
+        foreach (var rHandyMenuSupplierKanbanSqlLite in listRHandyMenuSupplierKanbanSqlLite)
+            await _dbService.SaveRHandyMenuSupplierKanbanAsync(rHandyMenuSupplierKanbanSqlLite);
+
+        // ローカルDBの古い出荷指示QRコーを削除
+        await _dbService.ALLDeleteMShipmentScheduleQRCodeAsync();
+        foreach (var shipmentScheduleQRCodeSqlLite in listShipmentScheduleQRCode)
+            await _dbService.SaveMShipmentScheduleQRCodeAsync(shipmentScheduleQRCodeSqlLite);
     }
 
     /// <summary>

@@ -3,7 +3,6 @@ using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
 using mar_sumaken_app.Properties;
 using Newtonsoft.Json;
-using System.Data.SqlTypes;
 using System.Text.RegularExpressions;
 
 namespace mar_sumaken_app.Views;
@@ -73,24 +72,13 @@ public partial class LoginPage : ContentPage
         {
             // ローカルDBのハンディ設定情報取得
             var settings = await _dbService.GetSetting();
-            if (settings.Count() == 0)
-            {
-                await DisplayAlert("エラー", $"E2008:  {ErrorMessagesResources.E2008}", "OK");
-                hasOnLoginClick = false;
-                return;
-            }
+            if (settings.Count() == 0) { await DisplayAlert("エラー", $"E2008:  {ErrorMessagesResources.E2008}", "OK"); hasOnLoginClick = false; return; }
 
             // 連続タップ制御
-            if (hasOnLoginClick)
-                return;
+            if (hasOnLoginClick) return;
 
             // ネットワーク接続チェック
-            if (!NetworkCheck.CheckNetworkConnection())
-            {
-                await DisplayAlert("エラー", $"E3003:  {ErrorMessagesResources.E3003}", "OK");
-                hasOnLoginClick = false;
-                return;
-            }
+            if (!NetworkCheck.CheckNetworkConnection()) { await DisplayAlert("エラー", $"E3003:  {ErrorMessagesResources.E3003}", "OK"); hasOnLoginClick = false; return; }
 
             hasOnLoginClick = true;
             string loginId = txtLoginId.Text;
@@ -123,20 +111,10 @@ public partial class LoginPage : ContentPage
                     loginError.Text = string.Empty;
                     // APIからコンテンツを取得
                     var contentFromApi = JsonConvert.DeserializeObject<LoginModel.LoginResponseBody>(response.content);
-                    loginUserSqlLite.CompanyCode = _handySetting.CompanyCode;
-                    loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
-                    loginUserSqlLite.CompanyPassword = _handySetting.CompanyPassword;
-                    loginUserSqlLite.LoginID = contentFromApi.M_User.LoginID;
-                    loginUserSqlLite.UserID = contentFromApi.M_User.UserID;
-                    loginUserSqlLite.UserName = contentFromApi.M_User.UserName;
-                    loginUserSqlLite.Password = contentFromApi.M_User.Password;
-                    loginUserSqlLite.Salt = contentFromApi.M_User.Salt;
-                    loginUserSqlLite.DepoID = contentFromApi.M_Depo.DepoID;
-                    loginUserSqlLite.AuthorizedKubun = contentFromApi.M_User.AuthorizedKubun;
-                    loginUserSqlLite.DepoName = contentFromApi.M_Depo.DepoName;
-
                     // メニュー作成
                     handyPages = contentFromApi.M_HandyMenuList;
+                    // ログインユーザーSqliteの値を設定する
+                    loginUserSqlLite = SetValueForLoginUserSqlLite(loginUserSqlLite, response.content);
                     // ローカルDBの古いメニューを削除
                     await _dbService.ALLDeleteMenuAsync();
                     // ローカルDBに保存
@@ -159,10 +137,34 @@ public partial class LoginPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", ex.Message, "OK");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
             hasOnLoginClick = false;
             Application.Current.MainPage = new LoginPage();
         }
+    }
+
+    /// <summary>
+    /// ログインユーザーSqliteの値を設定する
+    /// </summary>
+    /// <param name="loginUserSqlLite">LoginModel.LoginUserSqlLite</param>
+    /// <param name="content">string</param>
+    /// <returns>ログインユーザーSqliteの値</returns>
+    public LoginModel.LoginUserSqlLite SetValueForLoginUserSqlLite(LoginModel.LoginUserSqlLite loginUserSqlLite, string content)
+    {
+        var contentFromApi = JsonConvert.DeserializeObject<LoginModel.LoginResponseBody>(content);
+        loginUserSqlLite.CompanyCode = _handySetting.CompanyCode;
+        loginUserSqlLite.CompanyName = contentFromApi.CompanyName;
+        loginUserSqlLite.CompanyPassword = _handySetting.CompanyPassword;
+        loginUserSqlLite.LoginID = contentFromApi.M_User.LoginID;
+        loginUserSqlLite.UserID = contentFromApi.M_User.UserID;
+        loginUserSqlLite.UserName = contentFromApi.M_User.UserName;
+        loginUserSqlLite.Password = contentFromApi.M_User.Password;
+        loginUserSqlLite.Salt = contentFromApi.M_User.Salt;
+        loginUserSqlLite.DepoID = contentFromApi.M_Depo.DepoID;
+        loginUserSqlLite.AuthorizedKubun = contentFromApi.M_User.AuthorizedKubun;
+        loginUserSqlLite.DepoName = contentFromApi.M_Depo.DepoName;
+
+        return loginUserSqlLite;
     }
 
     /// <summary>

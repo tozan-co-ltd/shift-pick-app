@@ -55,8 +55,7 @@ public partial class RegisterStoreOutPage : ContentPage
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     public List<D_HandyErrorMessageModel> listDHandyErrorMessage = new List<D_HandyErrorMessageModel>();
     public List<ScanShipmentModel> listScanShipment = new List<ScanShipmentModel>();
-    public List<M_ShipmentScheduleQRCodeModel> listMShipmentScheduleQRCode = new List<M_ShipmentScheduleQRCodeModel>();
-    public D_HandyErrorMessageModel d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
+    public List<M_ShipmentScheduleQRCodeModel> listMShipmentScheduleQRCode = new List<M_ShipmentScheduleQRCodeModel>();    
 
     public RegisterStoreOutPage(int menuID, int selectedCompanyID, string deliveryName, string currentDate, string selectedDeliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite, ObservableCollection<D_ShipmentSchedule> dShipmentScheduleListSearch, List<D_ShipmentModel> dShipmentsListSearch, List<M_UserModel> mUserListSearch, List<M_ProductModel> listProductItems, string DeliverySlipNumber)
     {
@@ -188,6 +187,7 @@ public partial class RegisterStoreOutPage : ContentPage
 
                 //納入先かんばんをスキャンした時の文字列を格納
                 deliveryScanContent = clipboardContent;
+                supplierScanContent = string.Empty;
                 // 一回目コードの形式と日付をチェックすし、データを取得する
                 var deliveryQrIdentifyMatchStringList = listMShipmentScheduleQRCode.Where(x => x.IdentifyString == Util.QrcodeValueSubstring(x.IdentifyStringStartIndex, x.IdentifyString.Length, clipboardContent)).ToList();
                 if(deliveryQrIdentifyMatchStringList.Count  <= 0 ) { ShowErrorTextInLabel($"E2001: {ErrorMessagesResources.E2001}", resultErrorSound, clipboardContent, _loginUserSqlLite.DepoID, _loginUserSqlLite.UserName); return; }
@@ -369,7 +369,7 @@ public partial class RegisterStoreOutPage : ContentPage
             // 全てコンテンツを消す
             deliveryScanContent = string.Empty;
             supplierScanContent = string.Empty;
-            await DisplayAlert("エラー", ex.Message, "閉じる");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
         }
     }
 
@@ -648,8 +648,9 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <param name="clipboardContent">クリップボードの内容</param>
     /// <param name="scanTextError">スキャンテキストエラー</param>
     /// <returns></returns>
-    public D_HandyErrorMessageModel SetHandyErrorMessage(D_HandyErrorMessageModel d_HandyErrorMessageModel, int depoID, string userName, string scanTextError)
+    public D_HandyErrorMessageModel SetHandyErrorMessage(int depoID, string userName, string scanTextError)
     {
+        D_HandyErrorMessageModel d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
         d_HandyErrorMessageModel.DepoID = depoID;
         d_HandyErrorMessageModel.HandyMenuID = handyMenuID;
         d_HandyErrorMessageModel.FirstScanedString = deliveryScanContent;
@@ -661,26 +662,6 @@ public partial class RegisterStoreOutPage : ContentPage
         return d_HandyErrorMessageModel;
     }
 
-
-    /// <summary>
-    /// エラーメッセージを表示
-    /// </summary>
-    public void ShowErrorTextErrorCancel(string error, string resultErrorSound, int depoID, string userName)
-    {
-        // 既にスキャンしている場合はエラー
-        SoundPlayer.PlaySound(resultErrorSound);
-        scanTextResult.Text = error;
-        scanTextResult.IsVisible = true;
-        scanTextResult.TextColor = Colors.Red;
-        productNumberLabel.Text = string.Empty;
-        productNumberLabel.IsVisible = false;
-        statusScanLabel.Text = string.Empty;
-        statusScanLabel.IsVisible = false;
-
-        // 識別文字列が正しくない場合はエラー
-        d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, depoID, userName, error);
-        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
-    }
 
 
     /// <summary>
@@ -698,10 +679,9 @@ public partial class RegisterStoreOutPage : ContentPage
         statusScanLabel.Text = string.Empty;
         statusScanLabel.IsVisible = false;
 
-        // 識別文字列が正しくない場合はエラー
-        D_HandyErrorMessageModel  _d_HandyErrorMessag = SetHandyErrorMessage(d_HandyErrorMessageModel, depoID, userName, error);
-        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
-        d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
+        // 識別文字列が正しくない場合はエラー       
+        listDHandyErrorMessage.Add(SetHandyErrorMessage(depoID, userName, error));
+
     }
 
 
@@ -788,7 +768,7 @@ public partial class RegisterStoreOutPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", ex.Message, "閉じる");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
             return;
         }
     }
@@ -837,7 +817,6 @@ public partial class RegisterStoreOutPage : ContentPage
             storeOutPostBody.ScanShipmentModel = listScanShipment;
             storeOutPostBody.HandyErrorMessage = listDHandyErrorMessage;
             var jsonDataSend = JsonConvert.SerializeObject(storeOutPostBody);
-
             
             if (!NetworkCheck.CheckNetworkConnection())
             {
@@ -1008,6 +987,7 @@ public partial class RegisterStoreOutPage : ContentPage
         }
 
         // ハンディエラーメッセージ実績モデル
+        D_HandyErrorMessageModel d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
         d_HandyErrorMessageModel.UnlockedAt = DateTime.Now;
         d_HandyErrorMessageModel.UnlockedBy = _loginUserSqlLite.UserName;
         d_HandyErrorMessageModel.DepoID = _loginUserSqlLite.DepoID;

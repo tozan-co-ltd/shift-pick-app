@@ -3,12 +3,16 @@ using mar_sumaken_app.Models;
 using mar_sumaken_app.Services;
 using mar_sumaken_app.Properties;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace mar_sumaken_app.Views;
 
 public partial class HandySettingPage : ContentPage
 {
-    List<string> scanModeList = new List<string> { "ƒnƒ“ƒfƒBƒŠ[ƒ_["};
+    List<string> scanModeList = new List<string> { "ãƒãƒ³ãƒ‡ã‚£ãƒªãƒ¼ãƒ€ãƒ¼"};
     List<string> okSoundNameList = new List<string>();
     List<string> errorSsoundNameList = new List<string>();
     private readonly LocalDbService _dbService;
@@ -18,10 +22,10 @@ public partial class HandySettingPage : ContentPage
     public string companyCode = string.Empty;
     public string companyPassword = string.Empty;
     public string loginID = string.Empty;
-    bool hasRegiterClick = false; // “o˜^ƒNƒŠƒbƒN
+    bool hasRegiterClick = false; // ç™»éŒ²ã‚¯ãƒªãƒƒã‚¯
 
     /// <summary>
-    /// ƒnƒ“ƒfƒBİ’è‰æ–Ê•\¦
+    /// ãƒãƒ³ãƒ‡ã‚£è¨­å®šç”»é¢è¡¨ç¤º
     /// </summary>
     public HandySettingPage()
 	{
@@ -29,33 +33,33 @@ public partial class HandySettingPage : ContentPage
         _dbService = new LocalDbService();
 
 #if DEBUG
-        // ŠJ”­ŠÂ‹«(ƒfƒoƒbƒO—p)
+        // é–‹ç™ºç’°å¢ƒ(ãƒ‡ãƒãƒƒã‚°ç”¨)
         txtUrl.Text  = "https://wbtzn/sumaken-api-MRq2xg5_test/api/";
 #else
-        // –{”ÔŠÂ‹«
+        // æœ¬ç•ªç’°å¢ƒ
         txtUrl.Text = "https://www.tozan.co.jp/sumaken-api-MRq2xg5/api/";
 #endif
 
-        // ƒtƒB[ƒ‹ƒh‚Ìİ’è
+        // ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®è¨­å®š
         SetHandySetting();
     }
 
     /// <summary>
-    /// ƒtƒB[ƒ‹ƒh‚Ìİ’è
+    /// ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®è¨­å®š
     /// </summary>
     private async void SetHandySetting()
     {
-        // ƒXƒLƒƒƒ“ƒ‚[ƒh‚Ìİ’è
+        // ã‚¹ã‚­ãƒ£ãƒ³ãƒ¢ãƒ¼ãƒ‰ã®è¨­å®š
         scanMode.ItemsSource = scanModeList;
 
-        // ƒTƒEƒ“ƒhƒsƒbƒJ[‚Ìİ’è
+        // ã‚µã‚¦ãƒ³ãƒ‰ãƒ”ãƒƒã‚«ãƒ¼ã®è¨­å®š
         SoundModel sound = new SoundModel();
         okSoundNameList = sound.SoundOkeyList.Select(sound => sound.DisplayName).ToList();
         scanOkSound.ItemsSource = okSoundNameList;
         errorSsoundNameList = sound.SoundErrorList.Select(sound => sound.DisplayName).ToList();
         scanErrorSound.ItemsSource = errorSsoundNameList;
 
-        // ƒ[ƒJƒ‹DB‚Ìƒnƒ“ƒfƒBİ’èî•ñæ“¾
+        // ãƒ­ãƒ¼ã‚«ãƒ«DBã®ãƒãƒ³ãƒ‡ã‚£è¨­å®šæƒ…å ±å–å¾—
         var settings = await _dbService.GetSetting();
         if (settings.Count() > 0 && settings.Last() != null)
         {
@@ -77,7 +81,7 @@ public partial class HandySettingPage : ContentPage
      }
 
     /// <summary>
-    /// –ß‚éƒ{ƒ^ƒ“‰Ÿ‰º
+    /// æˆ»ã‚‹ãƒœã‚¿ãƒ³æŠ¼ä¸‹
     /// </summary>
     private async void OnBackButtonClicked(object sender, EventArgs e)
     {
@@ -85,72 +89,72 @@ public partial class HandySettingPage : ContentPage
     }
 
     /// <summary>
-    /// •Û‘¶ƒ{ƒ^ƒ“‰Ÿ‰º
+    /// ä¿å­˜ãƒœã‚¿ãƒ³æŠ¼ä¸‹
     /// </summary>
     private async void OnRegisterButtonClicked(object sender, EventArgs e)
     {
         try
         {
-            // ˜A‘±ƒ^ƒbƒv§Œä
+            // é€£ç¶šã‚¿ãƒƒãƒ—åˆ¶å¾¡
             if (hasRegiterClick)
                 return;
 
-            // ƒlƒbƒgƒ[ƒNÚ‘±ƒ`ƒFƒbƒN
-            if (!NetworkCheck.CheckNetworkConnection()) { await DisplayAlert("ƒGƒ‰[", $"E3003: {ErrorMessagesResources.E3003}", "OK"); hasRegiterClick = false; return; }
+            // ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯æ¥ç¶šãƒã‚§ãƒƒã‚¯
+            if (!NetworkCheck.CheckNetworkConnection()) { await DisplayAlert("ã‚¨ãƒ©ãƒ¼", $"E3003: {ErrorMessagesResources.E3003}", "OK"); hasRegiterClick = false; return; }
 
             hasRegiterClick = true;
 
             string txtUrlApi = txtUrl.Text;
-            // // APIƒŠƒNƒGƒXƒgƒ{ƒfƒB‚Ìİ’è
+            // // APIãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒœãƒ‡ã‚£ã®è¨­å®š
             var settingApiRequestBody = SettingApiRequestBody();
 
-            // “ü—Í’lƒ`ƒFƒbƒN
+            // å…¥åŠ›å€¤ãƒã‚§ãƒƒã‚¯
             bool isValidUrl = Uri.TryCreate(txtUrlApi, UriKind.Absolute, out Uri result);
-            if (string.IsNullOrWhiteSpace(txtUrlApi)) { await DisplayAlert("ƒGƒ‰[", $"E2004: {ErrorMessagesResources.E2004}", "OK"); hasRegiterClick = false; return; }
+            if (string.IsNullOrWhiteSpace(txtUrlApi)) { await DisplayAlert("ã‚¨ãƒ©ãƒ¼", $"E2004: {ErrorMessagesResources.E2004}", "OK"); hasRegiterClick = false; return; }
 
-            if (!isValidUrl) { await DisplayAlert("ƒGƒ‰[", $"E2005: {ErrorMessagesResources.E2005}", "OK"); hasRegiterClick = false; return; }
+            if (!isValidUrl) { await DisplayAlert("ã‚¨ãƒ©ãƒ¼", $"E2005: {ErrorMessagesResources.E2005}", "OK"); hasRegiterClick = false; return; }
        
             if (string.IsNullOrWhiteSpace(settingApiRequestBody.CompanyCode) || string.IsNullOrWhiteSpace(settingApiRequestBody.CompanyPassword))
             {
-                await DisplayAlert("ƒGƒ‰[", $"E2006: {ErrorMessagesResources.E2006}", "OK");
+                await DisplayAlert("ã‚¨ãƒ©ãƒ¼", $"E2006: {ErrorMessagesResources.E2006}", "OK");
                 hasRegiterClick = false;
                 return;
             }
 
-            // ƒ[ƒh’†‚ğ•\¦
+            // ãƒ­ãƒ¼ãƒ‰ä¸­ã‚’è¡¨ç¤º
             Application.Current.MainPage = new LoadingPage();
             await Task.Delay(100);
 
-            // APIÚ‘±
+            // APIæ¥ç¶š
             var jsonDataSend = JsonConvert.SerializeObject(settingApiRequestBody);
             var response = await App.API.PostMethod(jsonDataSend, txtUrlApi, "HandySetting/Validate");
             if (response.success)
             {
-                // ŒÃ‚¢ƒƒjƒ…[ƒf[ƒ^‚ğÁ‚·
+                // å¤ã„ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’æ¶ˆã™
                 await _dbService.ALLDeleteHandySettingAsync();
-                // ƒnƒ“ƒfƒB‚Èİ’è Sqlite ‚ğì¬‚·‚é
+                // ãƒãƒ³ãƒ‡ã‚£ãªè¨­å®š Sqlite ã‚’ä½œæˆã™ã‚‹
                 CreateHandySettingSqlLite(settingApiRequestBody, txtUrlApi);
 
-                // •Û‘¶‚µ‚½OKƒTƒEƒ“ƒh‚ÌƒpƒX‚ğæ“¾‚·‚é
+                // ä¿å­˜ã—ãŸOKã‚µã‚¦ãƒ³ãƒ‰ã®ãƒ‘ã‚¹ã‚’å–å¾—ã™ã‚‹
                 string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
-                // OKƒTƒEƒ“ƒh‚ğ–Â‚ç‚·
+                // OKã‚µã‚¦ãƒ³ãƒ‰ã‚’é³´ã‚‰ã™
                 SoundPlayer.PlaySound(resultOkSound);
-                // ƒ[ƒJƒ‹ƒf[ƒ^‚Ìíœ
+                // ãƒ­ãƒ¼ã‚«ãƒ«ãƒ‡ãƒ¼ã‚¿ã®å‰Šé™¤
                 RemoveLocalData();
 
-                await DisplayAlert("Š®—¹", "“o˜^‚ªŠ®—¹‚µ‚Ü‚µ‚½B", "OK");
+                await DisplayAlert("å®Œäº†", "ç™»éŒ²ãŒå®Œäº†ã—ã¾ã—ãŸã€‚", "OK");
 
-                // ƒƒOƒCƒ“‰æ–Ê•\¦
+                // ãƒ­ã‚°ã‚¤ãƒ³ç”»é¢è¡¨ç¤º
                 Application.Current.MainPage = new LoginPage();
             }
             else if (response.content.Contains("<!DOCTYPE html>"))
             {
-                await DisplayAlert("ƒGƒ‰[", $"E2005: {ErrorMessagesResources.E2005}", "OK");
+                await DisplayAlert("ã‚¨ãƒ©ãƒ¼", $"E2005: {ErrorMessagesResources.E2005}", "OK");
                 Application.Current.MainPage = new HandySettingPage();
             }
             else
             {
-                await DisplayAlert("ƒGƒ‰[", response.content, "OK");
+                await DisplayAlert("ã‚¨ãƒ©ãƒ¼", response.content, "OK");
                 Application.Current.MainPage = new HandySettingPage();
             }
 
@@ -158,13 +162,13 @@ public partial class HandySettingPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("ƒGƒ‰[", ex.Message, "OK");
-            Application.Current.MainPage = new HandySettingPage();
+            await DisplayAlert("ã‚¨ãƒ©ãƒ¼", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
+            throw;
         }
     }
 
     /// <summary>
-    /// APIƒŠƒNƒGƒXƒgƒ{ƒfƒB‚Ìİ’è
+    /// APIãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒœãƒ‡ã‚£ã®è¨­å®š
     /// </summary>
     public HandySettingModel.SettingPostBody SettingApiRequestBody()
     {
@@ -180,7 +184,7 @@ public partial class HandySettingPage : ContentPage
     }
 
     /// <summary>
-    /// ƒ[ƒJƒ‹ƒf[ƒ^‚Ìíœ
+    /// ãƒ­ãƒ¼ã‚«ãƒ«ãƒ‡ãƒ¼ã‚¿ã®å‰Šé™¤
     /// </summary>
     public void RemoveLocalData()
     {
@@ -190,7 +194,7 @@ public partial class HandySettingPage : ContentPage
     }
 
     /// <summary>
-    /// ƒnƒ“ƒfƒB‚Èİ’è Sqlite ‚ğì¬‚·‚é
+    /// ãƒãƒ³ãƒ‡ã‚£ãªè¨­å®š Sqlite ã‚’ä½œæˆã™ã‚‹
     /// </summary>
     public async void CreateHandySettingSqlLite(HandySettingModel.SettingPostBody settingApiRequestBody, string txtUrlApi)
     {
@@ -207,7 +211,7 @@ public partial class HandySettingPage : ContentPage
     }
 
     /// <summary>
-    /// ƒXƒLƒƒƒ“ƒGƒ‰[ƒTƒEƒ“ƒh•ÏX
+    /// ã‚¹ã‚­ãƒ£ãƒ³ã‚¨ãƒ©ãƒ¼ã‚µã‚¦ãƒ³ãƒ‰å¤‰æ›´
     /// </summary>
     private void OnScanErrorSoundChanged(object sender, EventArgs e)
     { 
@@ -219,13 +223,13 @@ public partial class HandySettingPage : ContentPage
         string errorSoundNumber = new string(scanErrorSound.SelectedItem.ToString().Where(char.IsDigit).ToArray());
         scanErrorSound.SelectedItem = scanErrorSound.SelectedItem.ToString();
 
-        //  ƒTƒEƒ“ƒh‚ÌƒpƒX‚ğæ“¾‚·‚é
+        //  ã‚µã‚¦ãƒ³ãƒ‰ã®ãƒ‘ã‚¹ã‚’å–å¾—ã™ã‚‹
         string resultErrorSound = Const.C_SOUND_ERROR_FOLDER + errorSoundNumber + ".mp3";
         SoundPlayer.PlaySound(resultErrorSound);
     }
 
     /// <summary>
-    /// ƒXƒLƒƒƒ“ƒGƒ‰[ƒTƒEƒ“ƒh•ÏX
+    /// ã‚¹ã‚­ãƒ£ãƒ³ã‚¨ãƒ©ãƒ¼ã‚µã‚¦ãƒ³ãƒ‰å¤‰æ›´
     /// </summary>
     private void OnScanOkSoundChanged(object sender, EventArgs e)
     {
@@ -237,13 +241,13 @@ public partial class HandySettingPage : ContentPage
         string okSoundNumber = new string(scanOkSound.SelectedItem.ToString().Where(char.IsDigit).ToArray());
         scanOkSound.SelectedItem = scanOkSound.SelectedItem.ToString();
 
-        //  ƒTƒEƒ“ƒh‚ÌƒpƒX‚ğæ“¾‚·‚é
+        //  ã‚µã‚¦ãƒ³ãƒ‰ã®ãƒ‘ã‚¹ã‚’å–å¾—ã™ã‚‹
         string resultOkSound = Const.C_SOUND_OK_FOLDER + okSoundNumber + ".mp3";
         SoundPlayer.PlaySound(resultOkSound);
     }
 
     /// <summary>
-    /// ƒXƒLƒƒƒ“ƒ‚ƒfƒ‹•ÏX
+    /// ã‚¹ã‚­ãƒ£ãƒ³ãƒ¢ãƒ‡ãƒ«å¤‰æ›´
     /// </summary>
     private void OnScanModelChanged(object sender, EventArgs e)
     {

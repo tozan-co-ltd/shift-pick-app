@@ -192,7 +192,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", ex.Message, "OK");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
             return;
         }
     }
@@ -336,7 +336,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", ex.Message, "OK");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
         }
     }
 
@@ -470,7 +470,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", ex.Message, "OK");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
             return;
         }
     }

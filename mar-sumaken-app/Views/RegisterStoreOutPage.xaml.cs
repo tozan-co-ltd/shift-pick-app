@@ -1005,6 +1005,7 @@ public partial class RegisterStoreOutPage : ContentPage
         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
   
         SetValueAndVisibleLabelAfterRegisterAndErrorCancel();
+        SoundPlayer.PlaySound(resultOkSound);
         // 出庫登録画面を表示
         registerStoreOut.IsVisible = true;
         adminErrorCancel.IsVisible = false;

@@ -159,9 +159,9 @@ public partial class RegisterStoreInPage : ContentPage
                 bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
                 if (!existsSupplierProductNumber)
                 {
-                    // 識別文字列が正しくない場合はエラー
+                    // 品番マスターにない場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
-                    scanTextResult.Text = $"E2002: {string.Format(ErrorMessagesResources.E2002,"品番マスター")}";
+                    scanTextResult.Text = $"E2002: {string.Format(ErrorMessagesResources.E2002, "品番マスター")}";
                     scanTextResult.TextColor = Colors.Red;
                     d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                     listDHandyErrorMessage.Add(d_HandyErrorMessageModel);

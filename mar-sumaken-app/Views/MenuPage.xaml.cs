@@ -118,6 +118,7 @@ public partial class MenuPage : FlyoutPage
     /// ナビゲーション
     /// </summary>
     /// <param name="handyMenuName">string</param>
+    /// <param name="handyMenuID">int</param>
     /// <returns>対応画面</returns>
     private async Task PerformNavigation(string handyMenuName, int handyMenuID)
     {
@@ -166,6 +167,7 @@ public partial class MenuPage : FlyoutPage
     /// </summary>
     /// <param name="listProducts">List<M_ProductModel></param>
     /// <param name="handyMenuID">string</param>
+    /// <param name="handyMenuTitle">string</param>
     public async void NavigationByHandyMenuTitle(string handyMenuTitle, int handyMenuID,  List<M_ProductModel> listProducts)
     {
         // 入庫

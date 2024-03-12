@@ -164,6 +164,14 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     scanTextResult.TextColor = Colors.Red;
                     d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
                     listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                var intCheckResult = Util.CheckIntType(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+                if (!intCheckResult.isInt)
+                {
+                    // 数値が変換できない場合はエラー
+                    SoundPlayer.PlaySound(resultErrorSound);
+                    scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
+                    scanTextResult.TextColor = Colors.Red;
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
@@ -298,8 +306,11 @@ public partial class RegisterBulkStoreInPage : ContentPage
 
                 // 箱数
                 int numOfBoxes = ((enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0);
+
                 // 収容数
-                int lotOfQuantity = (int)double.Parse(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+                int lotOfQuantity = 0;
+                var intCheckResult = Util.CheckIntType(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+                lotOfQuantity = intCheckResult.value;
 
                 // 箱数集計表示リスト内に同じ品番がある場合は、同一行の箱数を加算
                 if (existingProduct != null)

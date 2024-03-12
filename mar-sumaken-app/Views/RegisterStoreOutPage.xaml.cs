@@ -700,7 +700,7 @@ public partial class RegisterStoreOutPage : ContentPage
 
         // 識別文字列が正しくない場合はエラー
         D_HandyErrorMessageModel  _d_HandyErrorMessag = SetHandyErrorMessage(d_HandyErrorMessageModel, depoID, userName, error);
-        listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+        listDHandyErrorMessage.Add(_d_HandyErrorMessag);
         d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
     }
 
@@ -837,7 +837,6 @@ public partial class RegisterStoreOutPage : ContentPage
             storeOutPostBody.ScanShipmentModel = listScanShipment;
             storeOutPostBody.HandyErrorMessage = listDHandyErrorMessage;
             var jsonDataSend = JsonConvert.SerializeObject(storeOutPostBody);
-
             
             if (!NetworkCheck.CheckNetworkConnection())
             {

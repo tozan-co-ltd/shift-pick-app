@@ -169,7 +169,18 @@ public partial class RegisterStoreInPage : ContentPage
                 }
 
                 // 収容数
-                lotOfQuantity = (int) double.Parse(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+                int lotOfQuantity = 0;
+                var intCheckResult = Util.CheckIntType(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+                lotOfQuantity = intCheckResult.value;
+                if (!intCheckResult.isInt)
+                {
+                    // 数値が変換できない場合はエラー
+                    SoundPlayer.PlaySound(resultErrorSound);
+                    scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
+                    scanTextResult.TextColor = Colors.Red;
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
+                    return;
+                }
 
                 // キー
                 string mainProductKey = string.Empty;

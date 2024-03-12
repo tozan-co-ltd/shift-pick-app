@@ -1,5 +1,6 @@
 using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
+using mar_sumaken_app.Properties;
 using mar_sumaken_app.Services;
 using mar_sumaken_app.ViewModels;
 using Microsoft.Maui.Controls;
@@ -162,7 +163,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", ex.Message, "閉じる");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999} \n" + ex.Message, "OK");
             Application.Current.MainPage = new SearchShippingInstructionListPage(handyMenuID, listMCompany, listProducts);
         }
     }

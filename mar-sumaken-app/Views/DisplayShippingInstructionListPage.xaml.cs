@@ -7,6 +7,7 @@ using static mar_sumaken_app.Models.ShipmentScheduleModel;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Common;
 using mar_sumaken_app.Services;
+using mar_sumaken_app.Properties;
 
 namespace mar_sumaken_app.Views;
 
@@ -202,7 +203,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", ex.Message, "閉じる");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
             return;
         }
     }

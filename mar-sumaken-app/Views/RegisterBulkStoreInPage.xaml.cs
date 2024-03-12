@@ -110,18 +110,17 @@ public partial class RegisterBulkStoreInPage : ContentPage
         //箱数入力画面表示中は操作させない
         if (numberInputModal.IsVisible) return;
 
-            var settings = await _dbService.GetSetting();
-            _handyApiUrl = settings.Last().HandyApiUrl;
-            var loginUser = await _dbService.GetLoginAsync();
-            var d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
-
+        var settings = await _dbService.GetSetting();
+        _handyApiUrl = settings.Last().HandyApiUrl;
+        var loginUser = await _dbService.GetLoginAsync();
+        clipboardContent = Clipboard.GetTextAsync().Result ?? string.Empty;
+        // サウンドパスを取得
+        string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
+        string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
+        try
+        {          
             if (_IsScanPageActive)
-            {
-                // サウンドパスを取得
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
-                clipboardContent = Clipboard.GetTextAsync().Result;
-
+            {                                
                 if (string.IsNullOrEmpty(clipboardContent))
                 {
                     scanTextResult.Text = $"E2015: {ErrorMessagesResources.E2015}";
@@ -129,7 +128,6 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
-
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
                 listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
                 listRHandyMenuSupplierKanban = await _dbService.GetRHandyMenuSupplierKanbanByHandyMenuID(handyMenuID);
@@ -197,9 +195,13 @@ public partial class RegisterBulkStoreInPage : ContentPage
                
             }
         }
-        catch (ArgumentOutOfRangeException arg)
+        catch (ArgumentOutOfRangeException argException)
         {
-            await DisplayAlert("エラー", $"E2001: {ErrorMessagesResources.E2001}\n" + arg.Message, "OK");
+            // 識別文字列が正しくない場合はエラー
+            SoundPlayer.PlaySound(resultErrorSound);
+            scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
+            scanTextResult.TextColor = Colors.Red;
+            listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
             return;
         }
         catch (Exception ex)
@@ -212,7 +214,6 @@ public partial class RegisterBulkStoreInPage : ContentPage
     /// <summary>
     /// ハンディメッセージを設定
     /// </summary>
-    /// <param name="d_HandyErrorMessageModel">ハンディエラーメッセージ</param>
     /// <param name="loginUser">ログインのユーザー</param>
     /// <param name="clipboardContent">クリップボードの内容</param>
     /// <param name="scanTextError">スキャンテキストエラー</param>
@@ -306,23 +307,23 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 // 箱数
                 int numOfBoxes = ((enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0);
 
-                // 収容数
+                // 収容数                   
                 int lotOfQuantity = 0;
                 var intCheckResult = Util.CheckIntType(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
                 lotOfQuantity = intCheckResult.value;
 
                 // 箱数集計表示リスト内に同じ品番がある場合は、同一行の箱数を加算
                 if (existingProduct != null)
-                {
-                    //加算処理
-                    int numOfBoxesAccumlated = numOfBoxes + existingProduct.NumberOfBoxes;
-                    _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel { SupplierProductNumber = supplierProductNumber,
-                        LotNumber = lotNumber, NumberOfBoxes = numOfBoxesAccumlated ,Quantity = lotOfQuantity });
-                    // 既存の製品を削除
-                    _TotalNumberOfBoxesDisplay.Remove(existingProduct);
-                    // 読取実績・入荷実績のデータを設定
-                    scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity,lotNumber);
+                  {
+                        //加算処理
+                        int numOfBoxesAccumlated = numOfBoxes + existingProduct.NumberOfBoxes;
+                        _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel { SupplierProductNumber = supplierProductNumber,
+                            LotNumber = lotNumber, NumberOfBoxes = numOfBoxesAccumlated ,Quantity = lotOfQuantity });
+                        // 既存の製品を削除
+                        _TotalNumberOfBoxesDisplay.Remove(existingProduct);
+                        // 読取実績・入荷実績のデータを設定
+                        scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
+                        scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity,lotNumber);
                 }
                 else
                 {

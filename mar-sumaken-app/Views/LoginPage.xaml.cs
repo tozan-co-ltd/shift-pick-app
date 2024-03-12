@@ -137,7 +137,7 @@ public partial class LoginPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("エラー", ex.Message, "OK");
+            await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
             hasOnLoginClick = false;
             Application.Current.MainPage = new LoginPage();
         }

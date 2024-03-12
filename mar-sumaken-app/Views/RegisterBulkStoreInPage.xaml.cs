@@ -107,29 +107,27 @@ public partial class RegisterBulkStoreInPage : ContentPage
     /// </summary>
     protected async void OnClipboardContentChanged(object sender, EventArgs e)
     {
+        //箱数入力画面表示中は操作させない
+        if (numberInputModal.IsVisible) return;
+
+        var settings = await _dbService.GetSetting();
+        _handyApiUrl = settings.Last().HandyApiUrl;
+        var loginUser = await _dbService.GetLoginAsync();
+        clipboardContent = Clipboard.GetTextAsync().Result ?? string.Empty;
+        // サウンドパスを取得
+        string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
+        string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
         try
-        {
-            var settings = await _dbService.GetSetting();
-            _handyApiUrl = settings.Last().HandyApiUrl;
-            var loginUser = await _dbService.GetLoginAsync();
-            var d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
-
+        {          
             if (_IsScanPageActive)
-            {
-                // サウンドパスを取得
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
-                clipboardContent = Clipboard.GetTextAsync().Result;
-
+            {                                
                 if (string.IsNullOrEmpty(clipboardContent))
                 {
                     scanTextResult.Text = $"E2015: {ErrorMessagesResources.E2015}";
                     scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
-
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
                 listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
                 listRHandyMenuSupplierKanban = await _dbService.GetRHandyMenuSupplierKanbanByHandyMenuID(handyMenuID);
@@ -142,8 +140,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
                     scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
@@ -157,27 +154,35 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
                 if(!existsSupplierProductNumber)
                 {
-                    // 識別文字列が正しくない場合はエラー
+                    // 品番マスターにない場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2002: {string.Format(ErrorMessagesResources.E2002, "品番マスター")}";
                     scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
+                    return;
+                }
+                var intCheckResult = Util.CheckIntType(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+                if (!intCheckResult.isInt)
+                {
+                    // 数値が変換できない場合はエラー
+                    SoundPlayer.PlaySound(resultErrorSound);
+                    scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
+                    scanTextResult.TextColor = Colors.Red;
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
                 lotNumber = clipboardContent.Substring(mSupplierKanban.LotStartIndex-1, mSupplierKanban.LotLength).Trim();
 
                 // 履歴一覧表示リスト内の同じ品番・キーを取得
-                D_ReceiveModel duplicateProduct = _HistoryListDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
+                var duplicateProduct = _HistoryListDisplay.Where(p => p.SupplierProductNumber == supplierProductNumber && p.LotNumber == lotNumber).FirstOrDefault();
                 if (duplicateProduct != null)
                 {
                     // 既にスキャンしている場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2017: {ErrorMessagesResources.E2017}";
                     scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage( loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
@@ -190,6 +195,15 @@ public partial class RegisterBulkStoreInPage : ContentPage
                
             }
         }
+        catch (ArgumentOutOfRangeException argException)
+        {
+            // 識別文字列が正しくない場合はエラー
+            SoundPlayer.PlaySound(resultErrorSound);
+            scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
+            scanTextResult.TextColor = Colors.Red;
+            listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
+            return;
+        }
         catch (Exception ex)
         {
             await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
@@ -200,13 +214,13 @@ public partial class RegisterBulkStoreInPage : ContentPage
     /// <summary>
     /// ハンディメッセージを設定
     /// </summary>
-    /// <param name="d_HandyErrorMessageModel">ハンディエラーメッセージ</param>
     /// <param name="loginUser">ログインのユーザー</param>
     /// <param name="clipboardContent">クリップボードの内容</param>
     /// <param name="scanTextError">スキャンテキストエラー</param>
     /// <returns></returns>
-    public D_HandyErrorMessageModel SetHandyErrorMessage(D_HandyErrorMessageModel d_HandyErrorMessageModel, List<LoginModel.LoginUserSqlLite> loginUser, string clipboardContent, string scanTextError)
+    public D_HandyErrorMessageModel SetHandyErrorMessage(List<LoginModel.LoginUserSqlLite> loginUser, string clipboardContent, string scanTextError)
     {
+        D_HandyErrorMessageModel d_HandyErrorMessageModel = new();
         d_HandyErrorMessageModel.DepoID = loginUser.Last().DepoID;
         d_HandyErrorMessageModel.HandyMenuID = handyMenuID;
         d_HandyErrorMessageModel.FirstScanedString = clipboardContent;
@@ -292,21 +306,24 @@ public partial class RegisterBulkStoreInPage : ContentPage
 
                 // 箱数
                 int numOfBoxes = ((enteredNumberLabel.Text != string.Empty) ? int.Parse(enteredNumberLabel.Text) : 0);
-                // 収容数
-                int lotOfQuantity = (int)double.Parse(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+
+                // 収容数                   
+                int lotOfQuantity = 0;
+                var intCheckResult = Util.CheckIntType(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+                lotOfQuantity = intCheckResult.value;
 
                 // 箱数集計表示リスト内に同じ品番がある場合は、同一行の箱数を加算
                 if (existingProduct != null)
-                {
-                    //加算処理
-                    int numOfBoxesAccumlated = numOfBoxes + existingProduct.NumberOfBoxes;
-                    _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel { SupplierProductNumber = supplierProductNumber,
-                        LotNumber = lotNumber, NumberOfBoxes = numOfBoxesAccumlated ,Quantity = lotOfQuantity });
-                    // 既存の製品を削除
-                    _TotalNumberOfBoxesDisplay.Remove(existingProduct);
-                    // 読取実績・入荷実績のデータを設定
-                    scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
-                    scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity,lotNumber);
+                  {
+                        //加算処理
+                        int numOfBoxesAccumlated = numOfBoxes + existingProduct.NumberOfBoxes;
+                        _TotalNumberOfBoxesDisplay.Add(new D_ReceiveModel { SupplierProductNumber = supplierProductNumber,
+                            LotNumber = lotNumber, NumberOfBoxes = numOfBoxesAccumlated ,Quantity = lotOfQuantity });
+                        // 既存の製品を削除
+                        _TotalNumberOfBoxesDisplay.Remove(existingProduct);
+                        // 読取実績・入荷実績のデータを設定
+                        scanResultModel.d_ScanResultModel = SetScanResultModel(d_ScanResultModel, loginUser.Last().DepoID, clipboardContent, loginUser.Last().UserName, mSupplierKanban.SupplierKanbanID);
+                        scanResultModel.d_ReceiveModel = SetDReceiveModel(d_ReceiveModel, supplierProductNumber, loginUser.Last().UserName, numOfBoxes, mSupplierKanban.CompanyID, lotOfQuantity,lotNumber);
                 }
                 else
                 {

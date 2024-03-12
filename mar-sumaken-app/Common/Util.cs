@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace mar_sumaken_app.Common
@@ -91,7 +93,40 @@ namespace mar_sumaken_app.Common
             }
             return nextday;
         }
+        /// <summary>
+        ///  intへの変換ができるかチェック用
+        /// </summary>
+        /// <param name="valueCheck"></param>
+        public static (bool isInt, int value) CheckIntType(string valueCheck)
+        {
+            try
+            {
+                Match match = Regex.Match(valueCheck, @"^\d+");
+                int quantity = int.Parse(match.Value);
+                return (true, quantity);
+            }
+            catch (Exception ex)
+            {
+                return (false, 0);
+            }
+        }
 
+        /// <summary>
+        ///  日付への変換ができるかチェック用
+        /// </summary>
+        /// <param name="deliveryDateString"></param>
+        public static (bool isDate, DateTime dateTime) CheckDateTimeType(string deliveryDateString)
+        {
+            try
+            {
+                DateTime dateTime = DateTime.ParseExact(deliveryDateString, "yyyyMMdd", CultureInfo.InvariantCulture);
+                return (true, dateTime);
+            }
+            catch (Exception ex)
+            {
+                return (false, DateTime.Now);
+            }
+        }
     }
 }
 

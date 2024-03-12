@@ -105,29 +105,25 @@ public partial class RegisterStoreInPage : ContentPage
     /// </summary>
     protected async void OnClipboardContentChanged(object sender, EventArgs e)
     {
+        var settings = await _dbService.GetSetting();
+        _handyApiUrl = settings.Last().HandyApiUrl;
+        var loginUser = await _dbService.GetLoginAsync();
+        var d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
+        // サウンドパスを取得
+        string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
+        string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
+        string clipboardContent = Clipboard.GetTextAsync().Result ?? string.Empty;
         try
-        {
-            var settings = await _dbService.GetSetting();
-            _handyApiUrl = settings.Last().HandyApiUrl;
-            var loginUser = await _dbService.GetLoginAsync();
-            var d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
-
+        {            
             if (_IsScanPageActive)
-            {
-                // サウンドパスを取得
-                string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
-                string resultErrorSound = await GetPathSound.GetPathErrorSoundAsync(_dbService, _handySetting);
-                string clipboardContent = Clipboard.GetTextAsync().Result;
-
+            {                
                 if (string.IsNullOrEmpty(clipboardContent))
                 {
                     scanTextResult.Text = $"E2015: {ErrorMessagesResources.E2015}";
-                    scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    scanTextResult.TextColor = Colors.Red;                    
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent ?? string.Empty, scanTextResult.Text));
                     return;
                 }
-
                 // ローカルの仕入先かんばん情報取得(この画面で読めるかんばんのみ)
                 listMSupplierKanban = await _dbService.GetMSupplierKanbanAsync();
                 listRHandyMenuSupplierKanban = await _dbService.GetRHandyMenuSupplierKanbanByHandyMenuID(handyMenuID);
@@ -140,36 +136,42 @@ public partial class RegisterStoreInPage : ContentPage
                     // 識別文字列が正しくない場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
-                    scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    scanTextResult.TextColor = Colors.Red;                    
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
                 mSupplierKanban = supplierIdentifyMatchStringList.FirstOrDefault();
-
-               
+                
                 // 文字列をトリム
-                string supplierProductNumber = string.Empty;
-                int lotOfQuantity = 0;
-                    
+                string supplierProductNumber = string.Empty;                    
                 // 品番
                 supplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
                 // 仕入先品番が存在をチェック
                 bool existsSupplierProductNumber = listProducts.Any(product => product.SupplierProductNumber == supplierProductNumber);
                 if (!existsSupplierProductNumber)
                 {
-                    // 識別文字列が正しくない場合はエラー
+                    // 品番マスターにない場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
-                    scanTextResult.Text = $"E2002: {string.Format(ErrorMessagesResources.E2002,"品番マスター")}";
+                    scanTextResult.Text = $"E2002: {string.Format(ErrorMessagesResources.E2002, "品番マスター")}";
                     scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
                 // 収容数
-                lotOfQuantity = (int) double.Parse(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+                int lotOfQuantity = 0;
+                var intCheckResult = Util.CheckIntType(clipboardContent.Substring(mSupplierKanban.QuantityStartIndex - 1, mSupplierKanban.QuantityLength).Trim());
+                lotOfQuantity = intCheckResult.value;
+                if (!intCheckResult.isInt)
+                {
+                    // 数値が変換できない場合はエラー
+                    SoundPlayer.PlaySound(resultErrorSound);
+                    scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
+                    scanTextResult.TextColor = Colors.Red;
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
+                    return;
+                }
 
                 // キー
                 string mainProductKey = string.Empty;
@@ -200,9 +202,8 @@ public partial class RegisterStoreInPage : ContentPage
                     // 既にスキャンしている場合はエラー
                     SoundPlayer.PlaySound(resultErrorSound);
                     scanTextResult.Text = $"E2017: {ErrorMessagesResources.E2017}";
-                    scanTextResult.TextColor = Colors.Red;
-                    d_HandyErrorMessageModel = SetHandyErrorMessage(d_HandyErrorMessageModel, loginUser, clipboardContent, scanTextResult.Text);
-                    listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
+                    scanTextResult.TextColor = Colors.Red;                    
+                    listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));
                     return;
                 }
 
@@ -248,6 +249,15 @@ public partial class RegisterStoreInPage : ContentPage
                 historyCollectionView.ItemsSource = _HistoryListDisplay.Reverse();
               
             }
+        }
+        catch (ArgumentOutOfRangeException argException)
+        {
+            // 識別文字列が正しくない場合はエラー
+            SoundPlayer.PlaySound(resultErrorSound);
+            scanTextResult.Text = $"E2001: {ErrorMessagesResources.E2001}";
+            scanTextResult.TextColor = Colors.Red;
+            listDHandyErrorMessage.Add(SetHandyErrorMessage(loginUser, clipboardContent, scanTextResult.Text));           
+            return;
         }
         catch (Exception ex)
         {
@@ -317,8 +327,9 @@ public partial class RegisterStoreInPage : ContentPage
     /// <param name="clipboardContent">クリップボードの内容</param>
     /// <param name="scanTextError">スキャンテキストエラー</param>
     /// <returns></returns>
-    public D_HandyErrorMessageModel SetHandyErrorMessage(D_HandyErrorMessageModel d_HandyErrorMessageModel, List<LoginModel.LoginUserSqlLite> loginUser, string clipboardContent, string scanTextError)
+    public D_HandyErrorMessageModel SetHandyErrorMessage(List<LoginModel.LoginUserSqlLite> loginUser, string clipboardContent, string scanTextError)
     {
+        D_HandyErrorMessageModel d_HandyErrorMessageModel = new();
         d_HandyErrorMessageModel.DepoID = loginUser.Last().DepoID;
         d_HandyErrorMessageModel.HandyMenuID = handyMenuID;
         d_HandyErrorMessageModel.FirstScanedString = clipboardContent;

@@ -1,10 +1,5 @@
 ﻿using mar_sumaken_app.Models;
 using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace mar_sumaken_app.Services
 {
@@ -78,6 +73,14 @@ namespace mar_sumaken_app.Services
         public async Task Delete(HandySettingModel.HandySetting handySetting)
         {
             await _connection.DeleteAsync(handySetting);
+        }
+
+        /// <summary>
+        /// 古いハンディ設定ーデータを消す
+        /// </summary>
+        public async Task<int> ALLDeleteHandySettingAsync()
+        {
+            return await _connection.DeleteAllAsync<HandySettingModel.HandySetting>();
         }
         #endregion
 

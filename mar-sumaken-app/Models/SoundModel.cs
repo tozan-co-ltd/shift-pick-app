@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace mar_sumaken_app.Models
 {
@@ -26,6 +21,7 @@ namespace mar_sumaken_app.Models
                 {
                     SoundModel sound1 = new SoundModel
                     {
+                        Number = i+1,
                         DisplayName = "OK" + (i + 1).ToString(),
                         Item = soundOkeyList[i].ToString()
                     };
@@ -56,6 +52,7 @@ namespace mar_sumaken_app.Models
                 {
                     SoundModel sound1 = new SoundModel
                     {
+                        Number = i+1,
                         DisplayName = "Error" + (i + 1).ToString(),
                         Item = soundErrorList[i].ToString()
                     };
@@ -67,8 +64,8 @@ namespace mar_sumaken_app.Models
             set { }
         }
 
+        public int Number { get; set; }
         public string DisplayName { get; set; }
-
         public string Item { get; set; }
     }
 }

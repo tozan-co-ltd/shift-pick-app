@@ -891,8 +891,10 @@ public partial class RegisterStoreOutPage : ContentPage
                     // 結果の表示
                     foreach (var product in duplicateProduct)
                     {
-                        strDuplicateProduct += $"かんばんシリアル: {product.KanbanSerialNumber}, 納入先品番: {product.DeliveryProductNumber}" + "\n";
-                    }
+                        strDuplicateProduct += $"納入先品番　　　: {product.DeliveryProductNumber}" + "\n" 
+                                             + $"かんばんシリアル: {product.KanbanSerialNumber}" + "\n"
+                                             + "-----------------------" + "\n";
+                    }       
                 }
                 return defaultMessage + '\n' + storeOutResponseContent.Message +  '\n' + minusStockProduct + '\n' + strDuplicateProduct;
             }

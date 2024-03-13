@@ -1,7 +1,4 @@
-using mar_sumaken_app.ViewModels;
-using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
-using ProductDemo = mar_sumaken_app.Models.D_ReceiveModel;
 using Newtonsoft.Json;
 using static mar_sumaken_app.Models.ShipmentScheduleModel;
 using mar_sumaken_app.Models;
@@ -23,6 +20,19 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     private List<D_ShipmentSchedule> lstDShipmentSchedules = new List<D_ShipmentSchedule>();
 
+    /// <summary>
+    /// 出荷指示リスト表示
+    /// </summary>
+    /// <param name="menuID">menuID</param>
+    /// <param name="selectedCompanyID">会社ID</param>
+    /// <param name="mCompanySqlLite">会社一覧</param>
+    /// <param name="deliveryName">納入先</param>
+    /// <param name="selectedDate">納入指示日</param>
+    /// <param name="deliveryTimeClass">納入場所</param>
+    /// <param name="deliveryLocation">便</param>
+    /// <param name="shipmentScheduleList">出荷一覧</param>
+    /// <param name="listProductItems">プロダクト一覧</param>
+    /// <param name="deliverySlipNumber">納入番号</param>
     public DisplayShippingInstructionListPage(int menuID, int selectedCompanyID, string deliveryName, DateTime selectedDate, string deliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  ObservableCollection<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems, string deliverySlipNumber)
 	{
 		InitializeComponent();
@@ -90,7 +100,6 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         }
     }
 
-
     /// <summary>
     /// コレクションビューに表示データを追加
     /// </summary>
@@ -101,8 +110,8 @@ public partial class DisplayShippingInstructionListPage : ContentPage
             var startIndex = (currentPage - 1) * _itemsPerPage;
             var endIndex = startIndex + _itemsPerPage;
             var pageItems = lstDShipmentSchedules.Skip(startIndex).Take(_itemsPerPage);
-
             collectionView.ItemsSource = pageItems;
+
             return collectionView;
         }
         catch (Exception)
@@ -170,9 +179,6 @@ public partial class DisplayShippingInstructionListPage : ContentPage
             // ユーザー情報を取得
             var loginUsers = await _dbService.GetLoginAsync();
             var loginUserSqlLite = loginUsers.Last();
-
-            var shipmentScheduleSqlLite = new ShipmentScheduleModel.ShipmentScheduleRequestBody();
-
             var shipmentScheduleRequestBody = new
             {
                 CompanyID = companyID,
@@ -195,7 +201,6 @@ public partial class DisplayShippingInstructionListPage : ContentPage
                 var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList; // 出荷指示
                 var dShipmentList = contentFromApi.D_ShipmentList; // 出荷実績
                 var mUserList = contentFromApi.M_UserList; // 出荷実績
-                
                 Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, companyID, (string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, shipmentScheduleList, dShipmentList, mUserList, listProducts, deliverySlipNumberLabel.Text);
             }
             else

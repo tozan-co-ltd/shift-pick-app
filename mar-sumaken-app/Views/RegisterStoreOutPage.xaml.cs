@@ -294,7 +294,7 @@ public partial class RegisterStoreOutPage : ContentPage
                     // 仕入先かんばん分解 (出荷実績に値を入れる)
                 _dShipmentLocal.SupplierProductNumber = clipboardContent.Substring(mSupplierKanban.ProductNumberStartIndex - 1, mSupplierKanban.ProductNumberLength).Trim();
                 _dShipmentLocal.SupplierProductNumber = Util.SubStringAfterDash(_dShipmentLocal.SupplierProductNumber);
-
+                _dShipmentLocal.DeliveryProductNumber = deliveryKanbanModel.DeliveryProductNumber;
                 // 許可された重複チェック
                 if (!mSupplierKanban.AllowedDuplicatesFlag && mSupplierKanban.MainProductKeyLength != 0)
                 {
@@ -887,11 +887,11 @@ public partial class RegisterStoreOutPage : ContentPage
                     strDuplicateProduct = "【重複があった品番】 \n";
                     //重複したかんばんシリアルと納入先品番を羅列                    
                     var duplicateProduct = storeOutResponseContent.ScanShipmentDuplicateData
-                    .Select(p => p.d_ShipmentModel).Select(p => new { p.KanbanSerialNumber, p.SupplierProductNumber }).ToList();                   
+                    .Select(p => p.d_ShipmentModel).Select(p => new { p.KanbanSerialNumber, p.DeliveryProductNumber }).ToList();                   
                     // 結果の表示
                     foreach (var product in duplicateProduct)
                     {
-                        strDuplicateProduct += $"かんばんシリアル: {product.KanbanSerialNumber}, 仕入先品番: {product.SupplierProductNumber}" + "\n";
+                        strDuplicateProduct += $"かんばんシリアル: {product.KanbanSerialNumber}, 納入先品番: {product.DeliveryProductNumber}" + "\n";
                     }
                 }
                 return defaultMessage + '\n' + storeOutResponseContent.Message +  '\n' + minusStockProduct + '\n' + strDuplicateProduct;

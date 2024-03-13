@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="mar_sumaken_app.Views.SearchShippingInstructionListPage"
              NavigationPage.HasNavigationBar="False"
-             Background="#f2f2f2">
+             >
 
     <ContentPage.Resources>
         <Style x:Key="CustomRadioButtonStyle" TargetType="RadioButton">
@@ -39,7 +39,7 @@
         <StackLayout Grid.Row="0" BackgroundColor=" Transparent" Orientation="Horizontal" Margin="10">
             <Button FontFamily="FontAwesome6Solid" Text="&#xf048; 戻る" Background="Gray" TextColor=" White"  HorizontalOptions="StartAndExpand" CornerRadius="25" WidthRequest="120" HeightRequest="50" FontSize="16" Margin="25,0,0,0" Clicked="OnBackButtonClicked"/>
         </StackLayout>
-        <Frame CornerRadius="0" BorderColor="Transparent" Background="#f2f2f2" Margin="0" Padding="10">
+        <Frame CornerRadius="0" BorderColor="Transparent" Margin="0" Padding="10">
             <StackLayout HorizontalOptions="Center">
                 <Label Text="出庫" FontSize="20" />
             </StackLayout>

@@ -415,11 +415,15 @@ public partial class RegisterStoreInPage : ContentPage
                     strDuplicateProduct = "【今回登録されなかった品番】 \n";
                     //重複したかんばんシリアルと納入先品番を羅列                    
                     var duplicateProduct = storeInResponseContent.ScanReceive
-                    .Select(p => p.d_ReceiveModel).Select(p => new {p.SupplierProductNumber }).ToList();
+                    .Select(p => p.d_ReceiveModel).Select(p => new {p.SupplierProductNumber , p.MainProductKey,p.FirstSubProductKey,p.SecondSubProductKey }).ToList();
                     // 結果の表示
                     foreach (var product in duplicateProduct)
                     {
-                        strDuplicateProduct += $"仕入先品番: {product.SupplierProductNumber}" + "\n";
+                        strDuplicateProduct += $"品番　　　: {product.SupplierProductNumber} \n" 
+                                            +  $"メインキー: { product.MainProductKey}" + "\n" 
+                                            +  $"サブキー１: {product.FirstSubProductKey}" + "\n"
+                                            +  $"サブキー２: {product.SecondSubProductKey}" + "\n"
+                                            +  "-----------------------" + "\n"; 
                     }
                 }
                 return defaultMessage + '\n' + '\n' + storeInResponseContent.Message + '\n' + '\n' + strDuplicateProduct;

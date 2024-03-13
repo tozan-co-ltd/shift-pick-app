@@ -42,6 +42,10 @@ namespace mar_sumaken_app.Models
         
         public string SupplierProductNumber { get; set; }
         /// <summary>
+        /// 納入先品番
+        /// </summary>
+        public string DeliveryProductNumber { get; set; }
+        /// <summary>
         /// ロット番号
         /// </summary>
         public string LotNumber { get; set; } = string.Empty;

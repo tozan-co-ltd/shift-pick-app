@@ -376,7 +376,7 @@ public partial class RegisterStoreInPage : ContentPage
                 // OKサウンドを鳴らす
                 string resultOkSound = await GetPathSound.GetPathOkSoundAsync(_dbService, _handySetting);
                 SoundPlayer.PlaySound(resultOkSound);
-                await Application.Current.MainPage.DisplayAlert("完了", "データ登録が完了しました", "OK");
+                await Application.Current.MainPage.DisplayAlert("完了", CreateRegisteredMessage(response.content), "OK");
                 Application.Current.MainPage = new LoadingPage();
                 await Task.Delay(200);
                 Application.Current.MainPage = new RegisterStoreInPage(handyMenuID, listProducts);
@@ -393,6 +393,42 @@ public partial class RegisterStoreInPage : ContentPage
         {
             await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
             return;
+        }
+    }
+    /// <summary>
+    /// データ登録完了時のメッセージをレスポンスによって変える
+    /// </summary>
+    /// <param name="responceContent"></param>
+    /// <returns></returns>
+    private string CreateRegisteredMessage(string responceContent)
+    {
+        string defaultMessage = "データ登録が完了しました";
+        try
+        {
+            // contentをJSONオブジェクトにデシリアライズ
+            var storeInResponseContent = JsonConvert.DeserializeObject<D_StoreInModel.StoreInResponceContent>(responceContent);
+            if (storeInResponseContent != null)
+            {                
+                string strDuplicateProduct = string.Empty;
+                if (storeInResponseContent.ScanReceive != null)
+                {
+                    strDuplicateProduct = "【重複があった品番】 \n";
+                    //重複したかんばんシリアルと納入先品番を羅列                    
+                    var duplicateProduct = storeInResponseContent.ScanReceive
+                    .Select(p => p.d_ReceiveModel).Select(p => new {p.SupplierProductNumber }).ToList();
+                    // 結果の表示
+                    foreach (var product in duplicateProduct)
+                    {
+                        strDuplicateProduct += $"仕入先品番: {product.SupplierProductNumber}" + "\n";
+                    }
+                }
+                return defaultMessage + '\n' + storeInResponseContent.Message + '\n' + strDuplicateProduct;
+            }
+            return defaultMessage;
+        }
+        catch (JsonException)
+        {
+            return defaultMessage;
         }
     }
 

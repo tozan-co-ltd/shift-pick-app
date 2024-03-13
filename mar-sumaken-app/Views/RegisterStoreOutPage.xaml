@@ -24,7 +24,7 @@
                     <Button FontFamily="FontAwesome6Solid" Text="&#xe09a; 登録" Background="#F56462" TextColor=" White" HorizontalOptions="EndAndExpand" CornerRadius="25" WidthRequest="120" HeightRequest="50" FontSize="18" Margin="0,0,25,0" Clicked="OnRegisterButtonClicked"/>
                 </StackLayout>
 
-                <Frame CornerRadius="0" BorderColor="Transparent" Background="#f2f2f2" Padding="10">
+                <Frame CornerRadius="0" BorderColor="Transparent" Padding="10">
                     <StackLayout HorizontalOptions="Center">
                         <Label Text="出庫" FontSize="20" />
                     </StackLayout>

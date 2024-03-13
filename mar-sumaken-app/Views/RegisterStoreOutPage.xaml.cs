@@ -160,11 +160,11 @@ public partial class RegisterStoreOutPage : ContentPage
     /// ハンディリーダーでスキャンする時、処理する
     /// </summary>
     protected async void OnClipboardContentChanged(object sender, EventArgs e)
-    {
+    {        
         //　QRコードのコンテンツを取得
         string clipboardContent = Clipboard.GetTextAsync().Result ?? string.Empty;
         try
-        {
+        {            
             //管理者エラー解除画面表示中はスキャンさせない。
             if (adminErrorCancel.IsVisible) return;
                        
@@ -361,7 +361,7 @@ public partial class RegisterStoreOutPage : ContentPage
                 SoundPlayer.PlaySound(resultOkSound);
             }
         }
-        catch (ArgumentOutOfRangeException argException)
+        catch (Exception ex) when (ex is IndexOutOfRangeException || ex is ArgumentOutOfRangeException)
         {
             // 全てコンテンツを消す
             deliveryScanContent = string.Empty;

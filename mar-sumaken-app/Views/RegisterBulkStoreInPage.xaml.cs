@@ -195,7 +195,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                
             }
         }
-        catch (ArgumentOutOfRangeException argException)
+        catch (Exception ex) when (ex is IndexOutOfRangeException || ex is ArgumentOutOfRangeException)
         {
             // 識別文字列が正しくない場合はエラー
             SoundPlayer.PlaySound(resultErrorSound);

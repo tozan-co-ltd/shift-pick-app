@@ -586,7 +586,7 @@ public partial class RegisterStoreOutPage : ContentPage
             overallProgress++;
 
             double completeProgress = (double)overallProgress / (double)totalNumberOfBoxesRemaining;
-            progressBarValueLabel.Text = $"{overallProgress}/ " + totalNumberOfBoxesRemaining.ToString();
+            progressBarValueLabel.Text = $"{overallProgress} / " + totalNumberOfBoxesRemaining.ToString();
             progressBar.Progress = completeProgress;
             if (progressBar.Progress == 1)
             {
@@ -866,7 +866,7 @@ public partial class RegisterStoreOutPage : ContentPage
     /// <param name="responceContent"></param>
     /// <returns></returns>
     private string CreateRegisteredMessage(string responceContent) {
-        string defaultMessage = "データ登録が完了しました";
+        string defaultMessage = "データ登録が完了しました。";
         try
         {
             // contentをJSONオブジェクトにデシリアライズ
@@ -884,7 +884,7 @@ public partial class RegisterStoreOutPage : ContentPage
 
                 if (storeOutResponseContent.ScanShipmentDuplicateData != null )
                 {
-                    strDuplicateProduct = "【重複があった品番】 \n";
+                    strDuplicateProduct = "【今回登録されなかった品番】 \n";
                     //重複したかんばんシリアルと納入先品番を羅列                    
                     var duplicateProduct = storeOutResponseContent.ScanShipmentDuplicateData
                     .Select(p => p.d_ShipmentModel).Select(p => new { p.KanbanSerialNumber, p.SupplierProductNumber }).ToList();                   

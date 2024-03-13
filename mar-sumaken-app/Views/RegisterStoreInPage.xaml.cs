@@ -402,7 +402,7 @@ public partial class RegisterStoreInPage : ContentPage
     /// <returns></returns>
     private string CreateRegisteredMessage(string responceContent)
     {
-        string defaultMessage = "データ登録が完了しました";
+        string defaultMessage = "データ登録が完了しました。";
         try
         {
             // contentをJSONオブジェクトにデシリアライズ
@@ -412,7 +412,7 @@ public partial class RegisterStoreInPage : ContentPage
                 string strDuplicateProduct = string.Empty;
                 if (storeInResponseContent.ScanReceive != null)
                 {
-                    strDuplicateProduct = "【重複があった品番】 \n";
+                    strDuplicateProduct = "【今回登録されなかった品番】 \n";
                     //重複したかんばんシリアルと納入先品番を羅列                    
                     var duplicateProduct = storeInResponseContent.ScanReceive
                     .Select(p => p.d_ReceiveModel).Select(p => new {p.SupplierProductNumber }).ToList();
@@ -422,7 +422,7 @@ public partial class RegisterStoreInPage : ContentPage
                         strDuplicateProduct += $"仕入先品番: {product.SupplierProductNumber}" + "\n";
                     }
                 }
-                return defaultMessage + '\n' + storeInResponseContent.Message + '\n' + strDuplicateProduct;
+                return defaultMessage + '\n' + '\n' + storeInResponseContent.Message + '\n' + '\n' + strDuplicateProduct;
             }
             return defaultMessage;
         }

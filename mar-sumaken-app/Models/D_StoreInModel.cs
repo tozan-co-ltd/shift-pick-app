@@ -115,5 +115,12 @@ namespace mar_sumaken_app.Models
             /// </summary>
             public List<D_HandyErrorMessageModel> HandyErrorMessage { get; set; }
         }
+        public class StoreInResponceContent
+        {
+            // メッセージ
+            public string Message { get; set; }
+            // 重複している読取実績
+            public List<ScanReceiveModel> ScanReceive { get; set; }
+        }
     }
 }

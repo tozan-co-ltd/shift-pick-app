@@ -419,11 +419,11 @@ public partial class RegisterStoreInPage : ContentPage
                     // 結果の表示
                     foreach (var product in duplicateProduct)
                     {
-                        strDuplicateProduct += $"品番　　　: {product.SupplierProductNumber} \n" 
+                        strDuplicateProduct += $"仕入先品番: {product.SupplierProductNumber} \n" 
                                             +  $"メインキー: { product.MainProductKey}" + "\n" 
                                             +  $"サブキー１: {product.FirstSubProductKey}" + "\n"
                                             +  $"サブキー２: {product.SecondSubProductKey}" + "\n"
-                                            +  "-----------------------" + "\n"; 
+                                            +  "-------------------------------" + "\n"; 
                     }
                 }
                 return defaultMessage + '\n' + '\n' + storeInResponseContent.Message + '\n' + '\n' + strDuplicateProduct;

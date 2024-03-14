@@ -893,7 +893,7 @@ public partial class RegisterStoreOutPage : ContentPage
                     {
                         strDuplicateProduct += $"納入先品番　　　: {product.DeliveryProductNumber}" + "\n" 
                                              + $"かんばんシリアル: {product.KanbanSerialNumber}" + "\n"
-                                             + "-----------------------" + "\n";
+                                             + "-------------------------------" + "\n";
                     }       
                 }
                 return defaultMessage + '\n' + storeOutResponseContent.Message +  '\n' + minusStockProduct + '\n' + strDuplicateProduct;

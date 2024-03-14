@@ -965,48 +965,52 @@ public partial class RegisterStoreOutPage : ContentPage
     {
         var loginID = txtLoginId.Text;
         var password = txtPassword.Text;
-
+        const int passwordMinLength = 4;
+        const int passwordMaxLength = 12;
         //ログインIDまたはパスワードが空欄
-        //パスワードが4桁未満、または10桁を超える場合
-        if (string.IsNullOrWhiteSpace(loginID) || string.IsNullOrWhiteSpace(password) || (4 > password.Length || password.Length > 12))
+        //パスワードが4桁未満、または12桁を超える場合
+        if (string.IsNullOrWhiteSpace(loginID) || string.IsNullOrWhiteSpace(password) || (passwordMinLength > password.Length || password.Length > passwordMaxLength))
         {
-            DisplayAlert("エラー", $"E1023: {string.Format(ErrorMessagesResources.E1023, "ログインID・パスワード",12,4)}", "OK");
+            DisplayAlert("エラー", $"E1023: {string.Format(ErrorMessagesResources.E1023, "ログインID・パスワード", passwordMaxLength, passwordMinLength)}", "OK");
             return;
         }
-        //// ログインIDは合致するデータがない
-        var listUser = mUserList.Where(u => u.LoginID == loginID).ToList();
+        // ログインIDと合致するデータがない
+        var listAdminUser = mUserList.Where(u => u.LoginID == loginID).ToList();
 
-        if (listUser.Count <= 0)
+        if (listAdminUser.Count <= 0)
         {
             DisplayAlert("エラー", $"E2003: {ErrorMessagesResources.E2003}", "OK");
             return;
         }
+
+        //
+        var inputadminUser =  listAdminUser.FirstOrDefault();
         //// 入力されたパスワードをハッシュ化
-        byte[] salt = Hashing.ConvertStringToBytes(listUser.FirstOrDefault().Salt);
+        byte[] salt = Hashing.ConvertStringToBytes(inputadminUser.Salt);
         string hashedPassword = Hashing.ConvertPlaintextPasswordToHashedPassword(password, salt);
 
         // ハッシュ化されたパスワードと一致するかチェック
-        if (!listUser.FirstOrDefault().Password.Equals(hashedPassword))
+        if (!inputadminUser.Password.Equals(hashedPassword))
         {
             DisplayAlert("エラー", $"E2026: {ErrorMessagesResources.E2026}", "OK");
             return;
         }
-        // ハンディエラーメッセージ実績モデル
+        // ハンディエラーメッセージ実績モデルを作成
         D_HandyErrorMessageModel d_HandyErrorMessageModel = new D_HandyErrorMessageModel();
         d_HandyErrorMessageModel.UnlockedAt = DateTime.Now;
-        d_HandyErrorMessageModel.UnlockedBy = _loginUserSqlLite.UserName;
+        d_HandyErrorMessageModel.UnlockedBy = inputadminUser.UserName;
         d_HandyErrorMessageModel.DepoID = _loginUserSqlLite.DepoID;
         d_HandyErrorMessageModel.HandyMenuID = handyMenuID;
         d_HandyErrorMessageModel.FirstScanedString = deliveryScanContent;
         d_HandyErrorMessageModel.SecondScanedString = supplierScanContent;
         d_HandyErrorMessageModel.ErrorMessage = errorMessengerLabel.Text;
         d_HandyErrorMessageModel.CreatedAt = DateTime.Now;
-        d_HandyErrorMessageModel.CreatedBy = _loginUserSqlLite.UserName;
-
+        d_HandyErrorMessageModel.CreatedBy = _loginUserSqlLite.UserName;        
         listDHandyErrorMessage.Add(d_HandyErrorMessageModel);
   
         SetValueAndVisibleLabelAfterRegisterAndErrorCancel();
         SoundPlayer.PlaySound(resultOkSound);
+        
         // 出庫登録画面を表示
         registerStoreOut.IsVisible = true;
         adminErrorCancel.IsVisible = false;

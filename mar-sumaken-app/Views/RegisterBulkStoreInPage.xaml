@@ -244,6 +244,10 @@
                 </StackLayout>
             </StackLayout>
 
+            <StackLayout x:Name="doneScanText" Margin="0, 90, 0, 0">
+                <Label Text="ここにスキャン済みデータが表示されます。" HorizontalOptions="CenterAndExpand" FontSize="Small" TextColor="Gray"/>
+            </StackLayout>
+
         </StackLayout>
     </ScrollView>
 

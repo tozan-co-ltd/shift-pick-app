@@ -192,7 +192,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
                 scanTextResult.TextColor = Colors.Black;
                 numberInputModal.IsVisible = true;
                 bulkStockContent.IsVisible = false;
-               
+                doneScanText.IsVisible = false;
             }
         }
         catch (Exception ex) when (ex is IndexOutOfRangeException || ex is ArgumentOutOfRangeException)
@@ -282,13 +282,13 @@ public partial class RegisterBulkStoreInPage : ContentPage
             // 入力値が空または0の場合はエラー
             if (enteredNumberLabel.Text == string.Empty)
             {
-                errorLabel.Text = "0以上で入力してください。";
+                errorLabel.Text = "1以上で入力してください。";
                 SoundPlayer.PlaySound(resultErrorSound);
                 return;
             }
             if (enteredNumberLabel.Text != string.Empty && int.Parse(enteredNumberLabel.Text) == 0)
             {
-                errorLabel.Text = "0以上で入力してください。";
+                errorLabel.Text = "1以上で入力してください。";
                 SoundPlayer.PlaySound(resultErrorSound);
                 return;
             }

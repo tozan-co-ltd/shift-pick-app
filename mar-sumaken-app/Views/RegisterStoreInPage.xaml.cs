@@ -247,7 +247,7 @@ public partial class RegisterStoreInPage : ContentPage
                 // 履歴一覧表示リスト追加
                 _HistoryListDisplay.Add(new D_ReceiveModel {SupplierProductNumber = supplierProductNumber, MainProductKey = mainProductKey, Quantity = lotOfQuantity });
                 historyCollectionView.ItemsSource = _HistoryListDisplay.Reverse();
-              
+                doneScanText.IsVisible = false;
             }
         }
         catch (Exception ex) when (ex is IndexOutOfRangeException || ex is ArgumentOutOfRangeException)

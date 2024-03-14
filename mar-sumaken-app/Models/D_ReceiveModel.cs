@@ -26,7 +26,7 @@ namespace mar_sumaken_app.Models
         /// <summary>
         /// 入荷日時
         /// </summary>
-        public DateTime ReceiveDatetime { get; set; }
+        public DateTime ReceiveDate { get; set; }
 
         /// <summary>
         /// 仕入先品番

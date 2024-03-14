@@ -632,7 +632,7 @@ public partial class RegisterStoreOutPage : ContentPage
     public D_ShipmentModel SetDShipmentModel(D_ShipmentModel d_ShipmentModel, int KanbanSerialNumber , string supplierProductNumber, int numberOfBoxes, string userName, int quantity, int shipmentScheduleID)
     {
         d_ShipmentModel.ShipmentScheduleID = shipmentScheduleID;
-        d_ShipmentModel.ShipmentDatetime = DateTime.Now;
+        d_ShipmentModel.ShipmentDate = DateTime.Now;
         d_ShipmentModel.KanbanSerialNumber = KanbanSerialNumber ;
         d_ShipmentModel.SupplierProductNumber = supplierProductNumber;
         d_ShipmentModel.LotNumber = "";

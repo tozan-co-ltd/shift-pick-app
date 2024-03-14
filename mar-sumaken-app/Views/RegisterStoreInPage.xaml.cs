@@ -304,7 +304,7 @@ public partial class RegisterStoreInPage : ContentPage
         int quantity , int companyID, string mainProductKey, string fisrtSubProductKey, string secondSubProductKey)
     {
         d_ReceiveModel.CompanyID = companyID;
-        d_ReceiveModel.ReceiveDatetime = DateTime.Now;
+        d_ReceiveModel.ReceiveDate = DateTime.Now;
         d_ReceiveModel.SupplierProductNumber = supplierProductNumber;
         d_ReceiveModel.NumberOfBoxes = numberOfBoxes;
         d_ReceiveModel.Quantity = quantity;

@@ -763,7 +763,7 @@ public partial class RegisterStoreOutPage : ContentPage
         try
         {
             double completeProgress = (double)(overallProgress) / (double)totalNumberOfBoxesRemaining;
-            progressBarValueLabel.Text = $"{overallProgress}/ " + totalNumberOfBoxesRemaining.ToString();
+            progressBarValueLabel.Text = $"{overallProgress} / " + totalNumberOfBoxesRemaining.ToString();
             progressBar.Progress = completeProgress;
             progressBar.ProgressColor = Color.FromHex("#008080");
 
@@ -873,30 +873,35 @@ public partial class RegisterStoreOutPage : ContentPage
             var storeOutResponseContent = JsonConvert.DeserializeObject<StoreOutRegisterModel.StoreOutResponseContent>(responceContent);
             if (storeOutResponseContent != null)
             {
-                string minusStockProduct = string.Empty;
-                string strDuplicateProduct = string.Empty;
+                string minusStockProductMessage = string.Empty;
+                string duplicateProductMessage = string.Empty;
                 if (storeOutResponseContent.ProductsWithMinusNumberOfBoxes != null ) {
                     //在庫マイナス品番を羅列
                     // productWithMinusNumberOfBoxesからSupplierProductNumberのみを抽出して結合
-                    minusStockProduct = "【在庫がマイナスになった品番】\n ";
-                    minusStockProduct += string.Join("\n", storeOutResponseContent.ProductsWithMinusNumberOfBoxes.Select(p => p.SupplierProductNumber));// 改行で結合
+                    minusStockProductMessage = "【在庫がマイナスになった品番】\n";
+                    var minusProduct = storeOutResponseContent.ProductsWithMinusNumberOfBoxes.Select(p =>new { p.SupplierProductNumber, p.DeliveryProductNumber });
+                    foreach (var item in minusProduct) {
+                        minusStockProductMessage += $"仕入先品番　　　: {item.SupplierProductNumber}" + "\n"
+                                                  + $"納入先品番　　　: {item.DeliveryProductNumber}" + "\n"
+                                                  + "-----------------------" + "\n"; 
+                    }
                 }
-
                 if (storeOutResponseContent.ScanShipmentDuplicateData != null )
                 {
-                    strDuplicateProduct = "【今回登録されなかった品番】 \n";
+                    duplicateProductMessage = "【今回登録されなかった品番】 \n";
                     //重複したかんばんシリアルと納入先品番を羅列                    
                     var duplicateProduct = storeOutResponseContent.ScanShipmentDuplicateData
                     .Select(p => p.d_ShipmentModel).Select(p => new { p.KanbanSerialNumber, p.DeliveryProductNumber }).ToList();                   
                     // 結果の表示
                     foreach (var product in duplicateProduct)
                     {
+
                         strDuplicateProduct += $"納入先品番　　　: {product.DeliveryProductNumber}" + "\n" 
                                              + $"かんばんシリアル: {product.KanbanSerialNumber}" + "\n"
                                              + "-------------------------------" + "\n";
                     }       
                 }
-                return defaultMessage + '\n' + storeOutResponseContent.Message +  '\n' + minusStockProduct + '\n' + strDuplicateProduct;
+                return defaultMessage + '\n' + '\n' + storeOutResponseContent.Message + '\n' + '\n' + minusStockProductMessage + '\n' + '\n' + duplicateProductMessage;
             }
             return defaultMessage;
         }

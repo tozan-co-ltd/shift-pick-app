@@ -1,7 +1,4 @@
-using mar_sumaken_app.ViewModels;
-using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
-using ProductDemo = mar_sumaken_app.Models.D_ReceiveModel;
 using Newtonsoft.Json;
 using static mar_sumaken_app.Models.ShipmentScheduleModel;
 using mar_sumaken_app.Models;
@@ -23,6 +20,19 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
     private List<D_ShipmentSchedule> lstDShipmentSchedules = new List<D_ShipmentSchedule>();
 
+    /// <summary>
+    /// 出荷指示リスト表示
+    /// </summary>
+    /// <param name="menuID">menuID</param>
+    /// <param name="selectedCompanyID">会社ID</param>
+    /// <param name="mCompanySqlLite">会社一覧</param>
+    /// <param name="deliveryName">納入先</param>
+    /// <param name="selectedDate">納入指示日</param>
+    /// <param name="deliveryTimeClass">納入場所</param>
+    /// <param name="deliveryLocation">便</param>
+    /// <param name="shipmentScheduleList">出荷一覧</param>
+    /// <param name="listProductItems">プロダクト一覧</param>
+    /// <param name="deliverySlipNumber">納入番号</param>
     public DisplayShippingInstructionListPage(int menuID, int selectedCompanyID, string deliveryName, DateTime selectedDate, string deliveryTimeClass, string deliveryLocation, List<M_CompanyModel> mCompanySqlLite,  ObservableCollection<D_ShipmentSchedule> shipmentScheduleList, List<M_ProductModel> listProductItems, string deliverySlipNumber)
 	{
 		InitializeComponent();
@@ -60,6 +70,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     {
         try
         {
+            //テーブルのページネーション表示
             if (lstDShipmentSchedules.Count() % _itemsPerPage == 0)
                 totalPage.Text = "/" + (lstDShipmentSchedules.Count() / _itemsPerPage).ToString();
             else
@@ -67,10 +78,13 @@ public partial class DisplayShippingInstructionListPage : ContentPage
 
             pageNumber.Text = currentPage.ToString();
 
+            //ボタンイベント登録
             var previousButton = new Button { };
             previousButton.Clicked += OnPreviousClicked;
             var nextButton = new Button { };
             nextButton.Clicked += OnNextClicked;
+
+            //未検品の出荷指示数で表示切り替え
             if(lstDShipmentSchedules.Count() > 0)
             {
                 shippingInstructionsList.IsVisible = true;
@@ -90,7 +104,6 @@ public partial class DisplayShippingInstructionListPage : ContentPage
         }
     }
 
-
     /// <summary>
     /// コレクションビューに表示データを追加
     /// </summary>
@@ -101,8 +114,8 @@ public partial class DisplayShippingInstructionListPage : ContentPage
             var startIndex = (currentPage - 1) * _itemsPerPage;
             var endIndex = startIndex + _itemsPerPage;
             var pageItems = lstDShipmentSchedules.Skip(startIndex).Take(_itemsPerPage);
-
             collectionView.ItemsSource = pageItems;
+
             return collectionView;
         }
         catch (Exception)
@@ -112,7 +125,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     }
 
     /// <summary>
-    ///前へボタンをクリックするのを処理
+    ///前へボタンをクリックしたときのページネーション
     /// </summary>
     private void OnPreviousClicked(object sender, EventArgs e)
     {
@@ -125,7 +138,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     }
 
     /// <summary>
-    /// 次へボタンをクリックするのを処理
+    ///次へボタンをクリックしたときのページネーション
     /// </summary>
     private void OnNextClicked(object sender, EventArgs e)
     {
@@ -139,7 +152,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     }
 
     /// <summary>
-    /// 戻るボタンをクリックするのを処理
+    /// 戻るボタンをクリックしたときの画面遷移処理
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
@@ -160,7 +173,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
 
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
-                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+                await Application.Current.MainPage.DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK");
                 return;
             }
             //ロード画面表示
@@ -170,9 +183,6 @@ public partial class DisplayShippingInstructionListPage : ContentPage
             // ユーザー情報を取得
             var loginUsers = await _dbService.GetLoginAsync();
             var loginUserSqlLite = loginUsers.Last();
-
-            var shipmentScheduleSqlLite = new ShipmentScheduleModel.ShipmentScheduleRequestBody();
-
             var shipmentScheduleRequestBody = new
             {
                 CompanyID = companyID,
@@ -194,8 +204,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
                 var contentFromApi = JsonConvert.DeserializeObject<ShipmentScheduleModel.ShipmentScheduelResponseBody>(response.content);
                 var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList; // 出荷指示
                 var dShipmentList = contentFromApi.D_ShipmentList; // 出荷実績
-                var mUserList = contentFromApi.M_UserList; // 出荷実績
-                
+                var mUserList = contentFromApi.M_UserList; // 管理者ユーザーリスト
                 Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, companyID, (string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, shipmentScheduleList, dShipmentList, mUserList, listProducts, deliverySlipNumberLabel.Text);
             }
             else

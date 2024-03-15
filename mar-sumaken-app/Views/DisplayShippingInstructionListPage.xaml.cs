@@ -70,6 +70,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     {
         try
         {
+            //テーブルのページネーション表示
             if (lstDShipmentSchedules.Count() % _itemsPerPage == 0)
                 totalPage.Text = "/" + (lstDShipmentSchedules.Count() / _itemsPerPage).ToString();
             else
@@ -77,10 +78,13 @@ public partial class DisplayShippingInstructionListPage : ContentPage
 
             pageNumber.Text = currentPage.ToString();
 
+            //ボタンイベント登録
             var previousButton = new Button { };
             previousButton.Clicked += OnPreviousClicked;
             var nextButton = new Button { };
             nextButton.Clicked += OnNextClicked;
+
+            //未検品の出荷指示数で表示切り替え
             if(lstDShipmentSchedules.Count() > 0)
             {
                 shippingInstructionsList.IsVisible = true;
@@ -121,7 +125,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     }
 
     /// <summary>
-    ///前へボタンをクリックするのを処理
+    ///前へボタンをクリックしたときのページネーション
     /// </summary>
     private void OnPreviousClicked(object sender, EventArgs e)
     {
@@ -134,7 +138,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     }
 
     /// <summary>
-    /// 次へボタンをクリックするのを処理
+    ///次へボタンをクリックしたときのページネーション
     /// </summary>
     private void OnNextClicked(object sender, EventArgs e)
     {
@@ -148,7 +152,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     }
 
     /// <summary>
-    /// 戻るボタンをクリックするのを処理
+    /// 戻るボタンをクリックしたときの画面遷移処理
     /// </summary>
     private void OnBackButtonClicked(object sender, EventArgs e)
     {
@@ -169,7 +173,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
 
             if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
             {
-                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
+                await Application.Current.MainPage.DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK");
                 return;
             }
             //ロード画面表示
@@ -200,7 +204,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
                 var contentFromApi = JsonConvert.DeserializeObject<ShipmentScheduleModel.ShipmentScheduelResponseBody>(response.content);
                 var shipmentScheduleList = contentFromApi.D_ShipmentScheduleList; // 出荷指示
                 var dShipmentList = contentFromApi.D_ShipmentList; // 出荷実績
-                var mUserList = contentFromApi.M_UserList; // 出荷実績
+                var mUserList = contentFromApi.M_UserList; // 管理者ユーザーリスト
                 Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, companyID, (string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, shipmentScheduleList, dShipmentList, mUserList, listProducts, deliverySlipNumberLabel.Text);
             }
             else

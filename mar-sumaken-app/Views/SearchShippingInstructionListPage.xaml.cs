@@ -2,27 +2,30 @@ using mar_sumaken_app.Common;
 using mar_sumaken_app.Models;
 using mar_sumaken_app.Properties;
 using mar_sumaken_app.Services;
-using mar_sumaken_app.ViewModels;
-using Microsoft.Maui.Controls;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 
 namespace mar_sumaken_app.Views;
 
 public partial class SearchShippingInstructionListPage : ContentPage
 {
+    int selectedCompanyID;
     bool isItemTapped = false;
-    ObservableCollection<string> placeList = new ObservableCollection<string> { "E5", "T5" };
+    public int handyMenuID = 0;
+    private string? _handyApiUrl;
+    bool hasOnSearchClick = false; // 検索クリック
     string chosedDeliveryTimeClass = "1"; // デフォルトでは、便は 1 です
     private readonly LocalDbService _dbService;
-    bool hasOnSearchClick = false; // 検索クリック
-    List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
+    public List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
-    int selectedCompanyID;
-    private string? _handyApiUrl;
-    public int handyMenuID = 0;
+    public ObservableCollection<string> placeList = new ObservableCollection<string> { "E5", "T5" };
 
+    /// <summary>
+    /// 出荷指示リスト検索
+    /// </summary>
+    /// <param name="menuID">menuID</param>
+    /// <param name="mCompanySqlLite">会社リスト</param>
+    /// <param name="listProductItems">仕入先リスト</param>
     public SearchShippingInstructionListPage(int menuID, List<M_CompanyModel> mCompanySqlLite, List<M_ProductModel> listProductItems)
 	{
 		InitializeComponent();
@@ -81,9 +84,8 @@ public partial class SearchShippingInstructionListPage : ContentPage
         // 会社IDを取得
         int selectedIndex = deliveryName.SelectedIndex;
         if (selectedIndex != -1)
-        {
             selectedCompanyID = listMCompany[selectedIndex].CompanyID;
-        }
+
         deliveryName.SelectedItem = (string)deliveryName.SelectedItem;
     }
 
@@ -109,14 +111,11 @@ public partial class SearchShippingInstructionListPage : ContentPage
     {
         try
         {
-            if (hasOnSearchClick)
-                return;
+            if (hasOnSearchClick) return;
 
-            if (!NetworkCheck.CheckNetworkConnection()) // ネットワーク接続チェック
-            {
-                await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK");
-                return;
-            }
+            // ネットワーク接続チェック
+            if (!NetworkCheck.CheckNetworkConnection()) { await Application.Current.MainPage.DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK"); return;}
+
             //ロード画面表示
             Application.Current.MainPage = new LoadingPage();
             await Task.Delay(200);
@@ -126,8 +125,6 @@ public partial class SearchShippingInstructionListPage : ContentPage
             var loginUsers = await _dbService.GetLoginAsync();
             var loginUserSqlLite = loginUsers.Last();
             DateTime selectedDate = datePicker.Date;
-
-            var shipmentScheduleSqlLite = new ShipmentScheduleModel.ShipmentScheduleRequestBody();
 
             var shipmentScheduleRequestBody = new
             {

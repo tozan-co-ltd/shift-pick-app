@@ -164,6 +164,7 @@ public partial class DisplayShippingInstructionListPage : ContentPage
     /// </summary>
     private async void OnRegisterButtonClicked(object sender, EventArgs e)
     {
+        var tmp_page = this;
         try
         {
             // ローカルDBのハンディ設定情報取得
@@ -208,11 +209,15 @@ public partial class DisplayShippingInstructionListPage : ContentPage
                 Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, companyID, (string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, shipmentScheduleList, dShipmentList, mUserList, listProducts, deliverySlipNumberLabel.Text);
             }
             else
+            {
                 await DisplayAlert("エラー", response.content, "OK");
+                Application.Current.MainPage = tmp_page;
+            }
         }
         catch (Exception ex)
         {
             await DisplayAlert("エラー", $"E9999: {ErrorMessagesResources.E9999}\n" + ex.Message, "OK");
+            Application.Current.MainPage = tmp_page;
             return;
         }
     }

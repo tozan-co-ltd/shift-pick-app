@@ -883,7 +883,7 @@ public partial class RegisterStoreOutPage : ContentPage
                     foreach (var item in minusProduct) {
                         minusStockProductMessage += $"仕入先品番　　　: {item.SupplierProductNumber}" + "\n"
                                                   + $"納入先品番　　　: {item.DeliveryProductNumber}" + "\n"
-                                                  + "-----------------------" + "\n"; 
+                                                  + "-------------------------------" + "\n"; 
                     }
                 }
                 if (storeOutResponseContent.ScanShipmentDuplicateData != null )
@@ -896,9 +896,9 @@ public partial class RegisterStoreOutPage : ContentPage
                     foreach (var product in duplicateProduct)
                     {
 
-                        strDuplicateProduct += $"納入先品番　　　: {product.DeliveryProductNumber}" + "\n" 
-                                             + $"かんばんシリアル: {product.KanbanSerialNumber}" + "\n"
-                                             + "-------------------------------" + "\n";
+                        duplicateProductMessage += $"納入先品番　　　: {product.DeliveryProductNumber}" + "\n" 
+                                                 + $"かんばんシリアル: {product.KanbanSerialNumber}" + "\n"
+                                                + "-------------------------------" + "\n";
                     }       
                 }
                 return defaultMessage + '\n' + '\n' + storeOutResponseContent.Message + '\n' + '\n' + minusStockProductMessage + '\n' + '\n' + duplicateProductMessage;

@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="E1001" xml:space="preserve">
+    <value>{0}は必須項目です。</value>
+  </data>
+  <data name="E1002" xml:space="preserve">
+    <value>ログインIDまたはパスワードが正しくありません。正しい値を入力してください。</value>
+  </data>
+  <data name="E1003" xml:space="preserve">
+    <value>{0}は半角英数字で正しい値を入力してください。</value>
+  </data>
+  <data name="E1004" xml:space="preserve">
+    <value>日付指定に不正な値があります。半角YYYY/MM/DD形式で正しい値を入力してください。</value>
+  </data>
+  <data name="E1005" xml:space="preserve">
+    <value>日付指定に不正な値があります。半角YYYYMMDD形式で正しい値を入力してください。</value>
+  </data>
+  <data name="E1006" xml:space="preserve">
+    <value>時間指定に不正な値があります。半角HHMM形式で正しい値を入力してください。</value>
+  </data>
+  <data name="E1007" xml:space="preserve">
+    <value>数値指定に不正な値があります。半角数字で正しい値を入力してください。</value>
+  </data>
+  <data name="E1008" xml:space="preserve">
+    <value>規定の桁数に満たない、または超えている値があります。正しい値を入力してください。</value>
+  </data>
+  <data name="E1009" xml:space="preserve">
+    <value>この{0}は既に存在するため登録できません。</value>
+  </data>
+  <data name="E1010" xml:space="preserve">
+    <value>{0}が品番マスターに存在しません。</value>
+  </data>
+  <data name="E1011" xml:space="preserve">
+    <value>{0}が会社マスターに存在しません。</value>
+  </data>
+  <data name="E1012" xml:space="preserve">
+    <value>ファイルが選択されていません。</value>
+  </data>
+  <data name="E1013" xml:space="preserve">
+    <value>CSV形式でないファイルが含まれているため登録できません。</value>
+  </data>
+  <data name="E1014" xml:space="preserve">
+    <value>ファイル内にデータがありません。</value>
+  </data>
+  <data name="E1015" xml:space="preserve">
+    <value>アクセス権限がありません。</value>
+  </data>
+  <data name="E1016" xml:space="preserve">
+    <value>異なるログインを検出したため自動ログアウトされました。</value>
+  </data>
+  <data name="E1017" xml:space="preserve">
+    <value>入力値に不正な値があります。正しい値を入力してください。</value>
+  </data>
+  <data name="E1018" xml:space="preserve">
+    <value>{0}が仕入先かんばんマスターに存在しません。</value>
+  </data>
+  <data name="E1019" xml:space="preserve">
+    <value>ファイルが選択されていません。</value>
+  </data>
+  <data name="E1020" xml:space="preserve">
+    <value>既に実績データがあるため、上書きできません。</value>
+  </data>
+  <data name="E1023" xml:space="preserve">
+    <value>{0}は{2}～{1}文字の間で入力してください。</value>
+  </data>
+  <data name="E1022" xml:space="preserve">
+    <value>仕入先かんばんマスターに一致するデータがありません。</value>
+  </data>
+  <data name="E2001" xml:space="preserve">
+    <value>QRコードが正しくありません。正しいQRコードを読み取ってください。</value>
+  </data>
+  <data name="E2002" xml:space="preserve">
+    <value>{0}にデータがありません。</value>
+  </data>
+  <data name="E2003" xml:space="preserve">
+    <value>ログインIDが正しくありません。正しい値を入力してください。</value>
+  </data>
+  <data name="E2004" xml:space="preserve">
+    <value>接続先を入力してください。</value>
+  </data>
+  <data name="E2005" xml:space="preserve">
+    <value>接続先URLにアクセスできません。正しいURLを入力してください。</value>
+  </data>
+  <data name="E2006" xml:space="preserve">
+    <value>会社コード・会社パスワードはセットで入力してください。</value>
+  </data>
+  <data name="E2007" xml:space="preserve">
+    <value>使用ハンディメニューが登録されていません。</value>
+  </data>
+  <data name="E2008" xml:space="preserve">
+    <value>「設定」から会社コードを登録してください。</value>
+  </data>
+  <data name="E2009" xml:space="preserve">
+    <value>アプリバージョンが取得できませんでした。</value>
+  </data>
+  <data name="E2010" xml:space="preserve">
+    <value>アプリのバージョンが正しくありません。最新バージョンをダウンロードしてください。</value>
+  </data>
+  <data name="E2011" xml:space="preserve">
+    <value>ログイン情報が切断されました。再度ログインしてください。</value>
+  </data>
+  <data name="E2012" xml:space="preserve">
+    <value>接続がタイムアウトしました。再度お試しください。</value>
+  </data>
+  <data name="E2013" xml:space="preserve">
+    <value>メニューが登録されていません。</value>
+  </data>
+  <data name="E2014" xml:space="preserve">
+    <value>ページが存在しません。</value>
+  </data>
+  <data name="E2015" xml:space="preserve">
+    <value>QRコードの読取ができませんでした。再度スキャンしてください。</value>
+  </data>
+  <data name="E2016" xml:space="preserve">
+    <value>読取データがありません。</value>
+  </data>
+  <data name="E2017" xml:space="preserve">
+    <value>既にスキャン済みの仕入先かんばんです。</value>
+  </data>
+  <data name="E2018" xml:space="preserve">
+    <value>既に実績データがあるため、登録できません。</value>
+  </data>
+  <data name="E2019" xml:space="preserve">
+    <value>既に実績データがあるため、一部データのみ登録しました。</value>
+  </data>
+  <data name="E2020" xml:space="preserve">
+    <value>指定の条件に合致する出荷指示がありません。</value>
+  </data>
+  <data name="E2021" xml:space="preserve">
+    <value>会社コードまたは会社パスワードが正しくありません。正しい値を入力してください。</value>
+  </data>
+  <data name="E2022" xml:space="preserve">
+    <value>既にスキャン済みの納入先かんばんです。</value>
+  </data>
+  <data name="E2023" xml:space="preserve">
+    <value>納入先かんばんの品番・収容数と一致しません。</value>
+  </data>
+  <data name="E2024" xml:space="preserve">
+    <value>出荷指示リストに一致するデータがありません。</value>
+  </data>
+  <data name="E2025" xml:space="preserve">
+    <value>未検品の出荷指示がないためスキャンできません。</value>
+  </data>
+  <data name="E3001" xml:space="preserve">
+    <value>データベースに接続できませんでした。</value>
+  </data>
+  <data name="E3002" xml:space="preserve">
+    <value>サーバーに接続できませんでした。</value>
+  </data>
+  <data name="E3003" xml:space="preserve">
+    <value>ネットワークに接続できませんでした。</value>
+  </data>
+  <data name="E3004" xml:space="preserve">
+    <value>データベース処理実行中にエラーが発生しました。</value>
+  </data>
+  <data name="E9999" xml:space="preserve">
+    <value>予期せぬエラーが発生しました。</value>
+  </data>
+  <data name="E2026" xml:space="preserve">
+    <value>パスワードが正しくありません。正しい値を入力してください。</value>
+  </data>
+</root>

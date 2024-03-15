@@ -938,7 +938,10 @@ public partial class RegisterStoreOutPage : ContentPage
             Application.Current.MainPage = new RegisterStoreOutPage(handyMenuID, companyID, (string)selectedDeliveryNameLabel.Text, selectedDateLabel.Text, selectedDeliveryTimeClassLabel.Text, selectedDeliveryLocationLabel.Text, listMCompany, shipmentScheduleList, dShipmentList, mUserList, listProducts, deliverySlipNumberLabel.Text);
         }
         else
+        {
             await DisplayAlert("エラー", responseShipmentSchedule.content, "OK");
+            Application.Current.MainPage = this;
+        }
     }
 
     /// <summary>

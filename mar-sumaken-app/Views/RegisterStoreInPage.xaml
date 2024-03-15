@@ -24,7 +24,7 @@
                     <StackLayout HorizontalOptions="Center">
                         <Label 
                              Text="{Binding CurrentDate, StringFormat='入庫処理日: {0:yyyy/MM/dd}'}"
-                             FontSize="16" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
+                             FontSize="18" TextColor="#fff" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
                     </StackLayout>
                 </Frame>
                 <StackLayout Background="#fff" Padding="20, 15, 20, 5">

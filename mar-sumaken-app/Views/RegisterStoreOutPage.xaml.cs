@@ -763,7 +763,7 @@ public partial class RegisterStoreOutPage : ContentPage
         try
         {
             double completeProgress = (double)(overallProgress) / (double)totalNumberOfBoxesRemaining;
-            progressBarValueLabel.Text = $"{overallProgress}/ " + totalNumberOfBoxesRemaining.ToString();
+            progressBarValueLabel.Text = $"{overallProgress} / " + totalNumberOfBoxesRemaining.ToString();
             progressBar.Progress = completeProgress;
             progressBar.ProgressColor = Color.FromHex("#008080");
 

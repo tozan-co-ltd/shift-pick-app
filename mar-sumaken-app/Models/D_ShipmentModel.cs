@@ -30,7 +30,7 @@ namespace mar_sumaken_app.Models
         /// 出荷日時
         /// </summary>
         
-        public DateTime ShipmentDatetime { get; set; } = DateTime.Now;
+        public DateTime ShipmentDate { get; set; } = DateTime.Now;
         /// <summary>
         /// シリアル番号(かんばん識別番号)
         /// </summary>

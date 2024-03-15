@@ -392,7 +392,7 @@ public partial class RegisterBulkStoreInPage : ContentPage
     {
         d_ReceiveModel.CompanyID = companyID;
         d_ReceiveModel.Quantity = lotOfQuantity * numOfBoxes;
-        d_ReceiveModel.ReceiveDatetime = DateTime.Now;
+        d_ReceiveModel.ReceiveDate = DateTime.Now;
         d_ReceiveModel.SupplierProductNumber = supplierProductNumber;
         d_ReceiveModel.NumberOfBoxes = numOfBoxes;
         d_ReceiveModel.LotNumber = lotNumber;

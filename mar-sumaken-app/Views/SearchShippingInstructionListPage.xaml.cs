@@ -114,7 +114,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
             if (hasOnSearchClick) return;
 
             // ネットワーク接続チェック
-            if (!NetworkCheck.CheckNetworkConnection()) { await Application.Current.MainPage.DisplayAlert("エラー", "E3003: ネットワークに接続できませんでした。", "OK"); return;}
+            if (!NetworkCheck.CheckNetworkConnection()) { await Application.Current.MainPage.DisplayAlert("エラー", $"E3003: {ErrorMessagesResources.E3003}", "OK"); return;}
 
             //ロード画面表示
             Application.Current.MainPage = new LoadingPage();

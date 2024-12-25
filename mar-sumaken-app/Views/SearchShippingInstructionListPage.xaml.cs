@@ -18,7 +18,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
     private readonly LocalDbService _dbService;
     public List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
-    public ObservableCollection<string> placeList = new ObservableCollection<string> { "E5", "T5" };
+    public ObservableCollection<string> placeList = new ObservableCollection<string> { "E5", "TA" };
 
     /// <summary>
     /// 出荷指示リスト検索

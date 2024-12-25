@@ -18,7 +18,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
     private readonly LocalDbService _dbService;
     public List<M_CompanyModel> listMCompany = new List<M_CompanyModel>();
     public List<M_ProductModel> listProducts = new List<M_ProductModel>();
-    public ObservableCollection<string> placeList = new ObservableCollection<string> { "E5", "TA" };
+    public ObservableCollection<string> placeList = new ObservableCollection<string> { "TA", "E5"};
 
     /// <summary>
     /// 出荷指示リスト検索
@@ -51,7 +51,7 @@ public partial class SearchShippingInstructionListPage : ContentPage
         deliveryName.SelectedItem = listMCompany.Select(c => c.CompanyName).ToList().FirstOrDefault();
 
         deliveryLocation.ItemsSource = placeList;
-        deliveryLocation.SelectedItem = "E5";
+        deliveryLocation.SelectedItem = "TA";
         datePicker.Date = Util.GetNextday(DateTime.Now);
     }
 

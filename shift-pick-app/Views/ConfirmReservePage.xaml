@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="shift_pick_app.Views.ConfirmReservePage"
+             Title="ConfirmReservePage">
+    <NavigationPage.TitleView>
+            <StackLayout Margin="0" Padding="0">
+                <Label Text="メニュー" TextColor="#fff" ZIndex="9999" FontSize="22" Margin="0, 13, 0, 0" FontAttributes="Bold" Padding="0"/>
+            </StackLayout>
+    </NavigationPage.TitleView>
+
+    <StackLayout BackgroundColor="#f2f2f2">
+        <StackLayout x:Name="mainContent" BackgroundColor="#fff">
+            <Frame BackgroundColor="#FD5A00" CornerRadius="0" BorderColor="#FD5A00" Padding="0, 8" Margin="0">
+                <StackLayout HorizontalOptions="Center">
+                    <FlexLayout Direction="Row" JustifyContent="Start" Padding="0" Margin="0">
+                        <Label Text="ユーザーID: " FontSize="16" TextColor="#fff"/>
+                        <Label x:Name="userName" FontSize="16" TextColor="#fff"/>
+                    </FlexLayout>
+                    <FlexLayout Direction="Row" JustifyContent="Start" Padding="0" Margin="0, 8, 0, 0">
+                        <Label Text="予約: " FontSize="16" TextColor="#fff"/>
+                        <Label x:Name="reserve" FontSize="16" TextColor="#fff"/>
+                    </FlexLayout>
+                    <FlexLayout Direction="Row" JustifyContent="Start" Padding="0" Margin="0, 8, 0, 0">
+                        <Label Text="確定: " FontSize="16" TextColor="#fff"/>
+                        <Label x:Name="confirm" FontSize="16" TextColor="#fff"/>
+                    </FlexLayout>
+                    <FlexLayout Direction="Row" JustifyContent="Start" Padding="0" Margin="0, 8, 0, 0">
+                        <Label Text="NG: " FontSize="16" TextColor="#fff"/>
+                        <Label x:Name="NG" FontSize="16" TextColor="#fff"/>
+                    </FlexLayout>
+                </StackLayout>
+            </Frame>
+            <Border Stroke="Black" StrokeThickness="2" Background="White" Padding="0, 0, 0, 0" Margin="10, 10, 10, 5">
+                <CollectionView HeightRequest="300" ItemsSource="{Binding Items}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid RowDefinitions="Auto,Auto,Auto,1" Padding="10">
+
+                                <!-- 行の本体 -->
+                                <Label Grid.Row="0" Grid.Column="0" Text="{Binding OfficeName}" />
+                                <Label Grid.Row="1" Grid.Column="0" Text="{Binding OuboDate}" />
+                                <Label Grid.Row="2" Grid.Column="0" Text="{Binding Status}" />
+
+                                <!-- 下線（区切り線） -->
+                                <BoxView Grid.Row="3"
+                             HeightRequest="1"
+                             BackgroundColor="LightGray"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>                   
+                </CollectionView>
+            </Border>
+            <StackLayout Grid.Row="0" BackgroundColor=" Transparent" Orientation="Horizontal" Margin="10">
+                <Button FontFamily="FontAwesome6Solid" Text="&#xf048; 戻る" Background="Gray" TextColor=" White"  HorizontalOptions="StartAndExpand" CornerRadius="25" WidthRequest="120" HeightRequest="50" FontSize="18" Margin="25,0,0,0" Clicked="OnButtonBackClick"/>
+            </StackLayout>
+        </StackLayout>
+        <StackLayout x:Name="loadingOverLay" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
+            <ActivityIndicator x:Name="loadingIndicator" IsVisible="False" Color="#FD5A00" />
+        </StackLayout>
+    </StackLayout>
+</ContentPage>

@@ -28,25 +28,6 @@ namespace shift_pick_app.Models
 
         public class LatestMastersPostBackContent
         {
-            /// <summary>
-            /// 品番
-            /// </summary>
-            public List<M_ProductModel> M_ProductList { get; set; }
-
-            /// <summary>
-            /// 出荷指示QRコード
-            /// </summary>
-            public List<M_ShipmentScheduleQRCodeModel> M_ShipmentScheduleQRCodeList { get; set; }
-
-            /// <summary>
-            /// 仕入先かんばん
-            /// </summary>
-            public List<M_SupplierKanbanModel> M_SupplierKanbanList { get; set; }
-
-            /// <summary>
-            /// ハンディメニュー仕入先かんばん
-            /// </summary>
-            public List<R_HandyMenuSupplierKanbanModel> R_HandyMenuSupplierKanbanList { get; set; }
         }
     }
 }

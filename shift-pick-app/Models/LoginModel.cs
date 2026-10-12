@@ -38,9 +38,6 @@ namespace shift_pick_app.Models
             public string UserName { get; set; }
             public string Password { get; set; }
             public string Salt { get; set; }
-            public int DepoID { get; set; }
-            public string DepoCode { get; set; }
-            public string DepoName { get; set; }
             public int AuthorizedKubun { get; set; }
         }
 
@@ -51,7 +48,6 @@ namespace shift_pick_app.Models
         {
             public string CompanyName { get; set; }
             public M_UserModel M_User { get; set; }
-            public M_DepoModel M_Depo { get; set; }
             public List<M_HandyMenuModel> M_HandyMenuList { get; set; }
         }
     }

@@ -160,9 +160,7 @@ public partial class LoginPage : ContentPage
         loginUserSqlLite.UserName = contentFromApi.M_User.UserName;
         loginUserSqlLite.Password = contentFromApi.M_User.Password;
         loginUserSqlLite.Salt = contentFromApi.M_User.Salt;
-        loginUserSqlLite.DepoID = contentFromApi.M_Depo.DepoID;
         loginUserSqlLite.AuthorizedKubun = contentFromApi.M_User.AuthorizedKubun;
-        loginUserSqlLite.DepoName = contentFromApi.M_Depo.DepoName;
 
         return loginUserSqlLite;
     }

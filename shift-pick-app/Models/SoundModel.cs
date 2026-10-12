@@ -2,6 +2,10 @@
 
 namespace shift_pick_app.Models
 {
+    /// <summary>
+    /// TODO: 不要になる可能性がある場合は、このクラスの削除を検討する。
+    /// または必要な場合は、すべてのサウンドファイルについて "Scan" 接頭辞を取り除くよう、名前の変更を検討する。
+    /// </summary>
     public class SoundModel
     {
         /// <summary>

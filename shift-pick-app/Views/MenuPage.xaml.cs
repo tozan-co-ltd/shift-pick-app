@@ -13,9 +13,7 @@ public partial class MenuPage : FlyoutPage
     private LoginModel.LoginUserSqlLite _loginUserSqlLite;
     public List<M_HandyMenuModel> listHandyMenu;
     private HandySettingModel.HandySetting _handySetting;
-    public List<M_SupplierKanbanModel> listMSupplierKanban;
     public List<LoginModel.LoginUserSqlLite> loginUsers;
-    public List<R_HandyMenuSupplierKanbanModel> listRHandyMenuSupplierKanban;
 
     /// <summary>
     /// メニュー画面表示
@@ -125,7 +123,6 @@ public partial class MenuPage : FlyoutPage
         try
         {
             var latestMastersPostBody = new LatestMastersModel.LatestMastersPostBody();
-            var listProducts = new List<M_ProductModel>();
             latestMastersPostBody.CompanyCode = _handySetting.CompanyCode;
             latestMastersPostBody.CompanyPassword = _handySetting.CompanyPassword;
             latestMastersPostBody.UserID = _loginUserSqlLite.UserID;
@@ -140,11 +137,11 @@ public partial class MenuPage : FlyoutPage
             {
                 // APIからコンテンツを取得
                 var contentFromApi = JsonConvert.DeserializeObject<LatestMastersModel.LatestMastersPostBackContent>(response.content);
-                var listlatestMastersSqlLite =  new List<M_SupplierKanbanModel>();
-                listlatestMastersSqlLite = contentFromApi.M_SupplierKanbanList;
-                listProducts = contentFromApi.M_ProductList;
-                // 削除して Sqlite に保存
-                DeleteAndSaveToSqlLite(listlatestMastersSqlLite, response.content);
+                //var listlatestMastersSqlLite =  new List<M_SupplierKanbanModel>();
+                //listlatestMastersSqlLite = contentFromApi.M_SupplierKanbanList;
+                //listProducts = contentFromApi.M_ProductList;
+                //// 削除して Sqlite に保存
+                //DeleteAndSaveToSqlLite(listlatestMastersSqlLite, response.content);
             }
             else
             {
@@ -154,7 +151,7 @@ public partial class MenuPage : FlyoutPage
             }
 
             // ハンディメニューIDによるナビゲーション
-            NavigationByHandyMenuTitle(handyMenuName, handyMenuID, listProducts);
+            NavigationByHandyMenuTitle(handyMenuName, handyMenuID);
         }
         catch (Exception)
         {
@@ -168,22 +165,22 @@ public partial class MenuPage : FlyoutPage
     /// <param name="listProducts">List<M_ProductModel></param>
     /// <param name="handyMenuID">string</param>
     /// <param name="handyMenuTitle">string</param>
-    public async void NavigationByHandyMenuTitle(string handyMenuTitle, int handyMenuID,  List<M_ProductModel> listProducts)
+    public async void NavigationByHandyMenuTitle(string handyMenuTitle, int handyMenuID)
     {
-        // 入庫
-        if (handyMenuTitle == Const.C_REGISTER_STORE_IN_PAGE)
-            Application.Current.MainPage = new RegisterStoreInPage(handyMenuID, listProducts);
-        else if (handyMenuTitle == Const.C_REGISTER_BULK_STORE_IN_PAGE)
-            Application.Current.MainPage = new RegisterBulkStoreInPage(handyMenuID, listProducts);
+        //// 入庫
+        //if (handyMenuTitle == Const.C_REGISTER_STORE_IN_PAGE)
+        //    Application.Current.MainPage = new RegisterStoreInPage(handyMenuID, listProducts);
+        //else if (handyMenuTitle == Const.C_REGISTER_BULK_STORE_IN_PAGE)
+        //    Application.Current.MainPage = new RegisterBulkStoreInPage(handyMenuID, listProducts);
 
-        // 出庫
-        else if (handyMenuTitle == Const.C_SEARCH_SHIPPING_INSTRUCTION_IN_PAGE)
-        {
-            // API接続
-            var listCompanyResult = await GetListCompanyFromApi();
-            if (listCompanyResult.success)
-                Application.Current.MainPage = new SearchShippingInstructionListPage(handyMenuID, listCompanyResult.mCompanySqlLite, listProducts);
-        }
+        //// 出庫
+        //else if (handyMenuTitle == Const.C_SEARCH_SHIPPING_INSTRUCTION_IN_PAGE)
+        //{
+        //    // API接続
+        //    var listCompanyResult = await GetListCompanyFromApi();
+        //    if (listCompanyResult.success)
+        //        Application.Current.MainPage = new SearchShippingInstructionListPage(handyMenuID, listCompanyResult.mCompanySqlLite, listProducts);
+        //}
     }
 
 
@@ -192,66 +189,66 @@ public partial class MenuPage : FlyoutPage
     /// </summary>
     /// <param name="listlatestMastersSqlLite">List<M_SupplierKanbanModel></param>
     /// <param name="content">string</param>
-    public async void DeleteAndSaveToSqlLite(List<M_SupplierKanbanModel> listlatestMastersSqlLite, string content)
-    {
-        var contentFromApi = JsonConvert.DeserializeObject<LatestMastersModel.LatestMastersPostBackContent>(content);
+    //public async void DeleteAndSaveToSqlLite(List<M_SupplierKanbanModel> listlatestMastersSqlLite, string content)
+    //{
+    //    var contentFromApi = JsonConvert.DeserializeObject<LatestMastersModel.LatestMastersPostBackContent>(content);
 
-        var listShipmentScheduleQRCode = contentFromApi.M_ShipmentScheduleQRCodeList;
-        // ローカルDBの古いメニューを削除
-        await _dbService.ALLDeleteMSupplierKanbanAsync();
-        foreach (var latestMastersSqlLite in listlatestMastersSqlLite)
-            await _dbService.SaveMSupplierKanbanAsync(latestMastersSqlLite);
+    //    var listShipmentScheduleQRCode = contentFromApi.M_ShipmentScheduleQRCodeList;
+    //    // ローカルDBの古いメニューを削除
+    //    await _dbService.ALLDeleteMSupplierKanbanAsync();
+    //    foreach (var latestMastersSqlLite in listlatestMastersSqlLite)
+    //        await _dbService.SaveMSupplierKanbanAsync(latestMastersSqlLite);
 
-        var listRHandyMenuSupplierKanbanSqlLite = new List<R_HandyMenuSupplierKanbanModel>();
-        listRHandyMenuSupplierKanbanSqlLite = contentFromApi.R_HandyMenuSupplierKanbanList;
-        // ローカルDBの古いハンディメニューを削除
-        await _dbService.ALLDeleteRHandyMenuSupplierKanbanAsync();
-        foreach (var rHandyMenuSupplierKanbanSqlLite in listRHandyMenuSupplierKanbanSqlLite)
-            await _dbService.SaveRHandyMenuSupplierKanbanAsync(rHandyMenuSupplierKanbanSqlLite);
+    //    var listRHandyMenuSupplierKanbanSqlLite = new List<R_HandyMenuSupplierKanbanModel>();
+    //    listRHandyMenuSupplierKanbanSqlLite = contentFromApi.R_HandyMenuSupplierKanbanList;
+    //    // ローカルDBの古いハンディメニューを削除
+    //    await _dbService.ALLDeleteRHandyMenuSupplierKanbanAsync();
+    //    foreach (var rHandyMenuSupplierKanbanSqlLite in listRHandyMenuSupplierKanbanSqlLite)
+    //        await _dbService.SaveRHandyMenuSupplierKanbanAsync(rHandyMenuSupplierKanbanSqlLite);
 
-        // ローカルDBの古い出荷指示QRコーを削除
-        await _dbService.ALLDeleteMShipmentScheduleQRCodeAsync();
-        foreach (var shipmentScheduleQRCodeSqlLite in listShipmentScheduleQRCode)
-            await _dbService.SaveMShipmentScheduleQRCodeAsync(shipmentScheduleQRCodeSqlLite);
-    }
+    //    // ローカルDBの古い出荷指示QRコーを削除
+    //    await _dbService.ALLDeleteMShipmentScheduleQRCodeAsync();
+    //    foreach (var shipmentScheduleQRCodeSqlLite in listShipmentScheduleQRCode)
+    //        await _dbService.SaveMShipmentScheduleQRCodeAsync(shipmentScheduleQRCodeSqlLite);
+    //}
 
     /// <summary>
     /// 出荷指示リスト検索画面用の納入先リスト取得
     /// </summary>
     /// <returns>納入先リスト</returns>
-    public async Task<(List<M_CompanyModel> mCompanySqlLite, bool success)> GetListCompanyFromApi()
-    {
-        var mCompanySqlLite = new List<M_CompanyModel>();
-        var mCompanyPostBody = new
-        {
-            CompanyCode = _loginUserSqlLite.CompanyCode,
-            CompanyPassword = _loginUserSqlLite.CompanyPassword,
-        };
-        var jsonDataSend = JsonConvert.SerializeObject(mCompanyPostBody);
+    //public async Task<(List<M_CompanyModel> mCompanySqlLite, bool success)> GetListCompanyFromApi()
+    //{
+    //    var mCompanySqlLite = new List<M_CompanyModel>();
+    //    var mCompanyPostBody = new
+    //    {
+    //        CompanyCode = _loginUserSqlLite.CompanyCode,
+    //        CompanyPassword = _loginUserSqlLite.CompanyPassword,
+    //    };
+    //    var jsonDataSend = JsonConvert.SerializeObject(mCompanyPostBody);
 
-        // ネットワーク接続チェック
-        if (!NetworkCheck.CheckNetworkConnection())
-        {
-            await DisplayAlert("エラー", $"E3003:  {ErrorMessagesResources.E3003}", "OK");
-            Application.Current.MainPage = new MenuPage();
-            return (mCompanySqlLite, false);
-        }
+    //    // ネットワーク接続チェック
+    //    if (!NetworkCheck.CheckNetworkConnection())
+    //    {
+    //        await DisplayAlert("エラー", $"E3003:  {ErrorMessagesResources.E3003}", "OK");
+    //        Application.Current.MainPage = new MenuPage();
+    //        return (mCompanySqlLite, false);
+    //    }
 
-        // API接続
-        var response = await App.API.PostMethod(jsonDataSend, _handySetting.HandyApiUrl, "M_Company/FetchDelivery");
-        if (response.success)
-        { 
-            // APIからコンテンツを取得
-            mCompanySqlLite = JsonConvert.DeserializeObject<List<M_CompanyModel>>(response.content);
-            return (mCompanySqlLite, true);
-        }
-        else
-        {
-            await DisplayAlert("エラー", response.content, "OK");
-            Application.Current.MainPage = new MenuPage();
-            return (mCompanySqlLite, false);
-        }
-    }
+    //    // API接続
+    //    var response = await App.API.PostMethod(jsonDataSend, _handySetting.HandyApiUrl, "M_Company/FetchDelivery");
+    //    if (response.success)
+    //    { 
+    //        // APIからコンテンツを取得
+    //        mCompanySqlLite = JsonConvert.DeserializeObject<List<M_CompanyModel>>(response.content);
+    //        return (mCompanySqlLite, true);
+    //    }
+    //    else
+    //    {
+    //        await DisplayAlert("エラー", response.content, "OK");
+    //        Application.Current.MainPage = new MenuPage();
+    //        return (mCompanySqlLite, false);
+    //    }
+    //}
 
     /// <summary>
     /// ログアウトボタン押下
@@ -269,7 +266,7 @@ public partial class MenuPage : FlyoutPage
 
     private void OnReserveClicked(object sender, TappedEventArgs e)
     {
-        Application.Current.MainPage = new RegisterStoreInPage(0, new List<M_ProductModel>());
+        //Application.Current.MainPage = new RegisterStoreInPage(0, new List<M_ProductModel>());
     }
 
     public  void OnConfirmReserveClicked(object sender, TappedEventArgs e)

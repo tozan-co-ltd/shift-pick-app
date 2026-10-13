@@ -31,6 +31,7 @@ namespace shift_pick_app
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<LoginPageViewModel>();
             builder.Services.AddTransient<PasswordReset>();
+            builder.Services.AddTransient<PasswordResetViewModel>();
             builder.Services.AddTransient<MenuPage>();
             builder.Services.AddTransient<LoadingPage>();
             builder.Services.AddTransient<HandySettingPage>();

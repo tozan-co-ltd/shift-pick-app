@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using shift_pick_app.Common;
+using shift_pick_app.Models;
 using shift_pick_app.Services;
 using shift_pick_app.Views;
 
@@ -7,17 +9,6 @@ namespace shift_pick_app.ViewModels
 {
     public partial class LoginPageViewModel : BaseViewModel
     {
-        private const int PasswordMinLength = 8;
-
-        // デモ用アカウント（ユーザーID, パスワード）
-        private static readonly Dictionary<string, string> DemoAccounts = new()
-        {
-            ["user@example.com"] = "password1",
-            ["user@example.com"] = "password2",
-            ["user1@example.com"] = "password1",
-            ["user1@example.com"] = "password2",
-        };
-
         private readonly NavigationService _navigation;
 
         public LoginPageViewModel(NavigationService navigation)
@@ -48,19 +39,24 @@ namespace shift_pick_app.ViewModels
                 ErrorMessage = "ユーザーIDを入力してください。";
                 return;
             }
-            if (Password.Length < PasswordMinLength)
+            if (Password.Length < Const.C_PASSWORD_MIN_LENGTH)
             {
-                ErrorMessage = $"パスワードは{PasswordMinLength}文字以上で入力してください。";
+                ErrorMessage = $"パスワードは{Const.C_PASSWORD_MIN_LENGTH}文字以上で入力してください。";
                 return;
             }
-            if (!DemoAccounts.TryGetValue(userId, out var password) || password != Password)
+            if (!DemoAccounts.IsValid(userId, Password))
             {
                 ErrorMessage = "ユーザーIDまたはパスワードが正しくありません。";
                 return;
             }
 
-            // デモ：ログイン後はパスワードリセット画面へ
-            await _navigation.PushAsync<PasswordReset>();
+            // デモ：password2 はパスワード変更済み扱いでメニューへ、それ以外は初回パスワード変更（ケース1）へ
+            if (Password == "password2")
+            {
+                _navigation.SetRoot<MenuPage>(page => page.SetUser(userId));
+                return;
+            }
+            await _navigation.PushAsync<PasswordReset>(page => page.StartFirstLogin(userId));
         }
 
         /// <summary>

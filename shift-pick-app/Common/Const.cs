@@ -21,5 +21,8 @@ namespace shift_pick_app.Common
         // 権限
         public const int C_AUTHORIZED_KUBUN_WORKER = 3; // 作業者
 
+        // パスワード
+        public const int C_PASSWORD_MIN_LENGTH = 8;
+
     }
 }

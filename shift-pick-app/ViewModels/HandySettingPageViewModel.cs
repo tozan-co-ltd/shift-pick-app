@@ -1,12 +1,17 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using shift_pick_app.Services;
 using shift_pick_app.Themes;
 
 namespace shift_pick_app.ViewModels
 {
     public partial class HandySettingPageViewModel : BaseViewModel
     {
-        public HandySettingPageViewModel()
+        private readonly NavigationService _navigation;
+
+        public HandySettingPageViewModel(NavigationService navigation)
         {
+            _navigation = navigation;
             _selectedThemeIndex = ThemeSwitcher.Current;
         }
 
@@ -32,6 +37,25 @@ namespace shift_pick_app.ViewModels
         {
             if (value >= 0)
                 ThemeSwitcher.Apply(value);
+        }
+
+        /// <summary>
+        /// 戻るボタン押下
+        /// </summary>
+        [RelayCommand]
+        private Task Back()
+        {
+            return _navigation.PopAsync();
+        }
+
+        /// <summary>
+        /// 保存ボタン押下
+        /// </summary>
+        [RelayCommand]
+        private Task Save()
+        {
+            // 保存処理をここに追加
+            return _navigation.PopAsync();
         }
     }
 }

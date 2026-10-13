@@ -4,34 +4,45 @@
              xmlns:vm="clr-namespace:shift_pick_app.ViewModels"
              x:Class="shift_pick_app.Views.HandySettingPage"
              x:DataType="vm:HandySettingPageViewModel"
+             NavigationPage.HasBackButton="False"
              Title="ハンディ設定">
 
     <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="12">
+        <Border Style="{StaticResource Card}" Margin="16" VerticalOptions="Start">
+            <VerticalStackLayout Spacing="8">
+                <!-- 接続先 -->
+                <Label Text="接続先" Style="{StaticResource InputLabel}" />
+                <Border Style="{StaticResource InputBorder}">
+                    <Entry Text="{Binding ApiUrl}"
+                            Keyboard="Url"
+                            IsTextPredictionEnabled="False" />
+                </Border>
 
-            <!-- 接続先 -->
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="接続先" Style="{StaticResource InputLabel}" />
-                    <Border Style="{StaticResource InputBorder}">
-                        <Entry Text="{Binding ApiUrl}"
-                               Keyboard="Url"
-                               IsTextPredictionEnabled="False" />
-                    </Border>
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- テーマ（デモ用） -->
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="テーマ（デモ用）" Style="{StaticResource InputLabel}" />
-                    <Border Style="{StaticResource InputBorder}">
-                        <Picker Title="テーマ"
-                                ItemsSource="{Binding ThemeNames}"
-                                SelectedIndex="{Binding SelectedThemeIndex}" />
-                    </Border>
-                </VerticalStackLayout>
-            </Border>
-        </VerticalStackLayout>
+                <!-- テーマ（デモ用） -->
+                <Label Text="テーマ（デモ用）" Style="{StaticResource InputLabel}" />
+                <Border Style="{StaticResource InputBorder}">
+                    <Picker Title="テーマ"
+                            ItemsSource="{Binding ThemeNames}"
+                            SelectedIndex="{Binding SelectedThemeIndex}" />
+                </Border>
+                    
+                <!-- 戻る / 保存 -->
+                <Grid ColumnDefinitions="*,*" Margin="0,16,0,0" ColumnSpacing="12">
+                    <Button Text="戻る"
+                            Command="{Binding BackCommand}"
+                            BackgroundColor="{DynamicResource SecondaryContainer}"
+                            TextColor="{DynamicResource OnSecondaryContainer}"
+                            FontFamily="MPLUSRounded1cBold"
+                            FontSize="20"
+                            CornerRadius="12" />
+                    <Button Grid.Column="1"
+                            Text="保存"
+                            Command="{Binding SaveCommand}"
+                            FontFamily="MPLUSRounded1cBold"
+                            FontSize="20"
+                            CornerRadius="12" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
     </ScrollView>
 </ContentPage>

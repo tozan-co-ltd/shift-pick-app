@@ -1,5 +1,6 @@
 ﻿using shift_pick_app.Services;
 using Microsoft.Extensions.Logging;
+using shift_pick_app.ViewModels;
 using shift_pick_app.Views;
 
 namespace shift_pick_app
@@ -25,9 +26,15 @@ namespace shift_pick_app
             builder.Logging.AddDebug();
 #endif
             builder.Services.AddSingleton<LocalDbService>();
+            builder.Services.AddSingleton<NavigationService>();
+
             builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<LoginPageViewModel>();
+            builder.Services.AddTransient<PasswordReset>();
             builder.Services.AddTransient<MenuPage>();
             builder.Services.AddTransient<LoadingPage>();
+            builder.Services.AddTransient<HandySettingPage>();
+            builder.Services.AddTransient<HandySettingPageViewModel>();
 
             return builder.Build();
         }

@@ -25,17 +25,18 @@ namespace shift_pick_app
             }
         }
 
-        public App()
+        private readonly IServiceProvider _services;
+
+        public App(IServiceProvider services)
         {
             InitializeComponent();
+            _services = services;
 
             // テーマ適用（端末のLight/Dark変更時も再適用）
             ThemeSwitcher.Apply(0);
             RequestedThemeChanged += (s, e) => ThemeSwitcher.Apply(ThemeSwitcher.Current);
 
-            //MainPage = new AppShell();            
-            MainPage = new LoginPage();
-            // 入力の下線を削除する　
+            // 入力の下線を削除する
             Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
             {
 #if __ANDROID__
@@ -56,6 +57,11 @@ namespace shift_pick_app
                 handler.PlatformView.BackgroundTintList = ColorStateList.ValueOf(Colors.Transparent.ToAndroid());
 #endif
             });
+        }
+
+        protected override Window CreateWindow(IActivationState? activationState)
+        {
+            return new Window(new NavigationPage(_services.GetRequiredService<LoginPage>()));
         }
     }
 }

@@ -1,89 +1,98 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:shift_pick_app.ViewModels"
              x:Class="shift_pick_app.Views.LoginPage"
-             NavigationPage.HasBackButton="False"
-             Shell.NavBarIsVisible="False"
-             NavigationPage.HasNavigationBar="False"
-             Background="#F2F2F2"
+             x:DataType="vm:LoginPageViewModel"
              Title="ログイン">
 
-    <ContentPage.Resources>
-        <!--ラベル:アプリ名-->
-        <Style x:Key="LabelTitleStyle" TargetType="Label">
-            <Setter Property="FontSize" Value="Title" />
-            <Setter Property="FontAttributes" Value="Bold" />
-            <Setter Property="Margin" Value="10" />
-            <Setter Property="TextColor" Value="{StaticResource Key=Secondary}"/>
-        </Style>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="設定" Command="{Binding OpenSettingsCommand}" />
+    </ContentPage.ToolbarItems>
 
-        <Style TargetType="Frame">
-            <Setter Property="HasShadow" Value="False" />
-            <Setter Property="CornerRadius" Value="10" />
-        </Style>
+    <ScrollView>
+        <Border Style="{StaticResource Card}" Margin="16" VerticalOptions="Center">
+            <VerticalStackLayout Spacing="12">
 
-        <Style TargetType="Button">
-            <Setter Property="FontFamily" Value="Rounded Mplus 1c" />
-            <Setter Property="TextColor" Value="{DynamicResource ButtonTextColor}" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="HeightRequest" Value="60" />
-            <Setter Property="VerticalOptions" Value="Center"/>
-            <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
-            <Setter Property="FontSize" Value="Large" />
-        </Style>
-    </ContentPage.Resources>
+                <!-- アプリアイコン -->
+                <Border WidthRequest="120"
+                        HeightRequest="120"
+                        HorizontalOptions="Center"
+                        StrokeShape="RoundRectangle 30"
+                        Stroke="Transparent"
+                        BackgroundColor="{DynamicResource SurfaceContainer}">
+                    <Image Source="appicon.png" />
+                </Border>
 
-    <VerticalStackLayout>
-        <FlexLayout Direction="Row" JustifyContent="SpaceBetween" AlignItems="Center" Margin="0,0,0,10"  BackgroundColor="#000" HeightRequest="60" >
-            <Label Text="ログイン" TextColor="#fff" FontSize="22" FontAttributes="Bold" Margin="6, 0, 0, 0"/>
-            <Button Visual="Material"  Text="設定" BackgroundColor="Transparent" TextColor="#fff" VerticalOptions="StartAndExpand" FontAttributes="Bold" Clicked="OnSettingClicked">
-                <Button.ImageSource>
-                    <FontImageSource FontFamily="FontAwesome6Solid" Glyph="&#xf013;" Color="#fff" Size="Large" />
-                </Button.ImageSource>
-            </Button>
-        </FlexLayout>
+                <!-- アプリ名 + 説明 -->
+                <Label Text="ShiftPick"
+                       FontFamily="MPLUSRounded1cBold"
+                       FontSize="26"
+                       TextColor="{DynamicResource Primary}"
+                       HorizontalOptions="Center" />
+                <Label Text="湘南プラス利用アプリ"
+                       FontSize="16"
+                       TextColor="{DynamicResource Primary}"
+                       HorizontalOptions="Center"
+                       Margin="0,0,0,8" />
 
-        <StackLayout x:Name="loginContent" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
-            <ScrollView>
-                <Frame  BackgroundColor="#fff" CornerRadius="10" Margin="10, 0, 10, 0" Padding="20, 7, 20, 15">
-                    <StackLayout>
-                        <Frame WidthRequest="120" CornerRadius="30" HeightRequest="120" Padding="0" BackgroundColor="#E6E7EE">
-                            <Image Source="appicon.png" />
-                        </Frame>
-                        
-                        <StackLayout VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
-                            <Label Text="ShiftPick" FontSize="26" TextColor="#FD5A00" FontAttributes="Bold" HorizontalOptions="Center" />
-                            <Label Text ="湘南プラス利用アプリ"  FontSize="16" TextColor="#FD620B" HorizontalOptions="Center" Margin="0, 10, 0, 0"/>
-                            <!--<Label x:Name="appVersion" FontSize="22" Margin="0, 5, 0, 0" HorizontalOptions="Center"/>-->
-                        </StackLayout>
+                <!-- ユーザーID -->
+                <Border Style="{StaticResource InputBorder}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Label Text="&#xf007;"
+                               FontFamily="FontAwesome6Solid"
+                               FontSize="20"
+                               TextColor="{DynamicResource OnSurfaceVariant}"
+                               VerticalOptions="Center" />
+                        <Entry Grid.Column="1"
+                               Text="{Binding UserId}"
+                               Keyboard="Email"
+                               Placeholder="ユーザーID"
+                               IsTextPredictionEnabled="False"
+                               FontSize="20" />
+                    </Grid>
+                </Border>
 
-                        <StackLayout Spacing="2" VerticalOptions="End"  Margin="0, 10, 0, 0">
-                            <Label Text="ユーザーID" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start"  Margin="0,10,0,0" FontSize="20"/>
-                            <Frame Padding="10,0,10,0" CornerRadius="10" BackgroundColor="#f2f2f2" Margin="0,0,0,5">
-                                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal" VerticalOptions="CenterAndExpand">
-                                    <Entry x:Name="txtLoginId" FontSize="26" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Center" HorizontalOptions="FillAndExpand" IsTextPredictionEnabled="False"/>
-                                </StackLayout>
-                            </Frame>
-                            <Label Text="パスワード" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Start"  Margin="0,10,0,0" FontSize="20"/>
-                            <Frame Padding="10,0,10,0" CornerRadius="10" BackgroundColor="#f2f2f2" Margin="0,0,0,5">
-                                <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal" VerticalOptions="CenterAndExpand">
-                                    <Entry x:Name="txtPassword" FontSize="26" VerticalOptions="CenterAndExpand" HorizontalTextAlignment="Center" HorizontalOptions="FillAndExpand" IsTextPredictionEnabled="False"/>
-                                </StackLayout>
-                            </Frame>
-                            <Label x:Name="loginError" FontSize="14" TextColor="Red" HorizontalOptions="Center" Margin="0,0,0,5"/>
-                            <StackLayout Spacing="20" Margin="0, 0, 0, 5">
-                                <StackLayout>
-                                    <Button Visual="Material" Text="ログイン"  BackgroundColor="#FD5A00" Clicked="OnLoginClicked" FontSize="28" FontAttributes="Bold"/>
-                                </StackLayout>
-                            </StackLayout>
-                        </StackLayout>
-                        <StackLayout VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
-                            <Label Text ="パスワードをお忘れの場合はこちら"  FontSize="16" TextColor="#FD620B" HorizontalOptions="Center" Margin="0, 10, 0, 0"/>
-                        </StackLayout>
-                    </StackLayout>
-                </Frame>
-            </ScrollView>
-        </StackLayout>
-    </VerticalStackLayout>
+                <!-- パスワード -->
+                <Border Style="{StaticResource InputBorder}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Label Text="&#xf023;"
+                               FontFamily="FontAwesome6Solid"
+                               FontSize="20"
+                               TextColor="{DynamicResource OnSurfaceVariant}"
+                               VerticalOptions="Center" />
+                        <Entry Grid.Column="1"
+                               Text="{Binding Password}"
+                               IsPassword="True"
+                               Placeholder="パスワード"
+                               FontSize="20" />
+                    </Grid>
+                </Border>
 
+                <!-- エラーメッセージ -->
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="{DynamicResource Error}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+
+                <!-- ログイン -->
+                <Button Text="ログイン"
+                        Command="{Binding LoginCommand}"
+                        FontFamily="MPLUSRounded1cBold"
+                        FontSize="24"
+                        CornerRadius="12" />
+
+                <!-- パスワードリセット -->
+                <Label Text="パスワードをお忘れの場合はこちら"
+                       TextColor="{DynamicResource Primary}"
+                       TextDecorations="Underline"
+                       HorizontalOptions="Center"
+                       Padding="0,12">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </VerticalStackLayout>
+        </Border>
+    </ScrollView>
 </ContentPage>

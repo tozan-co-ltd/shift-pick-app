@@ -1,4 +1,5 @@
 ﻿using shift_pick_app.Common;
+using shift_pick_app.Themes;
 using shift_pick_app.Views;
 #if __ANDROID__
 using Android.Content.Res;
@@ -27,6 +28,10 @@ namespace shift_pick_app
         public App()
         {
             InitializeComponent();
+
+            // テーマ適用（端末のLight/Dark変更時も再適用）
+            ThemeSwitcher.Apply(0);
+            RequestedThemeChanged += (s, e) => ThemeSwitcher.Apply(ThemeSwitcher.Current);
 
             //MainPage = new AppShell();            
             MainPage = new LoginPage();

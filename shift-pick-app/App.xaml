@@ -9,10 +9,6 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="NavigationPage">
-                <Setter Property="BarBackgroundColor" Value="#000"/>
-                <Setter Property="BarTextColor" Value="#fff" />
-            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

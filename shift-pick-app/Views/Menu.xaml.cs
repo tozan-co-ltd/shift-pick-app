@@ -261,7 +261,8 @@ public partial class MenuPage : FlyoutPage
         // ログイン画面表示
         Application.Current.MainPage = new LoadingPage();
         await Task.Delay(200);
-        Application.Current.MainPage = new LoginPage();
+        // TODO: SW003で書き直す（暫定）
+        Application.Current.MainPage = new NavigationPage(IPlatformApplication.Current!.Services.GetRequiredService<LoginPage>());
     }
 
     private void OnReserveClicked(object sender, TappedEventArgs e)

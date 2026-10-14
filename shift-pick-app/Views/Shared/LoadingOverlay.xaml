@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    読み込み中のオーバーレイ（画面全体を覆い、タップを遮る）
+    使い方：画面のルート Grid の最後の子に置き、IsVisible を ViewModel の IsBusy にバインドする
+    例：   <shared:LoadingOverlay IsVisible="{Binding IsBusy}" />
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="shift_pick_app.Views.Shared.LoadingOverlay"
+             IsVisible="False">
+    <Grid>
+        <BoxView Color="{DynamicResource Scrim}" Opacity="0.32" />
+        <ActivityIndicator IsRunning="True"
+                           Color="{DynamicResource Primary}"
+                           WidthRequest="48"
+                           HeightRequest="48"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+    </Grid>
+</ContentView>

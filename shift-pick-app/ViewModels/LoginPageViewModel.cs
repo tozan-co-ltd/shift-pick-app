@@ -50,8 +50,8 @@ namespace shift_pick_app.ViewModels
                 return;
             }
 
-            // デモ：password2 はパスワード変更済み扱いでメニューへ、それ以外は初回パスワード変更（ケース1）へ
-            if (Password == "password2")
+            // デモ：22222222 はパスワード変更済み扱いでメニューへ、それ以外は初回パスワード変更（ケース1）へ
+            if (Password == "22222222")
             {
                 _navigation.SetRoot<MenuPage>(page => page.SetUser(userId));
                 return;

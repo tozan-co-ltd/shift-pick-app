@@ -7,10 +7,8 @@ namespace shift_pick_app.Models
     {
         private static readonly (string UserId, string Password)[] Accounts =
         [
-            ("user@example.com", "password1"),
-            ("user@example.com", "password2"),
-            ("user1@example.com", "password1"),
-            ("user1@example.com", "password2"),
+            ("user@example.com", "11111111"),
+            ("user@example.com", "22222222")
         ];
 
         public static bool Exists(string userId)

@@ -3,6 +3,7 @@
             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
             xmlns:vm="clr-namespace:shift_pick_app.ViewModels"
             xmlns:models="clr-namespace:shift_pick_app.Models"
+            xmlns:shared="clr-namespace:shift_pick_app.Views.Shared"
             x:Class="shift_pick_app.Views.MenuPage"
             x:DataType="vm:MenuPageViewModel"
             Title="メニュー">
@@ -30,91 +31,96 @@
         <NavigationPage>
             <x:Arguments>
                 <ContentPage Title="メニュー" x:DataType="vm:MenuPageViewModel">
-                    <ScrollView>
-                        <VerticalStackLayout Spacing="12">
+                    <Grid>
+                        <ScrollView>
+                            <VerticalStackLayout Spacing="12">
 
-                            <!-- ユーザーID + 予約状況 + ニュース -->
-                            <Border Style="{StaticResource Card}" Margin="12,12,12,0">
-                                <VerticalStackLayout Spacing="8">
-                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                                        <Label Text="ユーザーID"
-                                               Style="{StaticResource InputLabel}"
-                                               VerticalOptions="Center" />
-                                        <Label Grid.Column="1"
-                                               Text="{Binding UserId}"
-                                               FontSize="16"
-                                               VerticalOptions="Center" />
-                                    </Grid>
-
-                                    <VerticalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding QuickStatus}">
-                                        <BindableLayout.ItemTemplate>
-                                            <DataTemplate x:DataType="models:QuickStatusItem">
-                                                <HorizontalStackLayout Spacing="30">
-                                                    <!-- 幅を揃えて件数の位置を合わせる（「NG」は2文字より狭い） -->
-                                                    <Label Text="{Binding Label}" FontSize="14" MinimumWidthRequest="40" />
-                                                    <Label Text="{Binding Count, StringFormat='{0} 件'}" FontSize="14" />
-                                                </HorizontalStackLayout>
-                                            </DataTemplate>
-                                        </BindableLayout.ItemTemplate>
-                                    </VerticalStackLayout>
-
-                                    <Label Text="詳細は予約状況画面で確認をしてください。" FontSize="14" />
-
-                                    <!-- ニュース（高さ固定、中身はスクロール） -->
-                                    <Border HeightRequest="72"
-                                            Padding="12,8"
-                                            Stroke="Transparent"
-                                            StrokeShape="RoundRectangle 10"
-                                            BackgroundColor="{DynamicResource SecondaryContainer}">
-                                        <ScrollView>
-                                            <VerticalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding News}">
-                                                <BindableLayout.ItemTemplate>
-                                                    <DataTemplate x:DataType="x:String">
-                                                        <Label Text="{Binding .}"
-                                                               FontSize="14"
-                                                               TextColor="{DynamicResource OnSecondaryContainer}" />
-                                                    </DataTemplate>
-                                                </BindableLayout.ItemTemplate>
-                                            </VerticalStackLayout>
-                                        </ScrollView>
-                                    </Border>
-                                </VerticalStackLayout>
-                            </Border>
-
-                            <!-- 機能メニュー（全幅）：背景色が Spacing="1" の隙間から見えて区切り線になる -->
-                            <VerticalStackLayout Spacing="1"
-                                                 BackgroundColor="{DynamicResource OutlineVariant}"
-                                                 BindableLayout.ItemsSource="{Binding MenuItems}">
-                                <BindableLayout.ItemTemplate>
-                                    <DataTemplate x:DataType="models:MainMenuItem">
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <!-- 背面のボタン：タップ時のリップル表示用 -->
-                                            <Button Grid.ColumnSpan="2"
-                                                    BackgroundColor="{DynamicResource SurfaceContainerLowest}"
-                                                    CornerRadius="0"
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MenuPageViewModel}}, Path=OpenMenuCommand, x:DataType=vm:MenuPageViewModel}"
-                                                    CommandParameter="{Binding .}" />
-                                            <Label Text="{Binding Title}"
-                                                   InputTransparent="True"
-                                                   Margin="20,16"
-                                                   FontFamily="MPLUSRounded1cBold"
-                                                   FontSize="24"
-                                                   TextColor="{DynamicResource Primary}"
+                                <!-- ユーザーID + 予約状況 + ニュース -->
+                                <Border Style="{StaticResource Card}" Margin="12,12,12,0">
+                                    <VerticalStackLayout Spacing="8">
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                            <Label Text="ユーザーID"
+                                                   Style="{StaticResource InputLabel}"
                                                    VerticalOptions="Center" />
                                             <Label Grid.Column="1"
-                                                   Text="&#xf054;"
-                                                   InputTransparent="True"
-                                                   Margin="0,0,20,0"
-                                                   FontFamily="FontAwesome6Solid"
-                                                   FontSize="18"
-                                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                                   Text="{Binding UserId}"
+                                                   FontSize="16"
                                                    VerticalOptions="Center" />
                                         </Grid>
-                                    </DataTemplate>
-                                </BindableLayout.ItemTemplate>
+
+                                        <VerticalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding QuickStatus}">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="models:QuickStatusItem">
+                                                    <HorizontalStackLayout Spacing="30">
+                                                        <!-- 幅を揃えて件数の位置を合わせる（「NG」は2文字より狭い） -->
+                                                        <Label Text="{Binding Label}" FontSize="14" MinimumWidthRequest="40" />
+                                                        <Label Text="{Binding Count, StringFormat='{0} 件'}" FontSize="14" />
+                                                    </HorizontalStackLayout>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </VerticalStackLayout>
+
+                                        <Label Text="詳細は予約状況画面で確認をしてください。" FontSize="14" />
+
+                                        <!-- ニュース（高さ固定、中身はスクロール） -->
+                                        <Border HeightRequest="72"
+                                                Padding="12,8"
+                                                Stroke="Transparent"
+                                                StrokeShape="RoundRectangle 10"
+                                                BackgroundColor="{DynamicResource SecondaryContainer}">
+                                            <ScrollView>
+                                                <VerticalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding News}">
+                                                    <BindableLayout.ItemTemplate>
+                                                        <DataTemplate x:DataType="x:String">
+                                                            <Label Text="{Binding .}"
+                                                                   FontSize="14"
+                                                                   TextColor="{DynamicResource OnSecondaryContainer}" />
+                                                        </DataTemplate>
+                                                    </BindableLayout.ItemTemplate>
+                                                </VerticalStackLayout>
+                                            </ScrollView>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <!-- 機能メニュー（全幅）：背景色が Spacing="1" の隙間から見えて区切り線になる -->
+                                <VerticalStackLayout Spacing="1"
+                                                     BackgroundColor="{DynamicResource OutlineVariant}"
+                                                     BindableLayout.ItemsSource="{Binding MenuItems}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="models:MainMenuItem">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <!-- 背面のボタン：タップ時のリップル表示用 -->
+                                                <Button Grid.ColumnSpan="2"
+                                                        BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                                                        CornerRadius="0"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MenuPageViewModel}}, Path=OpenMenuCommand, x:DataType=vm:MenuPageViewModel}"
+                                                        CommandParameter="{Binding .}" />
+                                                <Label Text="{Binding Title}"
+                                                       InputTransparent="True"
+                                                       Margin="20,16"
+                                                       FontFamily="MPLUSRounded1cBold"
+                                                       FontSize="24"
+                                                       TextColor="{DynamicResource Primary}"
+                                                       VerticalOptions="Center" />
+                                                <Label Grid.Column="1"
+                                                       Text="&#xf054;"
+                                                       InputTransparent="True"
+                                                       Margin="0,0,20,0"
+                                                       FontFamily="FontAwesome6Solid"
+                                                       FontSize="18"
+                                                       TextColor="{DynamicResource OnSurfaceVariant}"
+                                                       VerticalOptions="Center" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
                             </VerticalStackLayout>
-                        </VerticalStackLayout>
-                    </ScrollView>
+                        </ScrollView>
+
+                        <!-- 画面遷移中のオーバーレイ -->
+                        <shared:LoadingOverlay IsVisible="{Binding IsBusy}" />
+                    </Grid>
                 </ContentPage>
             </x:Arguments>
         </NavigationPage>

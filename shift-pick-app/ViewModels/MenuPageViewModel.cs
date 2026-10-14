@@ -47,9 +47,30 @@ namespace shift_pick_app.ViewModels
         /// メニュー項目押下
         /// </summary>
         [RelayCommand]
-        private void OpenMenu(MainMenuItem item)
+        private async Task OpenMenu(MainMenuItem item)
         {
-            // TODO: SW004 / SW006 / SW007 / SW008 の画面作成後に遷移を追加
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+            try
+            {
+                // 画面生成は UI スレッドを止めるため、先にオーバーレイを描画させる
+                await Task.Delay(50);
+
+                await (item.Title switch
+                {
+                    "予約登録" => _navigation.PushAsync<Yoyaku>(page => page.SetUser(UserId)),
+                    "予約状況" => _navigation.PushAsync<YoyakuList>(),
+                    "勤務可能日登録" => _navigation.PushAsync<KinmuKanouDay>(),
+                    "希望事業所登録" => _navigation.PushAsync<KibouJigyousho>(),
+                    _ => Task.CompletedTask,
+                });
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         /// <summary>

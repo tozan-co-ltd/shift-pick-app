@@ -2,15 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net9.0-android</TargetFrameworks>
-		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-		<!-- <TargetFrameworks>$(TargetFrameworks);net9.0-tizen</TargetFrameworks> -->
-
-		<!-- Note for MacCatalyst:
-		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
-		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
-		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
-		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
-		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>shift_pick_app</RootNamespace>
@@ -19,13 +10,13 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
-		<!-- Display name -->
+		<!-- アプリ名 -->
 		<ApplicationTitle>スマ検</ApplicationTitle>
 
-		<!-- App Identifier -->
+		<!-- アプリ識別子 -->
 		<ApplicationId>jp.co.tozan.shift_pick_app</ApplicationId>
 
-		<!-- Versions -->
+		<!-- バージョン -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 		
@@ -37,19 +28,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- App Icon -->
+		<!-- アプリアイコン -->
 		<MauiIcon Include="Resources\AppIcon\appicon.png" />
 		
-		<!-- Splash Screen -->
+		<!-- スプラッシュスクリーン -->
 		<MauiSplashScreen Include="Resources\Splash\appicon.png" Color="#FFF" BaseSize="256,256" />
 
-		<!-- Images -->
+		<!-- 画像 -->
 		<MauiImage Include="Resources\Images\*" />
 
-		<!-- Custom Fonts -->
+		<!-- カスタムフォント -->
 		<MauiFont Include="Resources\Fonts\*" />
 
-		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<!-- Raw アセット（"Resources\Raw\" を除いたパスで参照） -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 

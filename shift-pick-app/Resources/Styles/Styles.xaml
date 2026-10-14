@@ -46,13 +46,14 @@
         <Setter Property="BackgroundColor" Value="{DynamicResource OutlineVariant}" />
     </Style>
 
-    <Style TargetType="Button">
+    <!-- 主ボタン。下の暗黙スタイルで全 Button の既定になる。補助ボタンは SecondaryButton -->
+    <Style TargetType="Button" x:Key="PrimaryButton">
         <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
         <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
-        <Setter Property="FontFamily" Value="MPLUSRounded1cRegular"/>
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontFamily" Value="MPLUSRounded1cBold"/>
+        <Setter Property="FontSize" Value="18"/>
         <Setter Property="BorderWidth" Value="0"/>
-        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="CornerRadius" Value="12"/>
         <Setter Property="Padding" Value="14,10"/>
         <Setter Property="MinimumHeightRequest" Value="44"/>
         <Setter Property="MinimumWidthRequest" Value="44"/>
@@ -70,6 +71,14 @@
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>
+    </Style>
+
+    <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}" />
+
+    <!-- 補助ボタン（戻る など） -->
+    <Style TargetType="Button" x:Key="SecondaryButton" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="TextColor" Value="{DynamicResource OnSecondaryContainer}" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource SecondaryContainer}" />
     </Style>
 
     <Style TargetType="CheckBox">
@@ -137,7 +146,7 @@
         <Setter Property="TextColor" Value="{DynamicResource OnSurface}" />
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="FontFamily" Value="MPLUSRounded1cRegular"/>
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="16" />
         <Setter Property="PlaceholderColor" Value="{DynamicResource OnSurfaceVariant}" />
         <Setter Property="MinimumHeightRequest" Value="44"/>
         <Setter Property="MinimumWidthRequest" Value="44"/>
@@ -153,12 +162,6 @@
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>
-    </Style>
-
-    <Style TargetType="Frame">
-        <Setter Property="HasShadow" Value="False" />
-        <Setter Property="BorderColor" Value="{DynamicResource OutlineVariant}" />
-        <Setter Property="CornerRadius" Value="8" />
     </Style>
 
     <Style TargetType="ImageButton">
@@ -204,25 +207,6 @@
 
     <Style TargetType="Span">
         <Setter Property="TextColor" Value="{DynamicResource OnSurface}" />
-    </Style>
-
-    <Style TargetType="Label" x:Key="Headline">
-        <Setter Property="TextColor" Value="{DynamicResource OnSurface}" />
-        <Setter Property="FontSize" Value="32" />
-        <Setter Property="HorizontalOptions" Value="Center" />
-        <Setter Property="HorizontalTextAlignment" Value="Center" />
-    </Style>
-
-    <Style TargetType="Label" x:Key="SubHeadline">
-        <Setter Property="TextColor" Value="{DynamicResource OnSurface}" />
-        <Setter Property="FontSize" Value="24" />
-        <Setter Property="HorizontalOptions" Value="Center" />
-        <Setter Property="HorizontalTextAlignment" Value="Center" />
-    </Style>
-
-    <Style TargetType="ListView">
-        <Setter Property="SeparatorColor" Value="{DynamicResource Outline}" />
-        <Setter Property="RefreshControlColor" Value="{DynamicResource Primary}" />
     </Style>
 
     <Style TargetType="Picker">
@@ -313,34 +297,6 @@
         </Setter>
     </Style>
 
-    <Style TargetType="SearchHandler">
-        <Setter Property="TextColor" Value="{DynamicResource OnSurface}" />
-        <Setter Property="PlaceholderColor" Value="{DynamicResource OnSurfaceVariant}" />
-        <Setter Property="BackgroundColor" Value="Transparent" />
-        <Setter Property="FontFamily" Value="MPLUSRounded1cRegular" />
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroupList>
-                <VisualStateGroup x:Name="CommonStates">
-                    <VisualState x:Name="Normal" />
-                    <VisualState x:Name="Disabled">
-                        <VisualState.Setters>
-                            <Setter Property="TextColor" Value="{DynamicResource Outline}" />
-                            <Setter Property="PlaceholderColor" Value="{DynamicResource Outline}" />
-                        </VisualState.Setters>
-                    </VisualState>
-                </VisualStateGroup>
-            </VisualStateGroupList>
-        </Setter>
-    </Style>
-
-    <Style TargetType="Shadow">
-        <Setter Property="Radius" Value="15" />
-        <Setter Property="Opacity" Value="0.5" />
-        <Setter Property="Brush" Value="White" />
-        <Setter Property="Offset" Value="10,10" />
-    </Style>
-
     <Style TargetType="Slider">
         <Setter Property="MinimumTrackColor" Value="{DynamicResource Primary}" />
         <Setter Property="MaximumTrackColor" Value="{DynamicResource Outline}" />
@@ -420,30 +376,10 @@
         <Setter Property="BackgroundColor" Value="{DynamicResource Background}" />
     </Style>
 
-    <Style TargetType="Shell" ApplyToDerivedTypes="True">
-        <Setter Property="Shell.BackgroundColor" Value="{DynamicResource Primary}" />
-        <Setter Property="Shell.ForegroundColor" Value="{DynamicResource OnPrimary}" />
-        <Setter Property="Shell.TitleColor" Value="{DynamicResource OnPrimary}" />
-        <Setter Property="Shell.DisabledColor" Value="{DynamicResource Outline}" />
-        <Setter Property="Shell.UnselectedColor" Value="{DynamicResource OnPrimary}" />
-        <Setter Property="Shell.NavBarHasShadow" Value="False" />
-        <Setter Property="Shell.TabBarBackgroundColor" Value="{DynamicResource Surface}" />
-        <Setter Property="Shell.TabBarForegroundColor" Value="{DynamicResource Primary}" />
-        <Setter Property="Shell.TabBarTitleColor" Value="{DynamicResource Primary}" />
-        <Setter Property="Shell.TabBarUnselectedColor" Value="{DynamicResource OnSurfaceVariant}" />
-    </Style>
-
     <Style TargetType="NavigationPage">
         <Setter Property="BarBackgroundColor" Value="{DynamicResource Primary}" />
         <Setter Property="BarTextColor" Value="{DynamicResource OnPrimary}" />
         <Setter Property="IconColor" Value="{DynamicResource OnPrimary}" />
-    </Style>
-
-    <Style TargetType="TabbedPage">
-        <Setter Property="BarBackgroundColor" Value="{DynamicResource Surface}" />
-        <Setter Property="BarTextColor" Value="{DynamicResource Primary}" />
-        <Setter Property="UnselectedTabColor" Value="{DynamicResource OnSurfaceVariant}" />
-        <Setter Property="SelectedTabColor" Value="{DynamicResource Primary}" />
     </Style>
 
 </ResourceDictionary>

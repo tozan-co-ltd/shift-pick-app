@@ -78,9 +78,7 @@
                 <!-- ログイン -->
                 <Button Text="ログイン"
                         Command="{Binding LoginCommand}"
-                        FontFamily="MPLUSRounded1cBold"
-                        FontSize="24"
-                        CornerRadius="12" />
+                        FontSize="24" />
 
                 <!-- パスワードリセット -->
                 <Label Text="パスワードをお忘れの場合はこちら"

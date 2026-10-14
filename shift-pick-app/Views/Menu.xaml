@@ -16,15 +16,12 @@
                        FontSize="26"
                        TextColor="{DynamicResource Primary}" />
                 <Label Text="Shift Pick App"
-                       FontFamily="MPLUSRounded1c"
+                       FontFamily="MPLUSRounded1cRegular"
                        FontSize="20"
                        Margin="0,0,0,12"
                        TextColor="{DynamicResource Primary}" />
                 <Button Text="ログアウト"
-                        Command="{Binding LogoutCommand}"
-                        FontFamily="MPLUSRounded1cBold"
-                        FontSize="18"
-                        CornerRadius="12" />
+                        Command="{Binding LogoutCommand}" />
             </VerticalStackLayout>
         </ContentPage>
     </FlyoutPage.Flyout>

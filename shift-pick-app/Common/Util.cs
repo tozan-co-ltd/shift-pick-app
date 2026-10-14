@@ -127,6 +127,15 @@ namespace shift_pick_app.Common
                 return (false, DateTime.Now);
             }
         }
+
+        /// <summary>
+        /// 日付を「（曜日）日」形式にする。例：（月）1
+        /// 端末の言語設定に関係なく曜日を漢字にするため ja-JP を指定する
+        /// </summary>
+        public static string ToJapaneseDay(DateTime date)
+        {
+            return date.ToString("（ddd）d", new CultureInfo("ja-JP"));
+        }
     }
 }
 

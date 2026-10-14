@@ -9,7 +9,7 @@ namespace shift_pick_app.Common
         /// </summary>
         /// <param name="sound">string</param>
         public static async void PlaySound(string sound) {
-            var audioPlayer = AudioManager.Current.CreatePlayer(await FileSystem.OpenAppPackageFileAsync(sound));
+            var audioPlayer = AudioManager.Current.CreatePlayer(await Util.OpenSoundAsync(sound));
 
             audioPlayer.Play();
         }

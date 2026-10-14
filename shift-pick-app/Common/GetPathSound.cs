@@ -13,16 +13,12 @@ namespace shift_pick_app.Common
         public static async Task<string> GetPathOkSoundAsync(LocalDbService _dbService, HandySettingModel.HandySetting handySetting)
         {
             var scanAndSoundList = await _dbService.GetSetting();
-            string okSoundNumber = string.Empty;
+            // 設定がない場合は1番目のサウンド
+            string okSoundNumber = "1";
             if (scanAndSoundList.Count > 0)
             {
                 handySetting = scanAndSoundList.Last();
                 okSoundNumber = new string(handySetting.ScanOkSound.Where(char.IsDigit).ToArray());
-            }
-            else
-            {
-                SoundModel sound = new SoundModel();
-                okSoundNumber = sound.SoundOkeyList.FirstOrDefault().Number.ToString();
             }
 
             // get path of sound
@@ -39,16 +35,12 @@ namespace shift_pick_app.Common
         public static async Task<string> GetPathErrorSoundAsync(LocalDbService _dbService, HandySettingModel.HandySetting handySetting)
         {
             var scanAndSoundList = await _dbService.GetSetting();
-            string errorSoundNumber = string.Empty;
+            // 設定がない場合は1番目のサウンド
+            string errorSoundNumber = "1";
             if (scanAndSoundList.Count > 0)
             {
                 handySetting = scanAndSoundList.Last();
                 errorSoundNumber = new string(handySetting.ScanErrorSound.Where(char.IsDigit).ToArray());
-            }
-            else
-            {
-                SoundModel sound = new SoundModel();
-                errorSoundNumber = sound.SoundErrorList.FirstOrDefault().Number.ToString();
             }
 
             // get path of sound

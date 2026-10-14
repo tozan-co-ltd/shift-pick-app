@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -14,12 +13,13 @@ namespace shift_pick_app.Common
         // 共通関数
         // 参考：https://gist.github.com/Buravo46/49c34e77ff1a75177340
 
-        public static Stream GetStreamFromFile(string filename)
+        /// <summary>
+        /// サウンドファイル（Resources\Raw 配下の MauiAsset）を開く
+        /// </summary>
+        /// <param name="path">Resources\Raw からの相対パス。例：ScanOkeySound/ScanOkeySound1.mp3</param>
+        public static Task<Stream> OpenSoundAsync(string path)
         {
-            var assembly = typeof(App).GetTypeInfo().Assembly;
-            // ビルドアクションで埋め込みリソースにしたファイルを取ってくる
-            var stream = assembly.GetManifestResourceStream(filename);
-            return stream;
+            return FileSystem.OpenAppPackageFileAsync(path);
         }
 
         public static string AddCompanyPath(string url, int companyID)

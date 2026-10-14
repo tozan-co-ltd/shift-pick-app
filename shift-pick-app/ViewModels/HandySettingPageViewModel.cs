@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using shift_pick_app.Services;
-using shift_pick_app.Themes;
 
 namespace shift_pick_app.ViewModels
 {
@@ -12,10 +11,7 @@ namespace shift_pick_app.ViewModels
         public HandySettingPageViewModel(NavigationService navigation)
         {
             _navigation = navigation;
-            _selectedThemeIndex = ThemeSwitcher.Current;
         }
-
-        public string[] ThemeNames => ThemeSwitcher.Names;
 
         /// <summary>
         /// 接続先
@@ -26,18 +22,6 @@ namespace shift_pick_app.ViewModels
 #else
         private string _apiUrl = "https://www.tozan.co.jp/sumaken-api-MRq2xg5/api/";
 #endif
-
-        /// <summary>
-        /// テーマ（デモ用）
-        /// </summary>
-        [ObservableProperty]
-        private int _selectedThemeIndex;
-
-        partial void OnSelectedThemeIndexChanged(int value)
-        {
-            if (value >= 0)
-                ThemeSwitcher.Apply(value);
-        }
 
         /// <summary>
         /// 戻るボタン押下

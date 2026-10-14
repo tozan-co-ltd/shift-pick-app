@@ -33,8 +33,8 @@ namespace shift_pick_app
             _services = services;
 
             // テーマ適用（端末のLight/Dark変更時も再適用）
-            ThemeSwitcher.Apply(0);
-            RequestedThemeChanged += (s, e) => ThemeSwitcher.Apply(ThemeSwitcher.Current);
+            ApplyTheme();
+            RequestedThemeChanged += (s, e) => ApplyTheme();
 
             // 入力の下線を削除する
             Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
@@ -57,6 +57,21 @@ namespace shift_pick_app
                 handler.PlatformView.BackgroundTintList = ColorStateList.ValueOf(Colors.Transparent.ToAndroid());
 #endif
             });
+        }
+
+        private ResourceDictionary? _theme;
+
+        /// <summary>
+        /// 端末のLight/Dark設定に合わせてテーマの色を差し替える
+        /// </summary>
+        private void ApplyTheme()
+        {
+            ResourceDictionary theme = RequestedTheme == AppTheme.Dark ? new DarkTheme() : new LightTheme();
+
+            if (_theme != null)
+                Resources.MergedDictionaries.Remove(_theme);
+            Resources.MergedDictionaries.Add(theme);
+            _theme = theme;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

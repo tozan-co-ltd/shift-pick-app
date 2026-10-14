@@ -1,63 +1,71 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                    x:Class="shift_pick_app.Themes.Theme1Light">
+                    x:Class="shift_pick_app.Themes.DarkTheme">
     <!-- メインカラー。主要ボタンや主要な操作 -->
-    <Color x:Key="Primary">#00245B</Color>
+    <Color x:Key="Primary">#AFC6FF</Color>
     <!-- Primary上の文字・アイコン -->
-    <Color x:Key="OnPrimary">#FFFFFF</Color>
+    <Color x:Key="OnPrimary">#002D6D</Color>
     <!-- Primaryの淡い背景。選択中の項目や強調カード -->
     <Color x:Key="PrimaryContainer">#003986</Color>
     <!-- PrimaryContainer上の文字・アイコン -->
     <Color x:Key="OnPrimaryContainer">#82A6F9</Color>
     <!-- 補助アクセント。サブボタンやフィルター -->
-    <Color x:Key="Secondary">#515E7E</Color>
+    <Color x:Key="Secondary">#B9C6EB</Color>
     <!-- Secondary上の文字・アイコン -->
-    <Color x:Key="OnSecondary">#FFFFFF</Color>
+    <Color x:Key="OnSecondary">#23304D</Color>
     <!-- 補助的な背景。チップやナビゲーションの選択状態 -->
-    <Color x:Key="SecondaryContainer">#CCD9FF</Color>
+    <Color x:Key="SecondaryContainer">#394665</Color>
     <!-- SecondaryContainer上の文字・アイコン -->
-    <Color x:Key="OnSecondaryContainer">#525F7F</Color>
+    <Color x:Key="OnSecondaryContainer">#A8B5D9</Color>
     <!-- 対比アクセント。補足情報やバッジ -->
-    <Color x:Key="Tertiary">#006481</Color>
+    <Color x:Key="Tertiary">#69D3FF</Color>
     <!-- Tertiary上の文字・アイコン -->
-    <Color x:Key="OnTertiary">#FFFFFF</Color>
+    <Color x:Key="OnTertiary">#003546</Color>
     <!-- Tertiaryの淡い背景。補足情報のカード -->
-    <Color x:Key="TertiaryContainer">#007EA2</Color>
+    <Color x:Key="TertiaryContainer">#199CC6</Color>
     <!-- TertiaryContainer上の文字・アイコン -->
-    <Color x:Key="OnTertiaryContainer">#FBFDFF</Color>
+    <Color x:Key="OnTertiaryContainer">#002735</Color>
+    <!-- 成功の表示（確定など）。文字・アイコン・塗りボタン -->
+    <Color x:Key="Success">#76DAA2</Color>
+    <!-- Success上の文字・アイコン -->
+    <Color x:Key="OnSuccess">#003920</Color>
+    <!-- 成功のステータスチップやカードの淡い背景 -->
+    <Color x:Key="SuccessContainer">#005231</Color>
+    <!-- SuccessContainer上の文字・アイコン -->
+    <Color x:Key="OnSuccessContainer">#C4ECD0</Color>
     <!-- エラーの文字・アイコン・枠線 -->
-    <Color x:Key="Error">#BA1A1A</Color>
+    <Color x:Key="Error">#FFB4AB</Color>
     <!-- Error上の文字・アイコン -->
-    <Color x:Key="OnError">#FFFFFF</Color>
+    <Color x:Key="OnError">#690005</Color>
     <!-- エラーメッセージの背景 -->
-    <Color x:Key="ErrorContainer">#FFDAD6</Color>
+    <Color x:Key="ErrorContainer">#93000A</Color>
     <!-- ErrorContainer上の文字・アイコン -->
-    <Color x:Key="OnErrorContainer">#93000A</Color>
+    <Color x:Key="OnErrorContainer">#FFDAD6</Color>
     <!-- 画面全体の背景 -->
-    <Color x:Key="Background">#FAF8FF</Color>
+    <Color x:Key="Background">#121318</Color>
     <!-- Background上の本文文字 -->
-    <Color x:Key="OnBackground">#1A1B21</Color>
+    <Color x:Key="OnBackground">#E2E2E9</Color>
     <!-- カードやシートなど面の背景 -->
-    <Color x:Key="Surface">#FAF8FF</Color>
+    <Color x:Key="Surface">#121318</Color>
     <!-- Surface上の文字・アイコン -->
-    <Color x:Key="OnSurface">#1A1B21</Color>
+    <Color x:Key="OnSurface">#E2E2E9</Color>
     <!-- 入力欄など、少し変化をつけた面 -->
-    <Color x:Key="SurfaceVariant">#E0E2EF</Color>
+    <Color x:Key="SurfaceVariant">#434651</Color>
     <!-- SurfaceVariant上の補助文字。ラベルやヒント -->
-    <Color x:Key="OnSurfaceVariant">#434651</Color>
+    <Color x:Key="OnSurfaceVariant">#C3C6D3</Color>
     <!-- はっきりした境界線。入力欄の枠 -->
-    <Color x:Key="Outline">#747782</Color>
+    <Color x:Key="Outline">#8D909C</Color>
     <!-- 控えめな境界線。区切り線 -->
-    <Color x:Key="OutlineVariant">#C3C6D3</Color>
+    <Color x:Key="OutlineVariant">#434651</Color>
     <!-- モーダル表示時の背景オーバーレイ -->
     <Color x:Key="Scrim">#000000</Color>
     <!-- 反転した面。Snackbarなど -->
-    <Color x:Key="InverseSurface">#2F3036</Color>
+    <Color x:Key="InverseSurface">#E2E2E9</Color>
     <!-- InverseSurface上の文字 -->
-    <Color x:Key="InverseOnSurface">#F1F0F7</Color>
+    <Color x:Key="InverseOnSurface">#2F3036</Color>
     <!-- InverseSurface上で使うPrimaryのアクセント -->
-    <Color x:Key="InversePrimary">#AFC6FF</Color>
+    <Color x:Key="InversePrimary">#345CAA</Color>
     <!-- テーマ切替えで変わらない固定のPrimary面 -->
     <Color x:Key="PrimaryFixed">#D9E2FF</Color>
     <!-- PrimaryFixed上の文字 -->
@@ -83,17 +91,17 @@
     <!-- TertiaryFixed上の補助文字 -->
     <Color x:Key="OnTertiaryFixedVariant">#004D64</Color>
     <!-- 暗めの面。非アクティブ領域 -->
-    <Color x:Key="SurfaceDim">#DAD9E0</Color>
+    <Color x:Key="SurfaceDim">#121318</Color>
     <!-- 明るめの面 -->
-    <Color x:Key="SurfaceBright">#FAF8FF</Color>
+    <Color x:Key="SurfaceBright">#38393F</Color>
     <!-- 最も低い階層のコンテナ背景 -->
-    <Color x:Key="SurfaceContainerLowest">#FFFFFF</Color>
+    <Color x:Key="SurfaceContainerLowest">#0C0E13</Color>
     <!-- 低い階層のコンテナ背景 -->
-    <Color x:Key="SurfaceContainerLow">#F3F3FA</Color>
+    <Color x:Key="SurfaceContainerLow">#1A1B21</Color>
     <!-- 標準のコンテナ背景。カードやリスト -->
-    <Color x:Key="SurfaceContainer">#EEEDF4</Color>
+    <Color x:Key="SurfaceContainer">#1E1F25</Color>
     <!-- 高い階層のコンテナ。ダイアログやメニュー -->
-    <Color x:Key="SurfaceContainerHigh">#E8E7EF</Color>
+    <Color x:Key="SurfaceContainerHigh">#282A2F</Color>
     <!-- 最も高い階層のコンテナ。ポップアップや強調 -->
-    <Color x:Key="SurfaceContainerHighest">#E2E2E9</Color>
+    <Color x:Key="SurfaceContainerHighest">#33353A</Color>
 </ResourceDictionary>

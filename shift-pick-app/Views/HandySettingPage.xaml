@@ -18,14 +18,6 @@
                             IsTextPredictionEnabled="False" />
                 </Border>
 
-                <!-- テーマ（デモ用） -->
-                <Label Text="テーマ（デモ用）" Style="{StaticResource InputLabel}" />
-                <Border Style="{StaticResource InputBorder}">
-                    <Picker Title="テーマ"
-                            ItemsSource="{Binding ThemeNames}"
-                            SelectedIndex="{Binding SelectedThemeIndex}" />
-                </Border>
-                    
                 <!-- 戻る / 保存 -->
                 <Grid ColumnDefinitions="*,*" Margin="0,16,0,0" ColumnSpacing="12">
                     <Button Text="戻る"

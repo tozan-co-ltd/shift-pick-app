@@ -42,6 +42,7 @@ namespace shift_pick_app
             builder.Services.AddTransient<YoyakuList>();
             builder.Services.AddTransient<YoyakuListViewModel>();
             builder.Services.AddTransient<KinmuKanouDay>();
+            builder.Services.AddTransient<KinmuKanouDayViewModel>();
             builder.Services.AddTransient<KibouJigyousho>();
             builder.Services.AddTransient<HandySettingPage>();
             builder.Services.AddTransient<HandySettingPageViewModel>();

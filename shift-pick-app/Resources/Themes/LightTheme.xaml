@@ -10,6 +10,7 @@
     <Color x:Key="PrimaryContainer">#003986</Color>
     <!-- PrimaryContainer上の文字・アイコン -->
     <Color x:Key="OnPrimaryContainer">#82A6F9</Color>
+    <!-- ================================================== -->
     <!-- 補助アクセント。サブボタンやフィルター -->
     <Color x:Key="Secondary">#515E7E</Color>
     <!-- Secondary上の文字・アイコン -->
@@ -18,6 +19,7 @@
     <Color x:Key="SecondaryContainer">#CCD9FF</Color>
     <!-- SecondaryContainer上の文字・アイコン -->
     <Color x:Key="OnSecondaryContainer">#525F7F</Color>
+    <!-- ================================================== -->
     <!-- 対比アクセント。補足情報やバッジ -->
     <Color x:Key="Tertiary">#006481</Color>
     <!-- Tertiary上の文字・アイコン -->
@@ -26,6 +28,7 @@
     <Color x:Key="TertiaryContainer">#007EA2</Color>
     <!-- TertiaryContainer上の文字・アイコン -->
     <Color x:Key="OnTertiaryContainer">#FBFDFF</Color>
+    <!-- ================================================== -->
     <!-- 成功の表示（確定など）。文字・アイコン・塗りボタン -->
     <Color x:Key="Success">#006D43</Color>
     <!-- Success上の文字・アイコン -->
@@ -34,6 +37,7 @@
     <Color x:Key="SuccessContainer">#C4ECD0</Color>
     <!-- SuccessContainer上の文字・アイコン -->
     <Color x:Key="OnSuccessContainer">#005231</Color>
+    <!-- ================================================== -->
     <!-- エラーの文字・アイコン・枠線 -->
     <Color x:Key="Error">#BA1A1A</Color>
     <!-- Error上の文字・アイコン -->
@@ -42,6 +46,7 @@
     <Color x:Key="ErrorContainer">#FFDAD6</Color>
     <!-- ErrorContainer上の文字・アイコン -->
     <Color x:Key="OnErrorContainer">#93000A</Color>
+    <!-- ================================================== -->
     <!-- 画面全体の背景 -->
     <Color x:Key="Background">#FAF8FF</Color>
     <!-- Background上の本文文字 -->
@@ -54,6 +59,7 @@
     <Color x:Key="SurfaceVariant">#E0E2EF</Color>
     <!-- SurfaceVariant上の補助文字。ラベルやヒント -->
     <Color x:Key="OnSurfaceVariant">#434651</Color>
+    <!-- ================================================== -->
     <!-- はっきりした境界線。入力欄の枠 -->
     <Color x:Key="Outline">#747782</Color>
     <!-- 控えめな境界線。区切り線 -->
@@ -64,6 +70,7 @@
     <Color x:Key="InverseSurface">#2F3036</Color>
     <!-- InverseSurface上の文字 -->
     <Color x:Key="InverseOnSurface">#F1F0F7</Color>
+    <!-- ================================================== -->
     <!-- InverseSurface上で使うPrimaryのアクセント -->
     <Color x:Key="InversePrimary">#AFC6FF</Color>
     <!-- テーマ切替えで変わらない固定のPrimary面 -->
@@ -74,6 +81,7 @@
     <Color x:Key="PrimaryFixedDim">#AFC6FF</Color>
     <!-- PrimaryFixed上の補助文字 -->
     <Color x:Key="OnPrimaryFixedVariant">#154390</Color>
+    <!-- ================================================== -->
     <!-- テーマ切替えで変わらない固定のSecondary面 -->
     <Color x:Key="SecondaryFixed">#D9E2FF</Color>
     <!-- SecondaryFixed上の文字 -->
@@ -82,6 +90,7 @@
     <Color x:Key="SecondaryFixedDim">#B9C6EB</Color>
     <!-- SecondaryFixed上の補助文字 -->
     <Color x:Key="OnSecondaryFixedVariant">#394665</Color>
+    <!-- ================================================== -->
     <!-- テーマ切替えで変わらない固定のTertiary面 -->
     <Color x:Key="TertiaryFixed">#BEE9FF</Color>
     <!-- TertiaryFixed上の文字 -->
@@ -90,6 +99,16 @@
     <Color x:Key="TertiaryFixedDim">#69D3FF</Color>
     <!-- TertiaryFixed上の補助文字 -->
     <Color x:Key="OnTertiaryFixedVariant">#004D64</Color>
+    <!-- ================================================== -->
+    <!-- テーマ切替えで変わらない固定のSuccess面 -->
+    <Color x:Key="SuccessFixed">#C4ECD0</Color>
+    <!-- SuccessFixed上の文字 -->
+    <Color x:Key="OnSuccessFixed">#002111</Color>
+    <!-- SuccessFixedより一段濃い固定色 -->
+    <Color x:Key="SuccessFixedDim">#76DAA2</Color>
+    <!-- SuccessFixed上の補助文字 -->
+    <Color x:Key="OnSuccessFixedVariant">#005231</Color>
+    <!-- ================================================== -->
     <!-- 暗めの面。非アクティブ領域 -->
     <Color x:Key="SurfaceDim">#DAD9E0</Color>
     <!-- 明るめの面 -->
@@ -104,4 +123,5 @@
     <Color x:Key="SurfaceContainerHigh">#E8E7EF</Color>
     <!-- 最も高い階層のコンテナ。ポップアップや強調 -->
     <Color x:Key="SurfaceContainerHighest">#E2E2E9</Color>
+    <!-- ================================================== -->
 </ResourceDictionary>

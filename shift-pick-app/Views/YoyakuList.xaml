@@ -28,7 +28,11 @@
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="models:QuickStatusItem">
                                 <HorizontalStackLayout Spacing="30">
-                                    <Label Text="{Binding Label}" FontSize="14" MinimumWidthRequest="40" VerticalOptions="Center" />
+                                    <Label Text="{Binding Label}"
+                                           Style="{StaticResource InputLabel}"
+                                           FontSize="14"
+                                           MinimumWidthRequest="40"
+                                           VerticalOptions="Center" />
                                     <shared:StatusPill Status="{Binding Status}" Text="{Binding Count, StringFormat='{0} 件'}" />
                                 </HorizontalStackLayout>
                             </DataTemplate>

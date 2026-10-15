@@ -44,7 +44,7 @@ namespace shift_pick_app.ViewModels
             new(DateTime.Today.AddDays(4), "○○事業所"),
         ];
 
-        public string PreferredOffices { get; } = string.Join("、", ["○○", "○○", "○○", "○○"]);
+        public string PreferredOffices => DemoReservations.PreferredOffices;
 
         /// <summary>
         /// 「予約」ボタン押下（選択の切り替え）
@@ -73,16 +73,21 @@ namespace shift_pick_app.ViewModels
         {
             ErrorMessage = string.Empty;
 
-            bool hasSameDay = Slots.Where(s => s.IsSelected)
-                                   .GroupBy(s => s.WorkDate)
-                                   .Any(g => g.Count() > 1);
+            var selected = Slots.Where(s => s.IsSelected).ToList();
+            if (selected.Count == 0)
+            {
+                ErrorMessage = "予約を選択してください。";
+                return;
+            }
+
+            bool hasSameDay = selected.GroupBy(s => s.WorkDate).Any(g => g.Count() > 1);
             if (hasSameDay)
             {
                 ErrorMessage = "同一日付では1つの事業所のみ選択できます。";
                 return;
             }
 
-            await _navigation.PushAsync<YoyakuUpdate>();
+            await _navigation.PushAsync<YoyakuUpdate>(page => page.SetSelection(UserId, selected));
         }
     }
 }

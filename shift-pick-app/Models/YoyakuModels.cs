@@ -16,6 +16,7 @@ namespace shift_pick_app.Models
 
         public DateTime WorkDate { get; }
         public string WorkDateText => Util.ToJapaneseDay(WorkDate);
+        public string WorkDateFullText => Util.ToJapaneseDate(WorkDate);
         public string OfficeName { get; }
 
         [ObservableProperty]

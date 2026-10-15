@@ -40,6 +40,14 @@ namespace shift_pick_app.Services
         }
 
         /// <summary>
+        /// スタックの最初の画面（メニュー）まで戻る
+        /// </summary>
+        public Task PopToRootAsync(bool animated = true)
+        {
+            return Navigation.PopToRootAsync(animated);
+        }
+
+        /// <summary>
         /// 画面スタックを破棄して新しいルート画面にする（戻るで前の画面に戻れない）
         /// FlyoutPage はルートでのみ使えるため NavigationPage で包まない
         /// </summary>

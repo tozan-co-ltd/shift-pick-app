@@ -19,20 +19,16 @@ namespace shift_pick_app.ViewModels
         private string _userId = string.Empty;
 
         // デモ用の固定値
-        public List<QuickStatusItem> QuickStatus { get; } =
-        [
-            new("予約", 3),
-            new("確定", 2),
-            new("NG", 1),
-        ];
+        public List<QuickStatusItem> QuickStatus { get; } = DemoReservations.CountByStatus();
 
         public List<string> News { get; } =
         [
-            "ニュース#1",
-            "ニュース#2",
-            "ニュース#3",
-            "ニュース#4",
-            "ニュース#5",
+            "お知らせ：○○○○○○○○○○",
+            "お知らせ：○○○○○○○○○○○○○○○○○○○○",
+            "お知らせ：○○○○○○○○○○",
+            "お知らせ：○○○○○○○○○○",
+            "お知らせ：○○○○○○○○○○" +
+            "",
         ];
 
         public List<MainMenuItem> MenuItems { get; } =
@@ -61,7 +57,7 @@ namespace shift_pick_app.ViewModels
                 await (item.Title switch
                 {
                     "予約登録" => _navigation.PushAsync<Yoyaku>(page => page.SetUser(UserId)),
-                    "予約状況" => _navigation.PushAsync<YoyakuList>(),
+                    "予約状況" => _navigation.PushAsync<YoyakuList>(page => page.SetUser(UserId)),
                     "勤務可能日登録" => _navigation.PushAsync<KinmuKanouDay>(),
                     "希望事業所登録" => _navigation.PushAsync<KibouJigyousho>(),
                     _ => Task.CompletedTask,

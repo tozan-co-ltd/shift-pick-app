@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    ステータスのピル（予約：ニュートラル / 確定：Success / NG：Error）
+    使い方：<shared:StatusPill Status="{Binding Status}" Text="{Binding StatusLabel}" />
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="shift_pick_app.Views.Shared.StatusPill"
+             HorizontalOptions="Start"
+             VerticalOptions="Center">
+    <Border x:Name="pill"
+            Stroke="Transparent"
+            StrokeThickness="0"
+            StrokeShape="RoundRectangle 12"
+            Padding="12,2">
+        <Label x:Name="label"
+               FontFamily="MPLUSRounded1cBold"
+               FontSize="14"
+               HorizontalTextAlignment="Center" />
+    </Border>
+</ContentView>

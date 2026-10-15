@@ -27,6 +27,7 @@ namespace shift_pick_app
 #endif
             builder.Services.AddSingleton<LocalDbService>();
             builder.Services.AddSingleton<NavigationService>();
+            builder.Services.AddSingleton<DialogService>();
 
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<LoginPageViewModel>();
@@ -35,6 +36,13 @@ namespace shift_pick_app
             builder.Services.AddTransient<MenuPage>();
             builder.Services.AddTransient<MenuPageViewModel>();
             builder.Services.AddTransient<Yoyaku>();
+            builder.Services.AddTransient<YoyakuViewModel>();
+            builder.Services.AddTransient<YoyakuUpdate>();
+            builder.Services.AddTransient<YoyakuUpdateViewModel>();
+            builder.Services.AddTransient<YoyakuList>();
+            builder.Services.AddTransient<YoyakuListViewModel>();
+            builder.Services.AddTransient<KinmuKanouDay>();
+            builder.Services.AddTransient<KibouJigyousho>();
             builder.Services.AddTransient<HandySettingPage>();
             builder.Services.AddTransient<HandySettingPageViewModel>();
 

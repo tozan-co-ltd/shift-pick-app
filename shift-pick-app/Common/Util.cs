@@ -136,6 +136,14 @@ namespace shift_pick_app.Common
         {
             return date.ToString("（ddd）d", new CultureInfo("ja-JP"));
         }
+
+        /// <summary>
+        /// 日付を「yyyy/MM/dd（曜日）」形式にする。例：2026/10/15（木）
+        /// </summary>
+        public static string ToJapaneseDate(DateTime date)
+        {
+            return date.ToString("yyyy/MM/dd（ddd）", new CultureInfo("ja-JP"));
+        }
     }
 }
 

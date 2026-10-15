@@ -53,8 +53,8 @@
                                                 <DataTemplate x:DataType="models:QuickStatusItem">
                                                     <HorizontalStackLayout Spacing="30">
                                                         <!-- 幅を揃えて件数の位置を合わせる（「NG」は2文字より狭い） -->
-                                                        <Label Text="{Binding Label}" FontSize="14" MinimumWidthRequest="40" />
-                                                        <Label Text="{Binding Count, StringFormat='{0} 件'}" FontSize="14" />
+                                                        <Label Text="{Binding Label}" FontSize="14" MinimumWidthRequest="40" VerticalOptions="Center" />
+                                                        <shared:StatusPill Status="{Binding Status}" Text="{Binding Count, StringFormat='{0} 件'}" />
                                                     </HorizontalStackLayout>
                                                 </DataTemplate>
                                             </BindableLayout.ItemTemplate>

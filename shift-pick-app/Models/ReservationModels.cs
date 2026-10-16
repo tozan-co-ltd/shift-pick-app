@@ -40,7 +40,7 @@ namespace shift_pick_app.Models
         [
             new(DateTime.Today, "○○事業所", ReservationStatus.Confirmed),
             new(DateTime.Today.AddDays(1), "○○事業所", ReservationStatus.Confirmed),
-            new(DateTime.Today.AddDays(2), "○○○○○○○○○○事業所", ReservationStatus.Reserved),
+            new(DateTime.Today.AddDays(2), "○○○○○○○○事業所", ReservationStatus.Reserved),
             new(DateTime.Today.AddDays(3), "○○事業所", ReservationStatus.Rejected),
             new(DateTime.Today.AddDays(5), "○○事業所", ReservationStatus.Reserved),
             new(DateTime.Today.AddDays(7), "○○事業所", ReservationStatus.Reserved),

@@ -32,7 +32,7 @@ namespace shift_pick_app.ViewModels
         [
             new(DateTime.Today, "○○事業所"),
             new(DateTime.Today, "○○事業所"),
-            new(DateTime.Today.AddDays(1), "○○○○○○○○○○事業所"),
+            new(DateTime.Today.AddDays(1), "○○○○○○○○事業所"),
             new(DateTime.Today.AddDays(1), "○○事業所"),
             new(DateTime.Today.AddDays(1), "○○事業所"),
             new(DateTime.Today.AddDays(1), "○○事業所"),

@@ -68,6 +68,7 @@
                                     <Label Grid.Column="1"
                                            Text="{Binding OfficeName}"
                                            FontSize="16"
+                                           Padding="8,0"
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center" />
                                     <!-- チェックボックス代わり：未選択 Secondary / 選択 Primary。角なしで縦に連結 -->

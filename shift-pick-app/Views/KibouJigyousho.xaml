@@ -1,11 +1,145 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:shift_pick_app.ViewModels"
+             xmlns:models="clr-namespace:shift_pick_app.Models"
+             xmlns:shared="clr-namespace:shift_pick_app.Views.Shared"
              x:Class="shift_pick_app.Views.KibouJigyousho"
+             x:DataType="vm:KibouJigyoushoViewModel"
              Title="希望事業所">
 
-    <!-- TODO: SW008 モック作成 -->
-    <Label Text="SW008 希望事業所（準備中）"
-           HorizontalOptions="Center"
-           VerticalOptions="Center" />
+    <Grid>
+        <!-- 1画面目：都道府県選択 -->
+        <ScrollView IsVisible="{Binding IsPrefectureView}">
+            <VerticalStackLayout Padding="12" Spacing="12">
+
+                <Button Text="GPSの近い事業所選択"
+                        Command="{Binding SelectByGpsCommand}"
+                        Style="{StaticResource SecondaryButton}" />
+
+                <!-- 都道府県カード（3列）：高さはコードビハインドで画面の約55%に設定 -->
+                <Border x:Name="prefectureCard" Style="{StaticResource Card}" Padding="8">
+                    <CollectionView ItemsSource="{Binding Prefectures}" SelectionMode="None">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="8" VerticalItemSpacing="8" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Prefecture">
+                                <Border Padding="8,12"
+                                        StrokeShape="RoundRectangle 12"
+                                        Stroke="{DynamicResource OutlineVariant}"
+                                        BackgroundColor="{DynamicResource SurfaceContainer}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:KibouJigyoushoViewModel}}, Path=TogglePrefectureCommand, x:DataType=vm:KibouJigyoushoViewModel}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <VerticalStackLayout Spacing="8">
+                                        <!-- 都道府県アイコンの代わり（fa-image） -->
+                                        <Label Text="&#xf03e;"
+                                               FontFamily="FontAwesome6Solid"
+                                               FontSize="32"
+                                               TextColor="{DynamicResource OnSurfaceVariant}"
+                                               HorizontalOptions="Center" />
+                                        <Label Text="{Binding Name}"
+                                               FontSize="14"
+                                               HorizontalOptions="Center" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+
+                <Button Text="都道府県選択"
+                        Command="{Binding SelectByPrefectureCommand}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 2画面目：希望の事業所 -->
+        <ScrollView IsVisible="{Binding IsOfficeView}">
+            <VerticalStackLayout Padding="12" Spacing="12">
+
+                <Label Text="希望の事業所" FontSize="20" FontAttributes="Bold" />
+
+                <!-- ユーザーID -->
+                <Border Style="{StaticResource Card}" Padding="12">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Label Text="ユーザーID"
+                               Style="{StaticResource InputLabel}"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="{Binding UserId}"
+                               FontSize="18"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- TODO: ボタンか説明文か確認中（機能なし） -->
+                <Button Text="GPSで現在位置より近い順で並び替え"
+                        Style="{StaticResource SecondaryButton}"
+                        FontSize="14"
+                        HorizontalOptions="End" />
+
+                <!-- 事業所リスト：高さはコードビハインドで画面の約55%に設定 -->
+                <Border x:Name="officeCard" Style="{StaticResource Card}" Padding="0">
+                    <CollectionView ItemsSource="{Binding Offices}" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Office">
+                                <!-- 3列目は設計書どおりの空列（用途確認中） -->
+                                <Grid ColumnDefinitions="2*,*,*" RowDefinitions="Auto,1">
+                                    <VerticalStackLayout Padding="12,8" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" FontSize="16" />
+                                        <Label Text="{Binding City}" FontSize="14" TextColor="{DynamicResource OnSurfaceVariant}" />
+                                    </VerticalStackLayout>
+                                    <!-- チェックボックス代わり：未選択 Secondary / 選択 Primary。角なしで縦に連結 -->
+                                    <Button Grid.Column="1"
+                                            Text="予約"
+                                            CornerRadius="0"
+                                            FontSize="16"
+                                            BackgroundColor="{DynamicResource SecondaryContainer}"
+                                            TextColor="{DynamicResource OnSecondaryContainer}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:KibouJigyoushoViewModel}}, Path=ToggleOfficeCommand, x:DataType=vm:KibouJigyoushoViewModel}"
+                                            CommandParameter="{Binding .}">
+                                        <Button.Triggers>
+                                            <DataTrigger TargetType="Button" Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                                <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                            </DataTrigger>
+                                        </Button.Triggers>
+                                    </Button>
+                                    <BoxView Grid.Row="1" Grid.ColumnSpan="3" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="{DynamicResource Error}"
+                       IsVisible="{Binding IsErrorMessageVisible}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+
+                <!-- 希望事業所 + 登録（カードなし、登録は上揃え） -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Padding="4,0">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="希望事業所" Style="{StaticResource InputLabel}" />
+                        <Label Text="{Binding PreferredOffices}" FontSize="16" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1"
+                            Text="登録"
+                            Command="{Binding RegisterCommand}"
+                            VerticalOptions="Start" />
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <shared:LoadingOverlay IsVisible="{Binding IsBusy}" />
+    </Grid>
 </ContentPage>

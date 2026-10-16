@@ -34,8 +34,8 @@
 		<!-- スプラッシュスクリーン -->
 		<MauiSplashScreen Include="Resources\Splash\appicon.png" Color="#FAF8FF" BaseSize="256,256" />
 
-		<!-- 画像 -->
-		<MauiImage Include="Resources\Images\*" />
+		<!-- 画像（サブフォルダー含む。出力はファイル名のみで参照、同名ファイル不可） -->
+		<MauiImage Include="Resources\Images\**" />
 
 		<!-- カスタムフォント -->
 		<MauiFont Include="Resources\Fonts\*" />

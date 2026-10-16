@@ -23,6 +23,15 @@
                        TextColor="{DynamicResource Primary}" />
                 <Button Text="ログアウト"
                         Command="{Binding LogoutCommand}" />
+
+                <!-- デモ用の一時的な切り替え（SW008 都道府県カード） -->
+                <Grid ColumnDefinitions="*,Auto" Margin="0,24,0,0">
+                    <Label Text="都道府県：名前入り画像（デモ）"
+                           FontSize="14"
+                           VerticalOptions="Center" />
+                    <Switch Grid.Column="1"
+                            IsToggled="{Binding PrefectureImageWithName, Mode=TwoWay}" />
+                </Grid>
             </VerticalStackLayout>
         </ContentPage>
     </FlyoutPage.Flyout>

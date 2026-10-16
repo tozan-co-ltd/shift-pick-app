@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using shift_pick_app.Models;
 using shift_pick_app.Services;
@@ -31,6 +31,13 @@ namespace shift_pick_app.ViewModels
             "",
         ];
 
+        // デモ用の一時的な切り替え：SW008 を開いたときに反映
+        public bool PrefectureImageWithName
+        {
+            get => DemoSettings.PrefectureImageWithName;
+            set => DemoSettings.PrefectureImageWithName = value;
+        }
+
         public List<MainMenuItem> MenuItems { get; } =
         [
             new("予約登録"),        // SW004
@@ -59,7 +66,7 @@ namespace shift_pick_app.ViewModels
                     "予約登録" => _navigation.PushAsync<Yoyaku>(page => page.SetUser(UserId)),
                     "予約状況" => _navigation.PushAsync<YoyakuList>(page => page.SetUser(UserId)),
                     "勤務可能日登録" => _navigation.PushAsync<KinmuKanouDay>(),
-                    "希望事業所登録" => _navigation.PushAsync<KibouJigyousho>(),
+                    "希望事業所登録" => _navigation.PushAsync<KibouJigyousho>(page => page.SetUser(UserId)),
                     _ => Task.CompletedTask,
                 });
             }

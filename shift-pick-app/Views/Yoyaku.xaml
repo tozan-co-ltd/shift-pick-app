@@ -10,23 +10,14 @@
     <ScrollView>
         <VerticalStackLayout Padding="12" Spacing="12">
 
-            <!-- ユーザーID + 開始日付 -->
+            <!-- 開始日付 -->
             <Border Style="{StaticResource Card}" Padding="12">
-                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
-                    <Label Text="ユーザーID"
-                           Style="{StaticResource InputLabel}"
-                           VerticalOptions="Center" />
-                    <Label Grid.Column="1"
-                           Text="{Binding UserId}"
-                           FontSize="18"
-                           VerticalOptions="Center" />
-
-                    <Label Grid.Row="1"
-                           Text="開始日付"
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                    <Label Text="開始日付"
                            Style="{StaticResource InputLabel}"
                            VerticalOptions="Center" />
                     <!-- タップで端末標準のカレンダーダイアログを表示 -->
-                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource InputBorder}">
+                    <Border Grid.Column="1" Style="{StaticResource InputBorder}">
                         <Grid ColumnDefinitions="*,Auto">
                             <DatePicker Grid.ColumnSpan="2"
                                         Date="{Binding StartDate, Mode=TwoWay}"
@@ -53,7 +44,7 @@
                           BackgroundColor="{DynamicResource SurfaceContainerHigh}">
                         <Label Text="日付" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
                         <Label Grid.Column="1" Text="事業所" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
-                        <Label Grid.Column="2" Text="選択" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
+                        <Label Grid.Column="2" Text="予約" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
                     </Grid>
 
                     <!-- 本体（スクロール） -->
@@ -73,7 +64,7 @@
                                            VerticalOptions="Center" />
                                     <!-- チェックボックス代わり：未選択 Secondary / 選択 Primary。角なしで縦に連結 -->
                                     <Button Grid.Column="2"
-                                            Text="予約"
+                                            Text="選択"
                                             CornerRadius="0"
                                             FontSize="16"
                                             BackgroundColor="{DynamicResource SecondaryContainer}"
@@ -110,7 +101,7 @@
                             Command="{Binding RegisterPreferredOfficesCommand}"
                             Style="{StaticResource SecondaryButton}" />
                     <Button Grid.Column="1"
-                            Text="選択"
+                            Text="申込"
                             Command="{Binding SelectCommand}" />
                 </Grid>
             </VerticalStackLayout>

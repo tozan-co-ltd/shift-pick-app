@@ -81,19 +81,6 @@
 
                 <Label Text="希望の事業所" FontSize="20" FontAttributes="Bold" />
 
-                <!-- ユーザーID -->
-                <Border Style="{StaticResource Card}" Padding="12">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                        <Label Text="ユーザーID"
-                               Style="{StaticResource InputLabel}"
-                               VerticalOptions="Center" />
-                        <Label Grid.Column="1"
-                               Text="{Binding UserId}"
-                               FontSize="18"
-                               VerticalOptions="Center" />
-                    </Grid>
-                </Border>
-
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                     <!-- TODO: ボタンか説明文か確認中（機能なし） -->
                     <Button Grid.Column="1"

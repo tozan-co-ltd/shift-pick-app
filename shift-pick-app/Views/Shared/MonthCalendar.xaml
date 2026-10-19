@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:shift_pick_app.Models"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             x:Class="shift_pick_app.Views.Shared.MonthCalendar">
+
+    <ContentView.Resources>
+        <!-- 曜日ラベル（タップで曜日をまとめて選択） -->
+        <Style x:Key="DayTitle" TargetType="Label">
+            <Setter Property="FontFamily" Value="MPLUSRounded1cBold" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="TextColor" Value="{DynamicResource OnSurfaceVariant}" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+            <Setter Property="Padding" Value="0,8" />
+        </Style>
+        <Style x:Key="WeekendTitle" TargetType="Label" BasedOn="{StaticResource DayTitle}">
+            <Setter Property="TextColor" Value="{DynamicResource Error}" />
+        </Style>
+    </ContentView.Resources>
+
+    <VerticalStackLayout Spacing="6">
+        <!-- 曜日（日曜始まり） -->
+        <Grid ColumnDefinitions="*,*,*,*,*,*,*">
+            <Label Grid.Column="0" Text="日" Style="{StaticResource WeekendTitle}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnWeekdayTapped" CommandParameter="{x:Static sys:DayOfWeek.Sunday}" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Column="1" Text="月" Style="{StaticResource DayTitle}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnWeekdayTapped" CommandParameter="{x:Static sys:DayOfWeek.Monday}" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Column="2" Text="火" Style="{StaticResource DayTitle}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnWeekdayTapped" CommandParameter="{x:Static sys:DayOfWeek.Tuesday}" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Column="3" Text="水" Style="{StaticResource DayTitle}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnWeekdayTapped" CommandParameter="{x:Static sys:DayOfWeek.Wednesday}" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Column="4" Text="木" Style="{StaticResource DayTitle}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnWeekdayTapped" CommandParameter="{x:Static sys:DayOfWeek.Thursday}" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Column="5" Text="金" Style="{StaticResource DayTitle}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnWeekdayTapped" CommandParameter="{x:Static sys:DayOfWeek.Friday}" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Column="6" Text="土" Style="{StaticResource WeekendTitle}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnWeekdayTapped" CommandParameter="{x:Static sys:DayOfWeek.Saturday}" />
+                </Label.GestureRecognizers>
+            </Label>
+        </Grid>
+
+        <!-- 日（7列×6行固定：月によって高さが変わらないように） -->
+        <Grid x:Name="daysGrid"
+              ColumnDefinitions="*,*,*,*,*,*,*"
+              RowDefinitions="44,44,44,44,44,44"
+              RowSpacing="6">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate x:DataType="models:CalendarDay">
+                    <Border Grid.Row="{Binding Row}"
+                            Grid.Column="{Binding Column}"
+                            StrokeShape="Rectangle"
+                            StrokeThickness="2"
+                            Stroke="Transparent"
+                            BackgroundColor="Transparent">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnDayTapped" />
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding State}" Value="{x:Static models:CalendarDayState.Registered}">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource OnSuccessFixedVariant}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding State}" Value="{x:Static models:CalendarDayState.Selected}">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                            <!-- 今日：枠線のみ（文字色は状態に従う） -->
+                            <DataTrigger TargetType="Border" Binding="{Binding IsToday}" Value="True">
+                                <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+
+                        <Label Text="{Binding Day}"
+                               FontSize="16"
+                               TextColor="{DynamicResource OnSurface}"
+                               Opacity="1"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center">
+                            <Label.Triggers>
+                                <!-- 文字色：TextTone で1つに決める -->
+                                <DataTrigger TargetType="Label" Binding="{Binding TextTone}" Value="{x:Static models:CalendarDayTextTone.Red}">
+                                    <Setter Property="TextColor" Value="{DynamicResource Error}" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding TextTone}" Value="{x:Static models:CalendarDayTextTone.OnRegistered}">
+                                    <Setter Property="TextColor" Value="{DynamicResource SuccessFixed}" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding TextTone}" Value="{x:Static models:CalendarDayTextTone.OnSelected}">
+                                    <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                </DataTrigger>
+                                <!-- 無効：文字色はそのまま（通常／赤）で38%に薄くする（Material 3 の無効表示） -->
+                                <DataTrigger TargetType="Label" Binding="{Binding State}" Value="{x:Static models:CalendarDayState.Disabled}">
+                                    <Setter Property="Opacity" Value="0.38" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Border>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </Grid>
+    </VerticalStackLayout>
+</ContentView>

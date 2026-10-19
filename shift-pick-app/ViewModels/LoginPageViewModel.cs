@@ -67,14 +67,5 @@ namespace shift_pick_app.ViewModels
         {
             return _navigation.PushAsync<PasswordReset>();
         }
-
-        /// <summary>
-        /// 設定ボタン押下
-        /// </summary>
-        [RelayCommand]
-        private Task OpenSettings()
-        {
-            return _navigation.PushAsync<HandySettingPage>();
-        }
     }
 }

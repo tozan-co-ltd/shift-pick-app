@@ -17,9 +17,6 @@ namespace shift_pick_app.ViewModels
             _dialog = dialog;
         }
 
-        [ObservableProperty]
-        private string _userId = string.Empty;
-
         /// <summary>
         /// SW004 で選択した予約
         /// </summary>
@@ -53,7 +50,7 @@ namespace shift_pick_app.ViewModels
             if (openList)
             {
                 await _navigation.PopToRootAsync(animated: false);
-                await _navigation.PushAsync<YoyakuList>(page => page.SetUser(UserId));
+                await _navigation.PushAsync<YoyakuList>();
                 return;
             }
             await _navigation.PopAsync();

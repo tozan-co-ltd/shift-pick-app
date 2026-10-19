@@ -12,19 +12,6 @@
         <ScrollView>
             <VerticalStackLayout Padding="12" Spacing="12">
 
-                <!-- ユーザーID -->
-                <Border Style="{StaticResource Card}" Padding="12">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                        <Label Text="ユーザーID"
-                               Style="{StaticResource InputLabel}"
-                               VerticalOptions="Center" />
-                        <Label Grid.Column="1"
-                               Text="{Binding UserId}"
-                               FontSize="18"
-                               VerticalOptions="Center" />
-                    </Grid>
-                </Border>
-
                 <!-- 予約内容テーブル：高さはコードビハインドで画面の約55%に設定 -->
                 <Border x:Name="tableCard" Style="{StaticResource Card}" Padding="0">
                     <Grid RowDefinitions="Auto,*">

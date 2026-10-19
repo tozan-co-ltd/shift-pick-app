@@ -11,19 +11,9 @@
     <ScrollView>
         <VerticalStackLayout Padding="12" Spacing="12">
 
-            <!-- ユーザーID + 予約状況（SW003 と同じ） -->
+            <!-- 予約状況（SW003 と同じ） -->
             <Border Style="{StaticResource Card}" Padding="12">
                 <VerticalStackLayout Spacing="8">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                        <Label Text="ユーザーID"
-                               Style="{StaticResource InputLabel}"
-                               VerticalOptions="Center" />
-                        <Label Grid.Column="1"
-                               Text="{Binding UserId}"
-                               FontSize="16"
-                               VerticalOptions="Center" />
-                    </Grid>
-
                     <VerticalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding QuickStatus}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="models:QuickStatusItem">

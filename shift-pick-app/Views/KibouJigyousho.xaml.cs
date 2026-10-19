@@ -13,11 +13,6 @@ public partial class KibouJigyousho : ContentPage
     }
 
     /// <summary>
-    /// ログインしたユーザーを表示する
-    /// </summary>
-    public void SetUser(string userId) => _viewModel.UserId = userId;
-
-    /// <summary>
     /// 戻る（ナビゲーションバー・端末の戻るボタン共通）：2画面目なら1画面目に戻す
     /// </summary>
     protected override bool OnBackButtonPressed() => _viewModel.TryBackToPrefectureView() || base.OnBackButtonPressed();

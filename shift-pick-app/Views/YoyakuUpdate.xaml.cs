@@ -16,11 +16,7 @@ public partial class YoyakuUpdate : ContentPage
     /// <summary>
     /// SW004 で選択した内容を表示する
     /// </summary>
-    public void SetSelection(string userId, List<YoyakuSlot> slots)
-    {
-        _viewModel.UserId = userId;
-        _viewModel.Slots = slots;
-    }
+    public void SetSelection(List<YoyakuSlot> slots) => _viewModel.Slots = slots;
 
     /// <summary>
     /// 予約内容テーブルの高さを画面の約55%に固定する（回転時も再計算）

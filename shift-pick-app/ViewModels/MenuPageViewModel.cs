@@ -9,10 +9,12 @@ namespace shift_pick_app.ViewModels
     public partial class MenuPageViewModel : BaseViewModel
     {
         private readonly NavigationService _navigation;
+        private readonly DialogService _dialog;
 
-        public MenuPageViewModel(NavigationService navigation)
+        public MenuPageViewModel(NavigationService navigation, DialogService dialog)
         {
             _navigation = navigation;
+            _dialog = dialog;
         }
 
         [ObservableProperty]
@@ -23,19 +25,41 @@ namespace shift_pick_app.ViewModels
 
         public List<string> News { get; } =
         [
-            "お知らせ：○○○○○○○○○○",
-            "お知らせ：○○○○○○○○○○○○○○○○○○○○",
-            "お知らせ：○○○○○○○○○○",
-            "お知らせ：○○○○○○○○○○",
-            "お知らせ：○○○○○○○○○○" +
-            "",
+            "○○：○○○○○○○○○○（たった今）",
+            "○○：○○○○○○○○○○（15分）",
+            "○○：○○○○○○○○○○（28分）",
+            "○○：○○○○○○○○○○（3時間）",
+            "○○：○○○○○○○○○○（8時間）",
+            "○○：○○○○○○○○○○（昨日）",
+            "○○：○○○○○○○○○○（2日前）",
         ];
+
+        // デモ用の一時的な切り替え：SW003 に即時反映
+        public bool HasNews
+        {
+            get => DemoSettings.HasNews;
+            set
+            {
+                DemoSettings.HasNews = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsNewsEmpty));
+            }
+        }
+
+        public bool IsNewsEmpty => !HasNews;
 
         // デモ用の一時的な切り替え：SW008 を開いたときに反映
         public bool PrefectureImageWithName
         {
             get => DemoSettings.PrefectureImageWithName;
             set => DemoSettings.PrefectureImageWithName = value;
+        }
+
+        // デモ用の一時的な切り替え：SW007 を開いたときに反映
+        public bool CustomCalendar
+        {
+            get => DemoSettings.CustomCalendar;
+            set => DemoSettings.CustomCalendar = value;
         }
 
         public List<MainMenuItem> MenuItems { get; } =
@@ -63,10 +87,10 @@ namespace shift_pick_app.ViewModels
 
                 await (item.Title switch
                 {
-                    "予約登録" => _navigation.PushAsync<Yoyaku>(page => page.SetUser(UserId)),
-                    "予約状況" => _navigation.PushAsync<YoyakuList>(page => page.SetUser(UserId)),
+                    "予約登録" => _navigation.PushAsync<Yoyaku>(),
+                    "予約状況" => _navigation.PushAsync<YoyakuList>(),
                     "勤務可能日登録" => _navigation.PushAsync<KinmuKanouDay>(),
-                    "希望事業所登録" => _navigation.PushAsync<KibouJigyousho>(page => page.SetUser(UserId)),
+                    "希望事業所登録" => _navigation.PushAsync<KibouJigyousho>(),
                     _ => Task.CompletedTask,
                 });
             }
@@ -80,9 +104,13 @@ namespace shift_pick_app.ViewModels
         /// ログアウトボタン押下
         /// </summary>
         [RelayCommand]
-        private void Logout()
+        private async Task Logout()
         {
-            _navigation.SetRoot<LoginPage>();
+            bool isConfirmed = await _dialog.ConfirmAsync("ログアウト", "ログアウトしてもよろしいですか？");
+            if (isConfirmed)
+            {
+                _navigation.SetRoot<LoginPage>();
+            }
         }
     }
 }

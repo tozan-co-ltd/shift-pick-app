@@ -16,9 +16,6 @@ namespace shift_pick_app.ViewModels
         }
 
         [ObservableProperty]
-        private string _userId = string.Empty;
-
-        [ObservableProperty]
         private DateTime _startDate = DateTime.Today;
 
         [ObservableProperty]
@@ -47,7 +44,7 @@ namespace shift_pick_app.ViewModels
         public string PreferredOffices => DemoReservations.PreferredOffices;
 
         /// <summary>
-        /// 「予約」ボタン押下（選択の切り替え）
+        /// 「選択」ボタン押下（選択の切り替え）
         /// </summary>
         [RelayCommand]
         private void ToggleSlot(YoyakuSlot slot)
@@ -66,7 +63,7 @@ namespace shift_pick_app.ViewModels
         }
 
         /// <summary>
-        /// 選択ボタン押下
+        /// 申込ボタン押下
         /// </summary>
         [RelayCommand]
         private async Task Select()
@@ -87,7 +84,7 @@ namespace shift_pick_app.ViewModels
                 return;
             }
 
-            await _navigation.PushAsync<YoyakuUpdate>(page => page.SetSelection(UserId, selected));
+            await _navigation.PushAsync<YoyakuUpdate>(page => page.SetSelection(selected));
         }
     }
 }

@@ -4,19 +4,27 @@
              xmlns:vm="clr-namespace:shift_pick_app.ViewModels"
              xmlns:calendar="clr-namespace:Plugin.Maui.Calendar.Controls;assembly=Plugin.Maui.Calendar"
              xmlns:shared="clr-namespace:shift_pick_app.Views.Shared"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              x:Class="shift_pick_app.Views.KinmuKanouDay"
              x:DataType="vm:KinmuKanouDayViewModel"
              Title="勤務可能日">
 
     <ContentPage.Resources>
-        <!-- 曜日ラベル -->
+        <!-- 曜日ラベル（タップで曜日をまとめて選択） -->
         <Style x:Key="CalendarDayTitle" TargetType="Label">
             <Setter Property="FontFamily" Value="MPLUSRounded1cBold" />
             <Setter Property="FontSize" Value="16" />
             <Setter Property="TextColor" Value="{DynamicResource OnSurfaceVariant}" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+            <Setter Property="Padding" Value="0,8" />
         </Style>
         <Style x:Key="CalendarWeekendTitle" TargetType="Label" BasedOn="{StaticResource CalendarDayTitle}">
             <Setter Property="TextColor" Value="{DynamicResource Error}" />
+        </Style>
+
+        <!-- ライブラリの曜日ラベルはタップできないため非表示にし、上の独自ラベルを使う -->
+        <Style x:Key="CalendarHiddenTitle" TargetType="Label">
+            <Setter Property="IsVisible" Value="False" />
         </Style>
 
         <!-- 当月／翌月の切り替えボタン -->
@@ -56,37 +64,87 @@
                             </Button>
                         </Grid>
 
-                        <calendar:MultiSelectionCalendar
-                            Culture="{Binding Culture}"
-                            ShownDate="{Binding ShownDate, Mode=TwoWay}"
-                            SelectedDates="{Binding SelectedDates, Mode=TwoWay}"
-                            MinimumDate="{Binding MinimumDate}"
-                            MaximumDate="{Binding MaximumDate}"
-                            Events="{Binding RegisteredEvents}"
-                            HeaderSectionVisible="False"
-                            FooterSectionVisible="False"
-                            SwipeToChangeMonthEnabled="False"
-                            SwipeUpToHideEnabled="False"
-                            OtherMonthDayIsVisible="False"
-                            DaysTitleMaximumLength="OneChar"
-                            DaysTitleLabelStyle="{StaticResource CalendarDayTitle}"
-                            WeekendTitleStyle="{StaticResource CalendarWeekendTitle}"
-                            DayViewSize="44"
-                            DayViewCornerRadius="0"
-                            DeselectedDayTextColor="{DynamicResource OnSurface}"
-                            WeekendDayColor="{DynamicResource Error}"
-                            DisabledDayColor="{DynamicResource Outline}"
-                            SelectedDayBackgroundColor="{DynamicResource Primary}"
-                            SelectedDayTextColor="{DynamicResource OnPrimary}"
-                            SelectedTodayTextColor="{DynamicResource OnPrimary}"
-                            TodayTextColor="{DynamicResource Primary}"
-                            TodayOutlineColor="{DynamicResource Primary}"
-                            TodayFillColor="Transparent"
-                            EventIndicatorType="Background"
-                            EventIndicatorColor="{DynamicResource OnSuccessFixedVariant}"
-                            EventIndicatorSelectedColor="{DynamicResource OnSuccessFixedVariant}"
-                            EventIndicatorTextColor="{DynamicResource SuccessFixed}"
-                            EventIndicatorSelectedTextColor="{DynamicResource SuccessFixed}" />
+                        <!-- テスト用：独自カレンダー（フライアウトの切り替えで表示） -->
+                        <shared:MonthCalendar IsVisible="{Binding UseCustomCalendar}"
+                                              ShownMonth="{Binding ShownDate}"
+                                              MinimumDate="{Binding MinimumDate}"
+                                              MaximumDate="{Binding MaximumDate}"
+                                              SelectedDates="{Binding SelectedDates, Mode=TwoWay}"
+                                              RegisteredDates="{Binding RegisteredDates}"
+                                              Holidays="{Binding Holidays}" />
+
+                        <!-- Plugin.Maui.Calendar（独自カレンダーの確認後に削除） -->
+                        <VerticalStackLayout IsVisible="{Binding UsePluginCalendar}" Spacing="8">
+                            <!-- 曜日（日曜始まり）：列幅はライブラリと同じ7等分 -->
+                            <Grid ColumnDefinitions="*,*,*,*,*,*,*">
+                                <Label Grid.Column="0" Text="日" Style="{StaticResource CalendarWeekendTitle}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectWeekdayCommand}" CommandParameter="{x:Static sys:DayOfWeek.Sunday}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="1" Text="月" Style="{StaticResource CalendarDayTitle}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectWeekdayCommand}" CommandParameter="{x:Static sys:DayOfWeek.Monday}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="2" Text="火" Style="{StaticResource CalendarDayTitle}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectWeekdayCommand}" CommandParameter="{x:Static sys:DayOfWeek.Tuesday}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="3" Text="水" Style="{StaticResource CalendarDayTitle}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectWeekdayCommand}" CommandParameter="{x:Static sys:DayOfWeek.Wednesday}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="4" Text="木" Style="{StaticResource CalendarDayTitle}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectWeekdayCommand}" CommandParameter="{x:Static sys:DayOfWeek.Thursday}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="5" Text="金" Style="{StaticResource CalendarDayTitle}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectWeekdayCommand}" CommandParameter="{x:Static sys:DayOfWeek.Friday}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="6" Text="土" Style="{StaticResource CalendarWeekendTitle}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectWeekdayCommand}" CommandParameter="{x:Static sys:DayOfWeek.Saturday}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Grid>
+
+                            <calendar:MultiSelectionCalendar
+                                Culture="{Binding Culture}"
+                                ShownDate="{Binding ShownDate, Mode=TwoWay}"
+                                SelectedDates="{Binding SelectedDates, Mode=TwoWay}"
+                                MinimumDate="{Binding MinimumDate}"
+                                MaximumDate="{Binding MaximumDate}"
+                                Events="{Binding CalendarEvents}"
+                                HeaderSectionVisible="False"
+                                FooterSectionVisible="False"
+                                SwipeToChangeMonthEnabled="False"
+                                SwipeUpToHideEnabled="False"
+                                OtherMonthDayIsVisible="False"
+                                DaysTitleLabelStyle="{StaticResource CalendarHiddenTitle}"
+                                WeekendTitleStyle="{StaticResource CalendarHiddenTitle}"
+                                DayViewSize="44"
+                                DayViewCornerRadius="0"
+                                DeselectedDayTextColor="{DynamicResource OnSurface}"
+                                WeekendDayColor="{DynamicResource Error}"
+                                DisabledDayColor="{DynamicResource Outline}"
+                                SelectedDayBackgroundColor="{DynamicResource Primary}"
+                                SelectedDayTextColor="{DynamicResource OnPrimary}"
+                                SelectedTodayTextColor="{DynamicResource OnPrimary}"
+                                TodayTextColor="{DynamicResource Primary}"
+                                TodayOutlineColor="{DynamicResource Primary}"
+                                TodayFillColor="Transparent"
+                                EventIndicatorType="Background"
+                                EventIndicatorColor="{DynamicResource OnSuccessFixedVariant}"
+                                EventIndicatorSelectedColor="{DynamicResource OnSuccessFixedVariant}"
+                                EventIndicatorTextColor="{DynamicResource SuccessFixed}"
+                                EventIndicatorSelectedTextColor="{DynamicResource SuccessFixed}" />
+                        </VerticalStackLayout>
 
                         <!-- 凡例 -->
                         <HorizontalStackLayout Spacing="16" Padding="12,0" HorizontalOptions="Center">

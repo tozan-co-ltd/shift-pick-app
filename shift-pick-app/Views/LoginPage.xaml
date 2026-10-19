@@ -6,10 +6,6 @@
              x:DataType="vm:LoginPageViewModel"
              Title="ログイン">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="設定" Command="{Binding OpenSettingsCommand}" />
-    </ContentPage.ToolbarItems>
-
     <ScrollView>
         <Border Style="{StaticResource Card}" Margin="16" VerticalOptions="Center">
             <VerticalStackLayout Spacing="12">

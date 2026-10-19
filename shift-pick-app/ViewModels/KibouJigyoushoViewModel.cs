@@ -20,9 +20,6 @@ namespace shift_pick_app.ViewModels
                 new Prefecture(p.Name, withName ? $"named_{p.Key}.png" : $"{p.Key}.png", !withName))];
         }
 
-        [ObservableProperty]
-        private string _userId = string.Empty;
-
         // false：都道府県選択 / true：希望の事業所
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsPrefectureView))]

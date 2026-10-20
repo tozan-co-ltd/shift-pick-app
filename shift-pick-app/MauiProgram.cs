@@ -1,4 +1,5 @@
 ﻿using shift_pick_app.Services;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using shift_pick_app.ViewModels;
 using shift_pick_app.Views;
@@ -12,6 +13,7 @@ namespace shift_pick_app
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

@@ -6,13 +6,14 @@
              x:Class="shift_pick_app.Views.Shared.MonthCalendar">
 
     <ContentView.Resources>
-        <!-- 曜日ラベル（タップで曜日をまとめて選択） -->
+        <!-- 曜日ラベル（タップで曜日をまとめて選択）：タップ領域は高さ44以上 -->
         <Style x:Key="DayTitle" TargetType="Label">
             <Setter Property="FontFamily" Value="MPLUSRounded1cBold" />
             <Setter Property="FontSize" Value="16" />
             <Setter Property="TextColor" Value="{DynamicResource OnSurfaceVariant}" />
             <Setter Property="HorizontalTextAlignment" Value="Center" />
-            <Setter Property="Padding" Value="0,8" />
+            <Setter Property="VerticalTextAlignment" Value="Center" />
+            <Setter Property="MinimumHeightRequest" Value="44" />
         </Style>
         <Style x:Key="WeekendTitle" TargetType="Label" BasedOn="{StaticResource DayTitle}">
             <Setter Property="TextColor" Value="{DynamicResource Error}" />

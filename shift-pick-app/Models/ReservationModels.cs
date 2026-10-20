@@ -46,8 +46,6 @@ namespace shift_pick_app.Models
             new(DateTime.Today.AddDays(7), "○○事業所", ReservationStatus.Reserved),
         ];
 
-        public static readonly string PreferredOffices = string.Join("、", ["○○", "○○", "○○", "○○"]);
-
         /// <summary>
         /// ステータスごとの件数（予約・確定・NG の順）
         /// </summary>

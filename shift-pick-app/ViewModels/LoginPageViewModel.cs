@@ -25,6 +25,16 @@ namespace shift_pick_app.ViewModels
         [ObservableProperty]
         private string _errorMessage = string.Empty;
 
+        // パスワードを隠す（初期値）/ 表示する
+        [ObservableProperty]
+        private bool _isPasswordHidden = true;
+
+        /// <summary>
+        /// パスワード欄の目のアイコン押下：表示 / 非表示の切り替え
+        /// </summary>
+        [RelayCommand]
+        private void TogglePassword() => IsPasswordHidden = !IsPasswordHidden;
+
         /// <summary>
         /// ログインボタン押下
         /// </summary>
@@ -51,12 +61,15 @@ namespace shift_pick_app.ViewModels
             }
 
             // デモ：22222222 はパスワード変更済み扱いでメニューへ、それ以外は初回パスワード変更（ケース1）へ
-            if (Password == "22222222")
+            await RunBusyAsync(ProcessingMessage, () =>
             {
-                _navigation.SetRoot<MenuPage>(page => page.SetUser(userId));
-                return;
-            }
-            await _navigation.PushAsync<PasswordReset>(page => page.StartFirstLogin(userId));
+                if (Password == "22222222")
+                {
+                    _navigation.SetRoot<MenuPage>(page => page.SetUser(userId));
+                    return Task.CompletedTask;
+                }
+                return _navigation.PushAsync<PasswordReset>(page => page.StartFirstLogin(userId));
+            });
         }
 
         /// <summary>
@@ -65,7 +78,7 @@ namespace shift_pick_app.ViewModels
         [RelayCommand]
         private Task ForgotPassword()
         {
-            return _navigation.PushAsync<PasswordReset>();
+            return RunBusyAsync(LoadingMessage, () => _navigation.PushAsync<PasswordReset>());
         }
     }
 }

@@ -31,17 +31,19 @@ public partial class StatusPill : ContentView
 	}
 
 	/// <summary>
-	/// ステータスに合わせてテーマの色を設定する
+	/// ステータスに合わせてテーマの色とアイコンを設定する
 	/// </summary>
 	private void ApplyStatus()
 	{
-		(string background, string text) = Status switch
+		(string background, string text, string glyph) = Status switch
 		{
-			ReservationStatus.Confirmed => ("SuccessContainer", "OnSuccessContainer"),
-			ReservationStatus.Rejected => ("ErrorContainer", "OnErrorContainer"),
-			_ => ("SurfaceContainerHighest", "OnSurfaceVariant"),
+			ReservationStatus.Confirmed => ("SuccessContainer", "OnSuccessContainer", ""),   // circle-check
+			ReservationStatus.Rejected => ("ErrorContainer", "OnErrorContainer", ""),        // circle-xmark
+			_ => ("SurfaceContainerHighest", "OnSurfaceVariant", ""),                      // hourglass-half
 		};
 		pill.SetDynamicResource(BackgroundColorProperty, background);
 		label.SetDynamicResource(Label.TextColorProperty, text);
+		icon.SetDynamicResource(Label.TextColorProperty, text);
+		icon.Text = glyph;
 	}
 }

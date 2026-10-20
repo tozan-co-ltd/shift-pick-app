@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    長い文字列の2つの表示
+    S1（初期）：1行で表示し、省略したときだけ「すべて表示」を出す
+    S2：全文を折り返して表示（下の要素を押し下げる）、「閉じる」で S1 に戻す
+    使い方：<shared:ExpandableLabel Text="{Binding PreferredOffices}" />
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="shift_pick_app.Views.Shared.ExpandableLabel">
+    <VerticalStackLayout>
+        <Grid>
+            <Label x:Name="textLabel"
+                   FontSize="16"
+                   MaxLines="1"
+                   LineBreakMode="TailTruncation"
+                   SizeChanged="OnTextSizeChanged" />
+
+            <!-- 全文の高さの測定用（見えない・タップしない・読み上げない）。高さ0のため表示の高さは textLabel で決まる -->
+            <VerticalStackLayout HeightRequest="0"
+                                 VerticalOptions="Start"
+                                 Opacity="0"
+                                 InputTransparent="True"
+                                 AutomationProperties.IsInAccessibleTree="False">
+                <Label x:Name="measureLabel"
+                       FontSize="16"
+                       SizeChanged="OnTextSizeChanged" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <Button x:Name="toggleButton"
+                Text="すべて表示"
+                Style="{StaticResource TextButton}"
+                HorizontalOptions="Start"
+                IsVisible="False"
+                Clicked="OnToggleClicked" />
+    </VerticalStackLayout>
+</ContentView>

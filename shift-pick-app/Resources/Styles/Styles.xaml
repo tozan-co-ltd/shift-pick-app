@@ -42,6 +42,16 @@
         <Setter Property="TextColor" Value="{DynamicResource OnSurfaceVariant}" />
     </Style>
 
+    <!-- 入力欄のラベル・見出しの前のアイコン（Font Awesome。幅を揃えて文字の位置を合わせる） -->
+    <Style TargetType="Label" x:Key="LabelIcon">
+        <Setter Property="FontFamily" Value="FontAwesome6Solid" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{DynamicResource OnSurfaceVariant}" />
+        <Setter Property="WidthRequest" Value="18" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
     <Style TargetType="BoxView">
         <Setter Property="BackgroundColor" Value="{DynamicResource OutlineVariant}" />
     </Style>
@@ -79,6 +89,43 @@
     <Style TargetType="Button" x:Key="SecondaryButton" BasedOn="{StaticResource PrimaryButton}">
         <Setter Property="TextColor" Value="{DynamicResource OnSecondaryContainer}" />
         <Setter Property="BackgroundColor" Value="{DynamicResource SecondaryContainer}" />
+    </Style>
+
+    <!-- 文字だけのボタン（選択解除・変更 など） -->
+    <Style TargetType="Button" x:Key="TextButton" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="TextColor" Value="{DynamicResource Primary}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Padding" Value="8,10" />
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="TextColor" Value="{DynamicResource Outline}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="PointerOver" />
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <!-- 切り替えボタン（セグメント）：SegmentTrack の中に SegmentButton を並べ、選択中は画面側の DataTrigger で Tertiary にする -->
+    <Style TargetType="Border" x:Key="SegmentTrack">
+        <Setter Property="BackgroundColor" Value="{DynamicResource SurfaceContainerHigh}" />
+        <Setter Property="Stroke" Value="Transparent" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="Padding" Value="4" />
+    </Style>
+
+    <Style TargetType="Button" x:Key="SegmentButton" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="TextColor" Value="{DynamicResource OnSurfaceVariant}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="8" />
     </Style>
 
     <Style TargetType="CheckBox">

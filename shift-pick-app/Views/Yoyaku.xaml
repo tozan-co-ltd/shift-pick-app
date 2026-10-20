@@ -3,108 +3,236 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:shift_pick_app.ViewModels"
              xmlns:models="clr-namespace:shift_pick_app.Models"
+             xmlns:shared="clr-namespace:shift_pick_app.Views.Shared"
              x:Class="shift_pick_app.Views.Yoyaku"
              x:DataType="vm:YoyakuViewModel"
              Title="予約">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="12" Spacing="12">
+    <!-- 本体（スクロール）＋ 下部固定のボタン -->
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView>
+            <VerticalStackLayout Padding="12" Spacing="12">
 
-            <!-- 開始日付 -->
-            <Border Style="{StaticResource Card}" Padding="12">
-                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                    <Label Text="開始日付"
-                           Style="{StaticResource InputLabel}"
-                           VerticalOptions="Center" />
-                    <!-- タップで端末標準のカレンダーダイアログを表示 -->
-                    <Border Grid.Column="1" Style="{StaticResource InputBorder}">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <DatePicker Grid.ColumnSpan="2"
-                                        Date="{Binding StartDate, Mode=TwoWay}"
-                                        Format="yyyy/MM/dd"
-                                        FontSize="18" />
-                            <Label Grid.Column="1"
-                                   Text="&#xf073;"
-                                   InputTransparent="True"
-                                   FontFamily="FontAwesome6Solid"
-                                   FontSize="18"
-                                   TextColor="{DynamicResource OnSurfaceVariant}"
-                                   VerticalOptions="Center" />
-                        </Grid>
-                    </Border>
-                </Grid>
-            </Border>
-
-            <!-- 予約テーブル：高さはコードビハインドで画面の約55%に設定 -->
-            <Border x:Name="tableCard" Style="{StaticResource Card}" Padding="0">
-                <Grid RowDefinitions="Auto,*">
-                    <!-- ヘッダー（固定） -->
-                    <Grid ColumnDefinitions="*,2*,*"
-                          Padding="0,12"
-                          BackgroundColor="{DynamicResource SurfaceContainerHigh}">
-                        <Label Text="日付" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
-                        <Label Grid.Column="1" Text="事業所" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
-                        <Label Grid.Column="2" Text="予約" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
+                <!-- 表示切り替え：希望事業所 / 全事業所 -->
+                <Border Style="{StaticResource SegmentTrack}">
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="4">
+                        <Button Text="希望事業所"
+                                Style="{StaticResource SegmentButton}"
+                                Command="{Binding ShowPreferredTabCommand}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding IsPreferredTab}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{DynamicResource Tertiary}" />
+                                    <Setter Property="TextColor" Value="{DynamicResource OnTertiary}" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                        <Button Grid.Column="1"
+                                Text="全事業所"
+                                Style="{StaticResource SegmentButton}"
+                                Command="{Binding ShowAllOfficesTabCommand}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding IsAllOfficesTab}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{DynamicResource Tertiary}" />
+                                    <Setter Property="TextColor" Value="{DynamicResource OnTertiary}" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
                     </Grid>
+                </Border>
 
-                    <!-- 本体（スクロール） -->
-                    <CollectionView Grid.Row="1" ItemsSource="{Binding Slots}" SelectionMode="None">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="models:YoyakuSlot">
-                                <Grid ColumnDefinitions="*,2*,*">
-                                    <Label Text="{Binding WorkDateText}"
-                                           FontSize="16"
-                                           HorizontalOptions="Center"
-                                           VerticalOptions="Center" />
+                <!-- 検索条件：開始日付 ＋ 希望事業所（希望事業所タブのみ） -->
+                <Border Style="{StaticResource Card}" Padding="12">
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label Text="開始日付"
+                                   Style="{StaticResource InputLabel}"
+                                   VerticalOptions="Center" />
+                            <!-- タップで端末標準のカレンダーダイアログを表示 -->
+                            <Border Grid.Column="1" Style="{StaticResource InputBorder}">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <DatePicker Grid.ColumnSpan="2"
+                                                Date="{Binding StartDate, Mode=TwoWay}"
+                                                Format="yyyy/MM/dd"
+                                                FontSize="18" />
                                     <Label Grid.Column="1"
-                                           Text="{Binding OfficeName}"
-                                           FontSize="16"
-                                           Padding="8,0"
-                                           HorizontalOptions="Center"
+                                           Text="&#xf073;"
+                                           InputTransparent="True"
+                                           FontFamily="FontAwesome6Solid"
+                                           FontSize="18"
+                                           TextColor="{DynamicResource OnSurfaceVariant}"
                                            VerticalOptions="Center" />
-                                    <!-- チェックボックス代わり：未選択 Secondary / 選択 Primary。角なしで縦に連結 -->
-                                    <Button Grid.Column="2"
-                                            Text="選択"
-                                            CornerRadius="0"
-                                            FontSize="16"
-                                            BackgroundColor="{DynamicResource SecondaryContainer}"
-                                            TextColor="{DynamicResource OnSecondaryContainer}"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:YoyakuViewModel}}, Path=ToggleSlotCommand, x:DataType=vm:YoyakuViewModel}"
-                                            CommandParameter="{Binding .}">
-                                        <Button.Triggers>
-                                            <DataTrigger TargetType="Button" Binding="{Binding IsSelected}" Value="True">
-                                                <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
-                                                <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
-                                            </DataTrigger>
-                                        </Button.Triggers>
-                                    </Button>
                                 </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </Grid>
-            </Border>
+                            </Border>
+                        </Grid>
 
-            <!-- 希望事業所 + ボタン（カードなし） -->
-            <VerticalStackLayout Spacing="8" Padding="4,0">
-                <Label Text="希望事業所" Style="{StaticResource InputLabel}" />
-                <Label Text="{Binding PreferredOffices}" FontSize="16" />
+                        <!-- 希望事業所：変更 → SW008。1行に収まらなければ「すべて表示」 -->
+                        <VerticalStackLayout IsVisible="{Binding IsPreferredSummaryVisible}">
+                            <BoxView HeightRequest="1" Margin="0,0,0,4" />
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Label Text="{Binding PreferredTitle}"
+                                       Style="{StaticResource InputLabel}"
+                                       VerticalOptions="Center" />
+                                <Button Grid.Column="1"
+                                        Text="変更"
+                                        shared:ButtonIcon.Glyph="&#xf304;"
+                                        Style="{StaticResource TextButton}"
+                                        Command="{Binding OpenPreferredOfficesCommand}" />
+                            </Grid>
+                            <shared:ExpandableLabel Text="{Binding PreferredOffices}" />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
 
+                <!-- 予約テーブル：高さはコードビハインドで画面の約55%に設定 -->
+                <Border x:Name="tableCard" Style="{StaticResource Card}" Padding="0">
+                    <Grid RowDefinitions="Auto,*">
+                        <!-- ヘッダー（固定） -->
+                        <Grid ColumnDefinitions="*,2*,*"
+                              Padding="0,12"
+                              BackgroundColor="{DynamicResource SurfaceContainerHigh}">
+                            <Label Text="日付" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
+                            <Label Grid.Column="1" Text="事業所" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
+                            <Label Grid.Column="2" Text="予約" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
+                        </Grid>
+
+                        <!-- 本体（スクロール）＋ データなしの表示（ヘッダーは残す） -->
+                        <Grid Grid.Row="1">
+                            <CollectionView ItemsSource="{Binding Slots}" SelectionMode="None">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:YoyakuSlot">
+                                        <Grid ColumnDefinitions="*,2*,*">
+                                            <!-- 同一日付エラーの行：日付・事業所を赤字 -->
+                                            <Label Text="{Binding WorkDateText}"
+                                                   FontSize="16"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsConflict}" Value="True">
+                                                        <Setter Property="TextColor" Value="{DynamicResource Error}" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                            <!-- 事業所名（★と一緒に中央寄せ） -->
+                                            <Grid Grid.Column="1"
+                                                  Padding="8,0"
+                                                  HorizontalOptions="Center"
+                                                  VerticalOptions="Center">
+                                                <Label Text="{Binding OfficeName}"
+                                                       FontSize="16"
+                                                       MaxLines="2"
+                                                       LineBreakMode="TailTruncation"
+                                                       VerticalOptions="Center">
+                                                    <Label.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsPreferredMarkVisible}" Value="True">
+                                                            <Setter Property="Padding" Value="20,0,0,0" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsConflict}" Value="True">
+                                                            <Setter Property="TextColor" Value="{DynamicResource Error}" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                                <!-- ★希望事業所（全事業所タブのみ）：塗りの星（下）＋ 枠の星（上）。色はテスト中 -->
+                                                <Grid IsVisible="{Binding IsPreferredMarkVisible}"
+                                                      HorizontalOptions="Start"
+                                                      VerticalOptions="Center"
+                                                      SemanticProperties.Description="希望事業所">
+                                                    <Label Text="&#xf005;"
+                                                           FontFamily="FontAwesome6Solid"
+                                                           FontSize="14"
+                                                           TextColor="{DynamicResource SuccessFixedDim}" />
+                                                    <Label Text="&#xf005;"
+                                                           FontFamily="FontAwesome6Regular"
+                                                           FontSize="14"
+                                                           TextColor="{DynamicResource OnSuccessFixedVariant}" />
+                                                </Grid>
+                                            </Grid>
+                                            <!-- チェックボックス代わり：未選択 Secondary「選択」/ 選択 Primary「選択中」。角なしで縦に連結 -->
+                                            <!-- 「選択中」が狭い画面・大きい文字でも1行に収まるよう左右の余白を小さくする -->
+                                            <Button Grid.Column="2"
+                                                    Text="選択"
+                                                    CornerRadius="0"
+                                                    FontSize="16"
+                                                    Padding="4,10"
+                                                    BackgroundColor="{DynamicResource SecondaryContainer}"
+                                                    TextColor="{DynamicResource OnSecondaryContainer}"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:YoyakuViewModel}}, Path=ToggleSlotCommand, x:DataType=vm:YoyakuViewModel}"
+                                                    CommandParameter="{Binding .}">
+                                                <Button.Triggers>
+                                                    <DataTrigger TargetType="Button" Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="Text" Value="選択中" />
+                                                        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                                        <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                                    </DataTrigger>
+                                                </Button.Triggers>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+
+                            <!-- データなし：希望事業所が未登録 -->
+                            <VerticalStackLayout IsVisible="{Binding IsNoPreferredVisible}"
+                                                 Padding="16"
+                                                 Spacing="8"
+                                                 VerticalOptions="Center">
+                                <Label Text="希望事業所が登録されていません。"
+                                       FontSize="16"
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center" />
+                                <Button Text="希望事業所を登録"
+                                        HorizontalOptions="Center"
+                                        Command="{Binding OpenPreferredOfficesCommand}" />
+                                <Button Text="全事業所を見る"
+                                        Style="{StaticResource TextButton}"
+                                        HorizontalOptions="Center"
+                                        Command="{Binding ShowAllOfficesTabCommand}" />
+                            </VerticalStackLayout>
+
+                            <!-- データなし：開始日付以降に予約可能な事業所がない -->
+                            <VerticalStackLayout IsVisible="{Binding IsNoSlotsVisible}"
+                                                 Padding="16"
+                                                 Spacing="8"
+                                                 VerticalOptions="Center">
+                                <Label Text="予約可能な事業所はありません。"
+                                       FontSize="16"
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center" />
+                                <Button Text="全事業所を見る"
+                                        Style="{StaticResource TextButton}"
+                                        HorizontalOptions="Center"
+                                        IsVisible="{Binding IsPreferredTab}"
+                                        Command="{Binding ShowAllOfficesTabCommand}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 下部固定：エラー + 選択解除 / 申込 -->
+        <VerticalStackLayout Grid.Row="1">
+            <BoxView HeightRequest="1" />
+            <VerticalStackLayout Padding="12,8,12,12" Spacing="8">
                 <Label Text="{Binding ErrorMessage}"
                        TextColor="{DynamicResource Error}"
                        IsVisible="{Binding IsErrorMessageVisible}"
                        HorizontalOptions="Center"
                        HorizontalTextAlignment="Center" />
 
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                    <Button Text="希望事業所登録"
-                            Command="{Binding RegisterPreferredOfficesCommand}"
-                            Style="{StaticResource SecondaryButton}" />
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                    <Button Text="選択解除"
+                            shared:ButtonIcon.Glyph="&#xf12d;"
+                            Style="{StaticResource TextButton}"
+                            TextColor="{DynamicResource Tertiary}"
+                            Command="{Binding ClearSelectionCommand}" />
                     <Button Grid.Column="1"
-                            Text="申込"
+                            Text="{Binding SelectButtonText}"
+                            shared:ButtonIcon.Glyph="&#xf044;"
                             Command="{Binding SelectCommand}" />
                 </Grid>
             </VerticalStackLayout>
         </VerticalStackLayout>
-    </ScrollView>
+
+        <shared:LoadingOverlay Grid.RowSpan="2" IsVisible="{Binding IsBusy}" Message="{Binding BusyMessage}" />
+    </Grid>
 </ContentPage>

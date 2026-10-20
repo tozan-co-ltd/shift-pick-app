@@ -10,13 +10,14 @@
              Title="勤務可能日">
 
     <ContentPage.Resources>
-        <!-- 曜日ラベル（タップで曜日をまとめて選択） -->
+        <!-- 曜日ラベル（タップで曜日をまとめて選択）：タップ領域は高さ44以上 -->
         <Style x:Key="CalendarDayTitle" TargetType="Label">
             <Setter Property="FontFamily" Value="MPLUSRounded1cBold" />
             <Setter Property="FontSize" Value="16" />
             <Setter Property="TextColor" Value="{DynamicResource OnSurfaceVariant}" />
             <Setter Property="HorizontalTextAlignment" Value="Center" />
-            <Setter Property="Padding" Value="0,8" />
+            <Setter Property="VerticalTextAlignment" Value="Center" />
+            <Setter Property="MinimumHeightRequest" Value="44" />
         </Style>
         <Style x:Key="CalendarWeekendTitle" TargetType="Label" BasedOn="{StaticResource CalendarDayTitle}">
             <Setter Property="TextColor" Value="{DynamicResource Error}" />
@@ -33,7 +34,8 @@
         </Style>
     </ContentPage.Resources>
 
-    <Grid>
+    <!-- 本体（スクロール）＋ 下部固定の登録 -->
+    <Grid RowDefinitions="*,Auto">
         <ScrollView>
             <VerticalStackLayout Padding="12" Spacing="12">
 
@@ -157,23 +159,35 @@
                                 <Label Text="登録済み（変更不可）" FontSize="14" VerticalOptions="Center" />
                             </HorizontalStackLayout>
                         </HorizontalStackLayout>
+
+                        <!-- 曜日まとめ選択のヒント（カレンダーの外、凡例の下） -->
+                        <Label Text="※曜日をタップするとまとめて選択できます"
+                               FontSize="14"
+                               TextColor="{DynamicResource OnSurfaceVariant}"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"
+                               Padding="12,0" />
                     </VerticalStackLayout>
                 </Border>
+            </VerticalStackLayout>
+        </ScrollView>
 
+        <!-- 下部固定：エラー + 登録（選択中の日数） -->
+        <VerticalStackLayout Grid.Row="1">
+            <BoxView HeightRequest="1" />
+            <VerticalStackLayout Padding="12,8,12,12" Spacing="8">
                 <Label Text="{Binding ErrorMessage}"
                        TextColor="{DynamicResource Error}"
                        IsVisible="{Binding IsErrorMessageVisible}"
                        HorizontalOptions="Center"
                        HorizontalTextAlignment="Center" />
-
-                <Button Text="登録"
-                        Command="{Binding RegisterCommand}"
-                        HorizontalOptions="Center"
-                        WidthRequest="200" />
+                <Button Text="{Binding RegisterButtonText}"
+                        shared:ButtonIcon.Glyph="&#xe09a;"
+                        Command="{Binding RegisterCommand}" />
             </VerticalStackLayout>
-        </ScrollView>
+        </VerticalStackLayout>
 
-        <!-- 登録中のオーバーレイ -->
-        <shared:LoadingOverlay IsVisible="{Binding IsBusy}" />
+        <!-- 画面遷移・登録中のオーバーレイ -->
+        <shared:LoadingOverlay Grid.RowSpan="2" IsVisible="{Binding IsBusy}" Message="{Binding BusyMessage}" />
     </Grid>
 </ContentPage>

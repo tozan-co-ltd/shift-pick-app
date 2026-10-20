@@ -10,10 +10,20 @@ public partial class MenuPage : FlyoutPage
     {
         InitializeComponent();
         BindingContext = _viewModel = viewModel;
+        IsPresentedChanged += (_, _) =>
+        {
+            if (IsPresented)
+                _viewModel.RefreshDemoSettings();
+        };
     }
 
     /// <summary>
     /// ログインしたユーザーを表示する
     /// </summary>
     public void SetUser(string userId) => _viewModel.UserId = userId;
+
+    /// <summary>
+    /// 戻る（端末の戻るボタン）：画面遷移中は受け付けない
+    /// </summary>
+    protected override bool OnBackButtonPressed() => _viewModel.IsBusy || base.OnBackButtonPressed();
 }

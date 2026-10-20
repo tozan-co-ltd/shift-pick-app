@@ -156,11 +156,29 @@ public partial class MonthCalendar : ContentView
             day.Date = date;
             day.Day = isThisMonth ? date.Day.ToString() : string.Empty;
             day.IsToday = isThisMonth && date == DateTime.Today;
-            day.State = !isThisMonth ? CalendarDayState.Hidden
-                : date < MinimumDate.Date || date > MaximumDate.Date ? CalendarDayState.Disabled
-                : registered.Contains(date) ? CalendarDayState.Registered
-                : selected.Contains(date) ? CalendarDayState.Selected
-                : CalendarDayState.Normal;
+
+            if (!isThisMonth)
+            {
+                day.State = CalendarDayState.Hidden;
+            }
+            else
+            {
+                if (date < MinimumDate.Date || date > MaximumDate.Date)
+                {
+                    day.State = CalendarDayState.Disabled;
+                }
+                else
+                {
+                    if (registered.Contains(date))
+                    {
+                        day.State = CalendarDayState.Registered;
+                    }
+                    else
+                    {
+                        day.State = selected.Contains(date) ? CalendarDayState.Selected : CalendarDayState.Normal;
+                    }
+                }
+            }
 
             // 祝日・土日の赤字は背景なしの日のみ（背景上では読みにくいため）。無効の日は XAML で薄くする
             bool isRed = holidays.Contains(date) || date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;

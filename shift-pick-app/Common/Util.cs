@@ -10,6 +10,9 @@ namespace shift_pick_app.Common
 {
     public static class Util
     {
+        // ワードジョイナー（U+2060）：前後で改行させない、表示されない文字
+        private const string WordJoiner = "\u2060";
+
         // 共通関数
         // 参考：https://gist.github.com/Buravo46/49c34e77ff1a75177340
 
@@ -129,12 +132,12 @@ namespace shift_pick_app.Common
         }
 
         /// <summary>
-        /// 日付を「（曜日）日」形式にする。例：（月）1
+        /// 日付を「月/日(曜日)」形式にする。例：10/20(火)
         /// 端末の言語設定に関係なく曜日を漢字にするため ja-JP を指定する
         /// </summary>
         public static string ToJapaneseDay(DateTime date)
         {
-            return date.ToString("（ddd）d", new CultureInfo("ja-JP"));
+            return date.ToString("M/d(ddd)", new CultureInfo("ja-JP"));
         }
 
         /// <summary>
@@ -143,6 +146,37 @@ namespace shift_pick_app.Common
         public static string ToJapaneseDate(DateTime date)
         {
             return date.ToString("yyyy/MM/dd（ddd）", new CultureInfo("ja-JP"));
+        }
+
+        /// <summary>
+        /// 改行位置を「|」で手動指定する（任意）。ハードコードされた固定の日本語文言にのみ使う
+        /// </summary>
+        /// <remarks>
+        /// 例：PhraseJpText("|予約が|確定したら|キャンセル|できません。")
+        /// 「|」以外の位置では改行されないよう文字間にワードジョイナーを入れる
+        /// </remarks>
+        public static string PhraseJpText(string markedText)
+        {
+            var result = new StringBuilder();
+            foreach (var phrase in markedText.Split('|'))
+            {
+                var lines = phrase.Split('\n').Select(
+                    line => string.Join(WordJoiner, TextElements(line)));
+                result.Append(string.Join("\n", lines));
+            }
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// 1文字ずつ（結合文字・絵文字は分けない）
+        /// </summary>
+        private static IEnumerable<string> TextElements(string text)
+        {
+            var elements = StringInfo.GetTextElementEnumerator(text);
+            while (elements.MoveNext())
+            {
+                yield return elements.GetTextElement();
+            }
         }
     }
 }

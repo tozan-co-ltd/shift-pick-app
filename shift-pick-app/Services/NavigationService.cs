@@ -34,17 +34,20 @@ namespace shift_pick_app.Services
             return Navigation.PushAsync(page);
         }
 
+        /// <summary>
+        /// 画面を積み、スタックの最初の画面（メニュー）との間の画面を外す（戻るでメニューへ）
+        /// </summary>
+        public async Task PushOverRootAsync<TPage>(Action<TPage>? setup = null) where TPage : Page
+        {
+            var navigation = Navigation;
+            await PushAsync(setup);
+            foreach (var page in navigation.NavigationStack.Skip(1).SkipLast(1).ToList())
+                navigation.RemovePage(page);
+        }
+
         public Task PopAsync()
         {
             return Navigation.PopAsync();
-        }
-
-        /// <summary>
-        /// スタックの最初の画面（メニュー）まで戻る
-        /// </summary>
-        public Task PopToRootAsync(bool animated = true)
-        {
-            return Navigation.PopToRootAsync(animated);
         }
 
         /// <summary>

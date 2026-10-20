@@ -5,7 +5,7 @@ namespace shift_pick_app.Models
     /// <summary>
     /// 都道府県カード
     /// </summary>
-    public partial class Prefecture : ObservableObject
+    public class Prefecture
     {
         public Prefecture(string name, string image, bool isNameVisible)
         {
@@ -17,9 +17,19 @@ namespace shift_pick_app.Models
         public string Name { get; }
         public string Image { get; }
         public bool IsNameVisible { get; }
+    }
 
-        [ObservableProperty]
-        private bool _isSelected;
+    /// <summary>
+    /// 地方（都道府県カードのグループ見出し）
+    /// </summary>
+    public class PrefectureGroup : List<Prefecture>
+    {
+        public PrefectureGroup(string name, IEnumerable<Prefecture> prefectures) : base(prefectures)
+        {
+            Name = name;
+        }
+
+        public string Name { get; }
     }
 
     /// <summary>
@@ -27,18 +37,19 @@ namespace shift_pick_app.Models
     /// </summary>
     public partial class Office : ObservableObject
     {
-        public Office(int id, string name, string city, double distanceKm)
+        public Office(OfficeInfo info)
         {
-            Id = id;
-            Name = name;
-            City = city;
-            DistanceKm = distanceKm;
+            Id = info.Id;
+            Name = info.Name;
+            City = info.City;
+            DistanceKm = info.DistanceKm;
         }
 
         public int Id { get; }
         public string Name { get; }
         public string City { get; }
         public double DistanceKm { get; }   // デモ：現在地からの距離（GPS の代わり）
+        public string DistanceText => $"{DistanceKm:0.0}km";
 
         [ObservableProperty]
         private bool _isSelected;

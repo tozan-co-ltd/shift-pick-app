@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    処理結果のポップアップ（アイコン・タイトル・メッセージ・ボタン2つ）
+    使い方：DialogService.ShowResultAsync から表示する。主ボタンで true、副ボタン・外側タップ・戻るで false
+    背景色は DialogService で設定する（ここで DynamicResource を使うとダークモードでも白くなる）
+-->
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:system="clr-namespace:System;assembly=mscorlib"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               x:Class="shift_pick_app.Views.Shared.ResultPopup"
+               x:TypeArguments="system:Boolean"
+               Padding="24"
+               Margin="24">
+
+    <!-- 幅は内容で決まるため最小幅を揃える（360dp 画面：余白 24×2 + 内側 24×2 + 240 = 336） -->
+    <VerticalStackLayout Spacing="16" MinimumWidthRequest="240">
+
+        <!-- 成功アイコン -->
+        <Border WidthRequest="64"
+                HeightRequest="64"
+                StrokeShape="RoundRectangle 32"
+                Stroke="Transparent"
+                BackgroundColor="{DynamicResource SuccessContainer}"
+                HorizontalOptions="Center">
+            <Label Text="&#xf00c;"
+                   FontFamily="FontAwesome6Solid"
+                   FontSize="28"
+                   TextColor="{DynamicResource OnSuccessContainer}"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+        </Border>
+
+        <Label x:Name="titleLabel"
+               FontFamily="MPLUSRounded1cBold"
+               FontSize="20"
+               HorizontalOptions="Center"
+               HorizontalTextAlignment="Center" />
+
+        <Label x:Name="messageLabel"
+               FontSize="16"
+               HorizontalOptions="Center"
+               HorizontalTextAlignment="Center" />
+
+        <!-- 長いボタン名（メインメニューへ 等）が折り返さないよう縦に並べる -->
+        <VerticalStackLayout Spacing="8">
+            <Button x:Name="primaryButton" Clicked="OnPrimaryClicked" />
+            <Button x:Name="secondaryButton" Style="{StaticResource SecondaryButton}" Clicked="OnSecondaryClicked" />
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+</toolkit:Popup>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-    ステータスのピル（予約：ニュートラル / 確定：Success / NG：Error）
+    ステータスのピル（予約：ニュートラル・砂時計 / 確定：Success・チェック / NG：Error・バツ）
+    アイコンは色が見分けにくい場合でもステータスが分かるように付ける
     使い方：<shared:StatusPill Status="{Binding Status}" Text="{Binding StatusLabel}" />
 -->
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -12,10 +13,16 @@
             Stroke="Transparent"
             StrokeThickness="0"
             StrokeShape="RoundRectangle 12"
-            Padding="12,2">
-        <Label x:Name="label"
-               FontFamily="MPLUSRounded1cBold"
-               FontSize="14"
-               HorizontalTextAlignment="Center" />
+            Padding="10,2,12,2">
+        <HorizontalStackLayout Spacing="6">
+            <Label x:Name="icon"
+                   FontFamily="FontAwesome6Solid"
+                   FontSize="12"
+                   VerticalOptions="Center" />
+            <Label x:Name="label"
+                   FontFamily="MPLUSRounded1cBold"
+                   FontSize="14"
+                   VerticalOptions="Center" />
+        </HorizontalStackLayout>
     </Border>
 </ContentView>

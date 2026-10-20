@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using shift_pick_app.Common;
 using shift_pick_app.Models;
 using shift_pick_app.Services;
 
@@ -18,6 +19,17 @@ namespace shift_pick_app.ViewModels
             bool withName = DemoSettings.PrefectureImageWithName;
             Prefectures = [.. PrefectureData.Select(p =>
                 new Prefecture(p.Name, withName ? $"named_{p.Key}.png" : $"{p.Key}.png", !withName))];
+
+            int start = 0;
+            foreach (var (name, count) in RegionData)
+            {
+                PrefectureGroups.Add(new PrefectureGroup(name, Prefectures.Skip(start).Take(count)));
+                start += count;
+            }
+
+            // 登録済みの希望事業所を選択済みで表示（都道府県を変えても選択は保持）
+            _allOffices = [.. DemoOffices.All.Select(o => new Office(o) { IsSelected = DemoOffices.PreferredIds.Contains(o.Id) })];
+            UpdatePreferredSummary();
         }
 
         // false：都道府県選択 / true：希望の事業所
@@ -32,6 +44,11 @@ namespace shift_pick_app.ViewModels
         private string _errorMessage = string.Empty;
 
         public bool IsErrorMessageVisible => !string.IsNullOrEmpty(ErrorMessage);
+
+        /// <summary>
+        /// SW004 の「変更」から開いた場合 true（登録後は SW004 に戻る）
+        /// </summary>
+        public bool FromYoyaku { get; set; }
 
         // デモ用の固定値
         // 都道府県コード（JIS X 0401）順
@@ -55,100 +72,180 @@ namespace shift_pick_app.ViewModels
             ("鹿児島県", "kagoshima"), ("沖縄県", "okinawa")
         ];
 
+        // 8地方区分（JIS 順で連続）：地方名と都道府県の数
+        private static readonly (string Name, int Count)[] RegionData =
+        [
+            ("北海道", 1), ("東北", 6), ("関東", 7), ("中部", 9),
+            ("近畿", 7), ("中国", 5), ("四国", 4), ("九州・沖縄", 8)
+        ];
+
+        // 都道府県カード（JIS 順）と、地方ごとのグループ
         public List<Prefecture> Prefectures { get; }
 
-        private readonly List<Office> _allOffices =
-        [
-            new(1, "○○事業所", "○○市", 5.2),
-            new(2, "○○事業所", "○○市", 1.3),
-            new(3, "○○○○○○○○事業所", "○○市", 8.0),
-            new(4, "○○事業所", "○○市", 3.4),
-            new(5, "○○事業所", "○○市", 12.5),
-            new(6, "○○事業所", "○○市", 9.1),
-            new(7, "○○事業所", "○○市", 6.7),
-            new(8, "○○事業所", "○○市", 15.0),
-        ];
+        public List<PrefectureGroup> PrefectureGroups { get; } = [];
+
+        // デモ用の一時的な切り替え（画面を開いたときに反映）：true = 地方ごと（見出し付き）/ false = 設計書どおり（見出しなし）
+        public bool IsRegionLayout { get; } = DemoSettings.PrefectureByRegion;
+
+        // 都道府県カードの一覧：地方ごとはグループ、設計書どおりは47件そのまま
+        public System.Collections.IEnumerable PrefectureItems => IsRegionLayout ? PrefectureGroups : Prefectures;
+
+        // デモ：どの都道府県・GPS でも同じ事業所を表示
+        private readonly List<Office> _allOffices;
 
         [ObservableProperty]
         private List<Office> _offices = [];
 
+        /// <summary>
+        /// 2画面目の見出し（○○県の事業所（8件）/ 現在地から近い事業所（8件））
+        /// </summary>
+        [ObservableProperty]
+        private string _officeListTitle = string.Empty;
+
+        // 並び順：true = 近い順 / false = 事業所ID順
+        [ObservableProperty]
+        private bool _isSortByDistance;
+
+        // 選択中の希望事業所（2画面目のリストの下）：見出し（○件）と事業所名
+        [ObservableProperty]
+        private string _preferredTitle = string.Empty;
+
         [ObservableProperty]
         private string _preferredOffices = string.Empty;
 
-        [RelayCommand]
-        private void TogglePrefecture(Prefecture prefecture) => prefecture.IsSelected = !prefecture.IsSelected;
+        public bool HasSelection => _allOffices.Any(o => o.IsSelected);
+
+        // 選択が登録済みの希望事業所と違う（未登録の変更あり）
+        private bool HasUnsavedChanges =>
+            !_allOffices.Where(o => o.IsSelected).Select(o => o.Id).ToHashSet().SetEquals(DemoOffices.PreferredIds);
+
+        partial void OnIsSortByDistanceChanged(bool value) => SortOffices();
 
         /// <summary>
-        /// 都道府県選択：事業所ID順
+        /// 都道府県カード押下：事業所ID順で2画面目へ
         /// </summary>
         [RelayCommand]
-        private void SelectByPrefecture() => ShowOffices([.. _allOffices.OrderBy(o => o.Id)]);
+        private Task SelectPrefecture(Prefecture prefecture) =>
+            ShowOffices($"{prefecture.Name}の事業所", sortByDistance: false,
+                        Util.PhraseJpText($"|{prefecture.Name}の|事業所を|読み込み中…"));
 
         /// <summary>
-        /// GPSの近い事業所選択：現在位置から近い順（デモは固定の距離）
+        /// 現在地から近い事業所を探す：現在位置から近い順で2画面目へ（デモは固定の距離）
         /// </summary>
         [RelayCommand]
-        private void SelectByGps() => ShowOffices([.. _allOffices.OrderBy(o => o.DistanceKm)]);
+        private Task SelectByGps() =>
+            ShowOffices("現在地から近い事業所", sortByDistance: true,
+                        Util.PhraseJpText("|現在地から|近い|事業所を|読み込み中…"));
 
-        private void ShowOffices(List<Office> offices)
+        [RelayCommand]
+        private void SortById() => IsSortByDistance = false;
+
+        [RelayCommand]
+        private void SortByDistance() => IsSortByDistance = true;
+
+        private Task ShowOffices(string title, bool sortByDistance, string loadingMessage) =>
+            RunBusyAsync(loadingMessage, () =>
+            {
+                OfficeListTitle = $"{title}（{_allOffices.Count}件）";
+                IsSortByDistance = sortByDistance;
+                SortOffices();
+                IsOfficeView = true;
+                return Task.CompletedTask;
+            });
+
+        private void SortOffices() =>
+            Offices = IsSortByDistance ? [.. _allOffices.OrderBy(o => o.DistanceKm)] : [.. _allOffices.OrderBy(o => o.Id)];
+
+        /// <summary>
+        /// 戻る（ナビゲーションバー・端末の戻るボタン共通）：
+        /// 2画面目なら1画面目に戻す。1画面目なら、未登録の変更があれば確認してから前の画面へ
+        /// </summary>
+        [RelayCommand]
+        private async Task Back()
         {
-            Offices = offices;
-            IsOfficeView = true;
+            if (IsBusy)
+                return;
+
+            if (IsOfficeView)
+            {
+                await RunBusyAsync(LoadingMessage, () =>
+                {
+                    ErrorMessage = string.Empty;
+                    IsOfficeView = false;
+                    return Task.CompletedTask;
+                });
+                return;
+            }
+
+            if (HasUnsavedChanges
+                && !await _dialog.ConfirmAsync("変更の破棄", Util.PhraseJpText("|変更を|保存せずに|戻りますか？")))
+                return;
+
+            await RunBusyAsync(LoadingMessage, _navigation.PopAsync);
         }
 
         /// <summary>
-        /// 戻る押下：希望の事業所 → 都道府県選択に戻す。都道府県選択なら false（通常どおり前の画面へ）
-        /// </summary>
-        public bool TryBackToPrefectureView()
-        {
-            if (!IsOfficeView)
-                return false;
-
-            ErrorMessage = string.Empty;
-            IsOfficeView = false;
-            return true;
-        }
-
-        /// <summary>
-        /// 「予約」ボタン押下（選択の切り替え）
+        /// 「選択」ボタン押下（選択の切り替え）
         /// </summary>
         [RelayCommand]
         private void ToggleOffice(Office office)
         {
             office.IsSelected = !office.IsSelected;
             ErrorMessage = string.Empty;
-            PreferredOffices = string.Join("、", _allOffices.Where(o => o.IsSelected).Select(o => o.Name.Replace("事業所", "")));
+            UpdatePreferredSummary();
+        }
+
+        /// <summary>
+        /// 選択解除ボタン押下（確認後、他の都道府県で選んだ事業所も含めてすべて。登録するまで保存しない）
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(HasSelection))]
+        private async Task ClearSelection()
+        {
+            bool confirmed = await _dialog.ConfirmAsync("選択解除", Util.PhraseJpText("|すべての|選択を|解除しますか？"));
+            if (!confirmed)
+                return;
+
+            foreach (var office in _allOffices.Where(o => o.IsSelected))
+                office.IsSelected = false;
+            ErrorMessage = string.Empty;
+            UpdatePreferredSummary();
+        }
+
+        private void UpdatePreferredSummary()
+        {
+            var selected = _allOffices.Where(o => o.IsSelected).ToList();
+            PreferredTitle = selected.Count > 0 ? $"希望事業所（{selected.Count}件）" : "希望事業所";
+            PreferredOffices = selected.Count > 0 ? DemoOffices.ToText(selected.Select(o => o.Name)) : "未選択";
+            ClearSelectionCommand.NotifyCanExecuteChanged();
         }
 
         [RelayCommand]
         private async Task Register()
         {
             ErrorMessage = string.Empty;
-            if (!_allOffices.Any(o => o.IsSelected))
+            if (!HasSelection)
             {
                 ErrorMessage = "希望事業所を選択してください。";
                 return;
             }
 
-            bool confirmed = await _dialog.ConfirmAsync("希望事業所登録", "選択した事業所を希望事業所として登録しますか？");
+            bool confirmed = await _dialog.ConfirmAsync("希望事業所登録", Util.PhraseJpText("|選択した|事業所を|希望事業所として|登録しますか？"));
             if (!confirmed)
                 return;
 
-            IsBusy = true;
-            try
+            await RunBusyAsync(ProcessingMessage, async () =>
             {
                 // デモ：登録の代わり
                 await Task.Delay(1000);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+                DemoOffices.PreferredIds = [.. _allOffices.Where(o => o.IsSelected).Select(o => o.Id)];
+            });
 
-            bool returnMenu = await _dialog.ConfirmAsync("登録しました", "希望事業所を登録しました。", "メインメニューへ", "閉じる");
-            if (returnMenu)
+            bool goBack = await _dialog.ShowResultAsync("登録しました", Util.PhraseJpText("|希望事業所を|登録しました。"),
+                                                        FromYoyaku ? "予約に戻る" : "メインメニューへ", "閉じる");
+            if (goBack)
             {
-                await _navigation.PopAsync();
+                // 登録済みのため確認なしで前の画面へ
+                await RunBusyAsync(LoadingMessage, _navigation.PopAsync);
             }
         }
     }

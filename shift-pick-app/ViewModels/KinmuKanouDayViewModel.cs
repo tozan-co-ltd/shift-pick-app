@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Plugin.Maui.Calendar.Models;
+using shift_pick_app.Common;
 using shift_pick_app.Models;
 using shift_pick_app.Services;
 using System.Collections.ObjectModel;
@@ -45,7 +46,11 @@ namespace shift_pick_app.ViewModels
 
         // カレンダー側で新しいコレクションに差し替えられるため ObservableProperty にする
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(RegisterButtonText))]
         private ObservableCollection<DateTime> _selectedDates = [];
+
+        // 登録ボタン：選択中の日数（例：登録（3日））
+        public string RegisterButtonText => SelectedDates?.Count > 0 ? $"登録（{SelectedDates.Count}日）" : "登録";
 
         /// <summary>
         /// 登録済みの日を選択から外す（変更不可）。
@@ -114,6 +119,12 @@ namespace shift_pick_app.ViewModels
                 : new(selected.Union(targets));
         }
 
+        /// <summary>
+        /// 戻る（ナビゲーションバー・端末の戻るボタン共通、登録後の「メインメニューへ」）→ SW003
+        /// </summary>
+        [RelayCommand]
+        private Task Back() => RunBusyAsync(LoadingMessage, _navigation.PopAsync);
+
         [RelayCommand]
         private async Task Register()
         {
@@ -124,27 +135,24 @@ namespace shift_pick_app.ViewModels
                 return;
             }
 
-            bool confirmed = await _dialog.ConfirmAsync("勤務希望日登録", "勤務希望日が確定したらキャンセルできません。\n登録しますか？");
+            bool confirmed = await _dialog.ConfirmAsync(
+                "勤務希望日登録", Util.PhraseJpText("|勤務希望日が|確定したら|キャンセル|できません。|登録しますか？"));
             if (!confirmed)
                 return;
 
-            IsBusy = true;
-            try
+            await RunBusyAsync(ProcessingMessage, async () =>
             {
                 // デモ：登録・メール送信の代わり
                 await Task.Delay(1000);
                 SetRegisteredDates([.. RegisteredDates, .. SelectedDates]);
                 SelectedDates = [];
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            });
 
-            bool returnMenu = await _dialog.ConfirmAsync("登録しました", "登録内容をメールで送信しました。", "メインメニューへ", "閉じる");
+            bool returnMenu = await _dialog.ShowResultAsync(
+                "登録しました", Util.PhraseJpText("|登録内容を|メールで|送信しました。"), "メインメニューへ", "閉じる");
             if (returnMenu)
             {
-                await _navigation.PopAsync();
+                await Back();
             }
         }
 

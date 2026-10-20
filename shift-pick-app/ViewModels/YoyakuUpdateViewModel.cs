@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using shift_pick_app.Common;
 using shift_pick_app.Models;
 using shift_pick_app.Services;
 using shift_pick_app.Views;
@@ -24,36 +25,43 @@ namespace shift_pick_app.ViewModels
         private List<YoyakuSlot> _slots = [];
 
         /// <summary>
+        /// 登録完了時の処理（SW004 の選択解除）
+        /// </summary>
+        public Action? OnRegistered { get; set; }
+
+        /// <summary>
+        /// 戻る（ナビゲーションバー・端末の戻るボタン共通、登録後の「閉じる」）→ SW004
+        /// </summary>
+        [RelayCommand]
+        private Task Back() => RunBusyAsync(LoadingMessage, _navigation.PopAsync);
+
+        /// <summary>
         /// 登録ボタン押下
         /// </summary>
         [RelayCommand]
         private async Task Register()
         {
-            bool confirmed = await _dialog.ConfirmAsync("応募登録", "予約が確定したらキャンセルできません。\n登録しますか？");
+            bool confirmed = await _dialog.ConfirmAsync("応募登録", Util.PhraseJpText("|予約が|確定したら|キャンセル|できません。|登録しますか？"));
             if (!confirmed)
                 return;
 
-            IsBusy = true;
-            try
+            await RunBusyAsync(ProcessingMessage, async () =>
             {
                 // デモ：登録・メール送信の代わり
                 await Task.Delay(1000);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+                OnRegistered?.Invoke();
+            });
 
-            bool openList = await _dialog.ConfirmAsync("登録しました",
-                                                       "登録内容をメールで送信しました。\n予約状況を確認しますか？",
-                                                       "予約状況へ", "閉じる");
+            bool openList = await _dialog.ShowResultAsync("登録しました",
+                                                          Util.PhraseJpText("|登録内容を|メールで|送信しました。\n|予約状況を|確認しますか？"),
+                                                          "予約状況へ", "閉じる");
             if (openList)
             {
-                await _navigation.PopToRootAsync(animated: false);
-                await _navigation.PushAsync<YoyakuList>();
+                // SW006 を開き、SW004・SW005 を外す（戻るでメニューへ）
+                await RunBusyAsync(LoadingMessage, () => _navigation.PushOverRootAsync<YoyakuList>());
                 return;
             }
-            await _navigation.PopAsync();
+            await Back();
         }
     }
 }

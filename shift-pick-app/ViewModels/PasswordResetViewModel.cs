@@ -55,6 +55,9 @@ namespace shift_pick_app.ViewModels
         public bool IsNewPasswordVisible => Step != ResetStep.EnterUserId;
         public string SubmitText => Step == ResetStep.EnterUserId ? "送信" : "登録";
 
+        // 新規パスワードの下のヒント（例：8文字以上）
+        public string PasswordRuleHint => $"{Const.C_PASSWORD_MIN_LENGTH}文字以上";
+
         /// <summary>
         /// ケース1：ログイン画面から初回ログインとして開く
         /// </summary>
@@ -68,7 +71,7 @@ namespace shift_pick_app.ViewModels
         /// 送信／登録ボタン押下
         /// </summary>
         [RelayCommand]
-        private void Submit()
+        private async Task Submit()
         {
             ErrorMessage = string.Empty;
 
@@ -84,22 +87,22 @@ namespace shift_pick_app.ViewModels
                         ErrorMessage = "初期パスワードが正しくありません。";
                         return;
                     }
-                    RegisterNewPassword();
+                    await RegisterNewPassword();
                     break;
 
                 case ResetStep.NewPassword:
-                    RegisterNewPassword();
+                    await RegisterNewPassword();
                     break;
             }
         }
 
         /// <summary>
-        /// 戻るボタン押下
+        /// 戻るボタン・端末の戻るボタン押下 → SW001
         /// </summary>
         [RelayCommand]
         private Task Back()
         {
-            return _navigation.PopAsync();
+            return RunBusyAsync(LoadingMessage, _navigation.PopAsync);
         }
 
         private void ConfirmUserId()
@@ -121,21 +124,25 @@ namespace shift_pick_app.ViewModels
             Step = ResetStep.NewPassword;
         }
 
-        private void RegisterNewPassword()
+        private Task RegisterNewPassword()
         {
             if (NewPassword.Length < Const.C_PASSWORD_MIN_LENGTH)
             {
                 ErrorMessage = $"パスワードは{Const.C_PASSWORD_MIN_LENGTH}文字以上で入力してください。";
-                return;
+                return Task.CompletedTask;
             }
             if (NewPassword != ConfirmPassword)
             {
                 ErrorMessage = "新規パスワードと確認用パスワードが一致しません。";
-                return;
+                return Task.CompletedTask;
             }
 
             // デモ：新しいパスワードでログインした扱いでメニューへ（戻れないようにスタックを置き換える）
-            _navigation.SetRoot<MenuPage>(page => page.SetUser(UserId));
+            return RunBusyAsync(ProcessingMessage, () =>
+            {
+                _navigation.SetRoot<MenuPage>(page => page.SetUser(UserId));
+                return Task.CompletedTask;
+            });
         }
     }
 }

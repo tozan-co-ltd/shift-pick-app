@@ -8,62 +8,73 @@
              x:DataType="vm:YoyakuListViewModel"
              Title="予約状況">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="12" Spacing="12">
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="12" Spacing="12">
 
-            <!-- 予約状況（SW003 と同じ） -->
-            <Border Style="{StaticResource Card}" Padding="12">
-                <VerticalStackLayout Spacing="8">
-                    <VerticalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding QuickStatus}">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="models:QuickStatusItem">
-                                <HorizontalStackLayout Spacing="30">
-                                    <Label Text="{Binding Label}"
-                                           Style="{StaticResource InputLabel}"
-                                           FontSize="14"
-                                           MinimumWidthRequest="40"
-                                           VerticalOptions="Center" />
-                                    <shared:StatusPill Status="{Binding Status}" Text="{Binding Count, StringFormat='{0} 件'}" />
-                                </HorizontalStackLayout>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
+                <!-- 予約状況（SW003 と同じ） -->
+                <Border Style="{StaticResource Card}" Padding="12">
+                    <VerticalStackLayout Spacing="8">
+                        <VerticalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding QuickStatus}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:QuickStatusItem">
+                                    <HorizontalStackLayout Spacing="30">
+                                        <Label Text="{Binding Label}"
+                                               Style="{StaticResource InputLabel}"
+                                               FontSize="14"
+                                               MinimumWidthRequest="40"
+                                               VerticalOptions="Center" />
+                                        <shared:StatusPill Status="{Binding Status}" Text="{Binding Count, StringFormat='{0} 件'}" />
+                                    </HorizontalStackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
                     </VerticalStackLayout>
+                </Border>
+
+                <!-- 予約・実績：高さはコードビハインドで画面の約55%に設定 -->
+                <Label Text="予約・実績" Style="{StaticResource InputLabel}" Margin="4,0" />
+                <Border x:Name="listCard" Style="{StaticResource Card}" Padding="0">
+                    <CollectionView ItemsSource="{Binding Reservations}" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Reservation">
+                                <Grid ColumnDefinitions="Auto,*"
+                                      RowDefinitions="Auto,Auto,Auto,1"
+                                      ColumnSpacing="16"
+                                      RowSpacing="6">
+                                    <HorizontalStackLayout Spacing="6" Margin="16,12,0,0">
+                                        <Label Text="&#xf1ad;" Style="{StaticResource LabelIcon}" />
+                                        <Label Text="事業所" Style="{StaticResource InputLabel}" />
+                                    </HorizontalStackLayout>
+                                    <Label Grid.Column="1" Text="{Binding OfficeName}" FontSize="16" Margin="0,12,16,0" />
+
+                                    <HorizontalStackLayout Grid.Row="1" Spacing="6" Margin="16,0,0,0">
+                                        <Label Text="&#xf783;" Style="{StaticResource LabelIcon}" />
+                                        <Label Text="年月日" Style="{StaticResource InputLabel}" />
+                                    </HorizontalStackLayout>
+                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding WorkDateText}" FontSize="16" />
+
+                                    <shared:StatusPill Grid.Row="2" Grid.Column="1"
+                                                       Status="{Binding Status}"
+                                                       Text="{Binding StatusLabel}"
+                                                       Margin="0,0,0,12" />
+
+                                    <BoxView Grid.Row="3" Grid.ColumnSpan="2" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+
+                <!-- 希望事業所（カードなし） -->
+                <VerticalStackLayout Spacing="8" Padding="4,0">
+                    <Label Text="希望事業所" Style="{StaticResource InputLabel}" />
+                    <Label Text="{Binding PreferredOffices}" FontSize="16" />
                 </VerticalStackLayout>
-            </Border>
-
-            <!-- 予約・実績：高さはコードビハインドで画面の約55%に設定 -->
-            <Label Text="予約・実績" Style="{StaticResource InputLabel}" Margin="4,0" />
-            <Border x:Name="listCard" Style="{StaticResource Card}" Padding="0">
-                <CollectionView ItemsSource="{Binding Reservations}" SelectionMode="None">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="models:Reservation">
-                            <Grid ColumnDefinitions="Auto,*"
-                                  RowDefinitions="Auto,Auto,Auto,1"
-                                  ColumnSpacing="16"
-                                  RowSpacing="6">
-                                <Label Text="事業所" Style="{StaticResource InputLabel}" Margin="16,12,0,0" />
-                                <Label Grid.Column="1" Text="{Binding OfficeName}" FontSize="16" Margin="0,12,16,0" />
-
-                                <Label Grid.Row="1" Text="年月日" Style="{StaticResource InputLabel}" Margin="16,0,0,0" />
-                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding WorkDateText}" FontSize="16" />
-
-                                <shared:StatusPill Grid.Row="2" Grid.Column="1"
-                                                   Status="{Binding Status}"
-                                                   Text="{Binding StatusLabel}"
-                                                   Margin="0,0,0,12" />
-
-                                <BoxView Grid.Row="3" Grid.ColumnSpan="2" />
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Border>
-
-            <!-- 希望事業所（カードなし） -->
-            <VerticalStackLayout Spacing="8" Padding="4,0">
-                <Label Text="希望事業所" Style="{StaticResource InputLabel}" />
-                <Label Text="{Binding PreferredOffices}" FontSize="16" />
             </VerticalStackLayout>
-        </VerticalStackLayout>
-    </ScrollView>
+        </ScrollView>
+
+        <!-- 戻るときのオーバーレイ -->
+        <shared:LoadingOverlay IsVisible="{Binding IsBusy}" Message="{Binding BusyMessage}" />
+    </Grid>
 </ContentPage>

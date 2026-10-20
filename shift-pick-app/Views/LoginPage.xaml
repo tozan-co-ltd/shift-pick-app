@@ -2,91 +2,120 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:shift_pick_app.ViewModels"
+             xmlns:shared="clr-namespace:shift_pick_app.Views.Shared"
              x:Class="shift_pick_app.Views.LoginPage"
              x:DataType="vm:LoginPageViewModel"
              Title="ログイン">
 
-    <ScrollView>
-        <Border Style="{StaticResource Card}" Margin="16" VerticalOptions="Center">
-            <VerticalStackLayout Spacing="12">
+    <Grid>
+        <ScrollView>
+            <Border Style="{StaticResource Card}" Margin="16" VerticalOptions="Center">
+                <VerticalStackLayout Spacing="12">
 
-                <!-- アプリアイコン -->
-                <Border WidthRequest="120"
-                        HeightRequest="120"
-                        HorizontalOptions="Center"
-                        StrokeShape="RoundRectangle 30"
-                        Stroke="Transparent"
-                        BackgroundColor="{DynamicResource SurfaceContainer}">
-                    <Image Source="appicon.png" />
-                </Border>
+                    <!-- アプリアイコン -->
+                    <Border WidthRequest="120"
+                            HeightRequest="120"
+                            HorizontalOptions="Center"
+                            StrokeShape="RoundRectangle 30"
+                            Stroke="Transparent"
+                            BackgroundColor="{DynamicResource SurfaceContainer}">
+                        <Image Source="appicon.png" />
+                    </Border>
 
-                <!-- アプリ名 + 説明 -->
-                <Label Text="ShiftPick"
-                       FontFamily="MPLUSRounded1cBold"
-                       FontSize="26"
-                       TextColor="{DynamicResource Primary}"
-                       HorizontalOptions="Center" />
-                <Label Text="湘南プラス利用アプリ"
-                       FontSize="16"
-                       TextColor="{DynamicResource Primary}"
-                       HorizontalOptions="Center"
-                       Margin="0,0,0,8" />
+                    <!-- アプリ名 + 説明 -->
+                    <Label Text="ShiftPick"
+                           FontFamily="MPLUSRounded1cBold"
+                           FontSize="26"
+                           TextColor="{DynamicResource Primary}"
+                           HorizontalOptions="Center" />
+                    <Label Text="湘南プラス利用アプリ"
+                           FontSize="16"
+                           TextColor="{DynamicResource Primary}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,8" />
 
-                <!-- ユーザーID -->
-                <Border Style="{StaticResource InputBorder}">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                        <Label Text="&#xf007;"
-                               FontFamily="FontAwesome6Solid"
-                               FontSize="20"
-                               TextColor="{DynamicResource OnSurfaceVariant}"
-                               VerticalOptions="Center" />
-                        <Entry Grid.Column="1"
-                               Text="{Binding UserId}"
-                               Keyboard="Email"
-                               Placeholder="ユーザーID"
-                               IsTextPredictionEnabled="False"
-                               FontSize="20" />
-                    </Grid>
-                </Border>
+                    <!-- ユーザーID -->
+                    <Border Style="{StaticResource InputBorder}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label Text="&#xf007;"
+                                   FontFamily="FontAwesome6Solid"
+                                   FontSize="20"
+                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                   VerticalOptions="Center" />
+                            <Entry Grid.Column="1"
+                                   Text="{Binding UserId}"
+                                   Keyboard="Email"
+                                   Placeholder="ユーザーID"
+                                   IsTextPredictionEnabled="False"
+                                   FontSize="20"
+                                   ReturnType="Next"
+                                   Completed="OnUserIdCompleted" />
+                        </Grid>
+                    </Border>
 
-                <!-- パスワード -->
-                <Border Style="{StaticResource InputBorder}">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                        <Label Text="&#xf023;"
-                               FontFamily="FontAwesome6Solid"
-                               FontSize="20"
-                               TextColor="{DynamicResource OnSurfaceVariant}"
-                               VerticalOptions="Center" />
-                        <Entry Grid.Column="1"
-                               Text="{Binding Password}"
-                               IsPassword="True"
-                               Placeholder="パスワード"
-                               FontSize="20" />
-                    </Grid>
-                </Border>
+                    <!-- パスワード（右端のボタンで表示 / 非表示） -->
+                    <Border Style="{StaticResource InputBorder}" Padding="12,0,0,0">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Label Text="&#xf023;"
+                                   FontFamily="FontAwesome6Solid"
+                                   FontSize="20"
+                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                   VerticalOptions="Center" />
+                            <!-- キーボードの「完了」でログイン -->
+                            <Entry x:Name="passwordEntry"
+                                   Grid.Column="1"
+                                   Text="{Binding Password}"
+                                   IsPassword="{Binding IsPasswordHidden}"
+                                   Placeholder="パスワード"
+                                   FontSize="20"
+                                   ReturnType="Done"
+                                   ReturnCommand="{Binding LoginCommand}" />
+                            <!-- 非表示中：目（タップで表示）/ 表示中：目に斜線（タップで隠す） -->
+                            <Button Grid.Column="2"
+                                    Text="&#xf06e;"
+                                    Style="{StaticResource TextButton}"
+                                    FontFamily="FontAwesome6Solid"
+                                    FontSize="20"
+                                    TextColor="{DynamicResource OnSurfaceVariant}"
+                                    Padding="12,0"
+                                    SemanticProperties.Description="パスワードを表示"
+                                    Command="{Binding TogglePasswordCommand}">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding IsPasswordHidden}" Value="False">
+                                        <Setter Property="Text" Value="&#xf070;" />
+                                        <Setter Property="SemanticProperties.Description" Value="パスワードを隠す" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+                        </Grid>
+                    </Border>
 
-                <!-- エラーメッセージ -->
-                <Label Text="{Binding ErrorMessage}"
-                       TextColor="{DynamicResource Error}"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center" />
+                    <!-- エラーメッセージ -->
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="{DynamicResource Error}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
 
-                <!-- ログイン -->
-                <Button Text="ログイン"
-                        Command="{Binding LoginCommand}"
-                        FontSize="24" />
+                    <!-- ログイン -->
+                    <Button Text="ログイン"
+                            shared:ButtonIcon.Glyph="&#xf090;"
+                            Command="{Binding LoginCommand}"
+                            FontSize="24" />
 
-                <!-- パスワードリセット -->
-                <Label Text="パスワードをお忘れの場合はこちら"
-                       TextColor="{DynamicResource Primary}"
-                       TextDecorations="Underline"
-                       HorizontalOptions="Center"
-                       Padding="0,12">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
-                    </Label.GestureRecognizers>
-                </Label>
-            </VerticalStackLayout>
-        </Border>
-    </ScrollView>
+                    <!-- パスワードリセット -->
+                    <Label Text="パスワードをお忘れの場合はこちら"
+                           TextColor="{DynamicResource Primary}"
+                           TextDecorations="Underline"
+                           HorizontalOptions="Center"
+                           Padding="0,12">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
+        </ScrollView>
+
+        <shared:LoadingOverlay IsVisible="{Binding IsBusy}" Message="{Binding BusyMessage}" />
+    </Grid>
 </ContentPage>

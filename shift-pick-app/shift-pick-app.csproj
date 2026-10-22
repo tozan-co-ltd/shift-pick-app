@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android</TargetFrameworks>
+		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>shift_pick_app</RootNamespace>
@@ -11,7 +11,7 @@
 		<Nullable>enable</Nullable>
 
 		<!-- アプリ名 -->
-		<ApplicationTitle>スマ検</ApplicationTitle>
+		<ApplicationTitle>Shift Pick</ApplicationTitle>
 
 		<!-- アプリ識別子 -->
 		<ApplicationId>jp.co.tozan.shift_pick_app</ApplicationId>
@@ -19,20 +19,43 @@
 		<!-- バージョン -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
-		
+
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>	
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
+	  <ApplicationId>jp.co.tozan.shift-pick-app</ApplicationId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0-ios'">
+	  <CodesignKey>Apple Development: Created via API (V9FG95H3Q9)</CodesignKey>
+	  <CodesignProvision>VS: jp.co.tozan.shift-pick-app Development</CodesignProvision>
+	  <ProvisioningType>manual</ProvisioningType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
+	  <ApplicationId>jp.co.tozan.shift-pick-app</ApplicationId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-ios|AnyCPU'">
+	  <ApplicationId>jp.co.tozan.shift-pick-app</ApplicationId>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-ios|AnyCPU'">
+	  <ApplicationId>jp.co.tozan.shift-pick-app</ApplicationId>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- アプリアイコン -->
-		<MauiIcon Include="Resources\AppIcon\appicon.png" />
-		
-		<!-- スプラッシュスクリーン -->
-		<MauiSplashScreen Include="Resources\Splash\appicon.png" Color="#FAF8FF" BaseSize="256,256" />
+		<!-- アプリアイコン設定：
+					Color：iOS は背景色がないと透明扱いになり App Store Connect の検証でエラーになる
+					ForegroundScale：Android のアダプティブアイコンは周囲が切り取られるため、ロゴ全体がセーフゾーンに入るよう縮小 -->
+		<MauiIcon Include="Resources\AppIcon\appicon.png" Color="#FFFFFF" ForegroundScale="0.5" />
+
+		<!-- スプラッシュスクリーン設定：画像はアプリアイコンを3/4に縮小したもの（Androidの角丸による端の途切れを防ぐため）
+					BaseSize：未指定だと iOS で画像が表示されない -->
+		<MauiSplashScreen Include="Resources\Splash\appicon.png" Color="#00245B" BaseSize="128,128" />
 
 		<!-- 画像（サブフォルダー含む。出力はファイル名のみで参照、同名ファイル不可） -->
 		<MauiImage Include="Resources\Images\**" />

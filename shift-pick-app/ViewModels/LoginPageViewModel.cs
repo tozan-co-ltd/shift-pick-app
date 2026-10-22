@@ -25,6 +25,9 @@ namespace shift_pick_app.ViewModels
         [ObservableProperty]
         private string _errorMessage = string.Empty;
 
+        [ObservableProperty]
+        private bool _isErrorVisible = false;
+
         // パスワードを隠す（初期値）/ 表示する
         [ObservableProperty]
         private bool _isPasswordHidden = true;
@@ -42,21 +45,25 @@ namespace shift_pick_app.ViewModels
         private async Task Login()
         {
             ErrorMessage = string.Empty;
+            IsErrorVisible = false;
             string userId = UserId.Trim();
 
             if (string.IsNullOrEmpty(userId))
             {
                 ErrorMessage = "ユーザーIDを入力してください。";
+                IsErrorVisible = true;
                 return;
             }
             if (Password.Length < Const.C_PASSWORD_MIN_LENGTH)
             {
                 ErrorMessage = $"パスワードは{Const.C_PASSWORD_MIN_LENGTH}文字以上で入力してください。";
+                IsErrorVisible = true;
                 return;
             }
             if (!DemoAccounts.IsValid(userId, Password))
             {
                 ErrorMessage = "ユーザーIDまたはパスワードが正しくありません。";
+                IsErrorVisible = true;
                 return;
             }
 

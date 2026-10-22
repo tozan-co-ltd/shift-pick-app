@@ -13,26 +13,14 @@
                 <VerticalStackLayout Spacing="12">
 
                     <!-- アプリアイコン -->
-                    <Border WidthRequest="120"
-                            HeightRequest="120"
+                    <Border WidthRequest="180"
+                            HeightRequest="180"
                             HorizontalOptions="Center"
                             StrokeShape="RoundRectangle 30"
                             Stroke="Transparent"
-                            BackgroundColor="{DynamicResource SurfaceContainer}">
-                        <Image Source="appicon.png" />
+                            StrokeThickness="0">
+                        <Image Source="login_logo.png" />
                     </Border>
-
-                    <!-- アプリ名 + 説明 -->
-                    <Label Text="ShiftPick"
-                           FontFamily="MPLUSRounded1cBold"
-                           FontSize="26"
-                           TextColor="{DynamicResource Primary}"
-                           HorizontalOptions="Center" />
-                    <Label Text="湘南プラス利用アプリ"
-                           FontSize="16"
-                           TextColor="{DynamicResource Primary}"
-                           HorizontalOptions="Center"
-                           Margin="0,0,0,8" />
 
                     <!-- ユーザーID -->
                     <Border Style="{StaticResource InputBorder}">
@@ -92,6 +80,7 @@
 
                     <!-- エラーメッセージ -->
                     <Label Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding IsErrorVisible}"
                            TextColor="{DynamicResource Error}"
                            HorizontalOptions="Center"
                            HorizontalTextAlignment="Center" />

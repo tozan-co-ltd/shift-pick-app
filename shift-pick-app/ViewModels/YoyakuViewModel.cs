@@ -94,7 +94,7 @@ namespace shift_pick_app.ViewModels
         {
             var preferredIds = DemoOffices.PreferredIds;
             foreach (var slot in _allSlots)
-                slot.IsPreferredMarkVisible = !IsPreferredTab && preferredIds.Contains(slot.OfficeId);
+                slot.IsPreferredMarkVisible = preferredIds.Contains(slot.OfficeId);
 
             Slots = [.. _allSlots.Where(s => s.WorkDate >= StartDate
                                           && (!IsPreferredTab || preferredIds.Contains(s.OfficeId)))];

@@ -65,7 +65,7 @@
                             </Border>
                         </Grid>
 
-                        <!-- 希望事業所：変更 → SW008。1行に収まらなければ「すべて表示」 -->
+                        <!-- 希望事業所：変更 → 希望事業所登録画面。1行に収まらなければ「すべて表示」 -->
                         <VerticalStackLayout IsVisible="{Binding IsPreferredSummaryVisible}">
                             <BoxView HeightRequest="1" Margin="0,0,0,4" />
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
@@ -91,7 +91,7 @@
                               Padding="0,12"
                               BackgroundColor="{DynamicResource SurfaceContainerHigh}">
                             <Label Text="日付" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
-                            <Label Grid.Column="1" Text="事業所" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
+                            <Label Grid.Column="1" Text="事業所" Style="{StaticResource InputLabel}" Margin="12,0" />
                             <Label Grid.Column="2" Text="予約" Style="{StaticResource InputLabel}" HorizontalOptions="Center" />
                         </Grid>
 
@@ -112,10 +112,9 @@
                                                     </DataTrigger>
                                                 </Label.Triggers>
                                             </Label>
-                                            <!-- 事業所名（★と一緒に中央寄せ） -->
+                                            <!-- 事業所名（左寄せで見やすく。日付列と離すため左右に余白） -->
                                             <Grid Grid.Column="1"
-                                                  Padding="8,0"
-                                                  HorizontalOptions="Center"
+                                                  Padding="12,0,8,0"
                                                   VerticalOptions="Center">
                                                 <Label Text="{Binding OfficeName}"
                                                        FontSize="16"
@@ -131,20 +130,15 @@
                                                         </DataTrigger>
                                                     </Label.Triggers>
                                                 </Label>
-                                                <!-- ★希望事業所（全事業所タブのみ）：塗りの星（下）＋ 枠の星（上）。色はテスト中 -->
-                                                <Grid IsVisible="{Binding IsPreferredMarkVisible}"
-                                                      HorizontalOptions="Start"
-                                                      VerticalOptions="Center"
-                                                      SemanticProperties.Description="希望事業所">
-                                                    <Label Text="&#xf005;"
-                                                           FontFamily="FontAwesome6Solid"
-                                                           FontSize="14"
-                                                           TextColor="{DynamicResource SuccessFixedDim}" />
-                                                    <Label Text="&#xf005;"
-                                                           FontFamily="FontAwesome6Regular"
-                                                           FontSize="14"
-                                                           TextColor="{DynamicResource OnSuccessFixedVariant}" />
-                                                </Grid>
+                                                <!-- 希望事業所（両タブ共通）：希望事業所登録画面 の「保存」と同じブックマーク -->
+                                                <Label IsVisible="{Binding IsPreferredMarkVisible}"
+                                                       Text="&#xf02e;"
+                                                       FontFamily="FontAwesome6Solid"
+                                                       FontSize="14"
+                                                       TextColor="{DynamicResource Secondary}"
+                                                       HorizontalOptions="Start"
+                                                       VerticalOptions="Center"
+                                                       SemanticProperties.Description="希望事業所" />
                                             </Grid>
                                             <!-- チェックボックス代わり：未選択 Secondary「選択」/ 選択 Primary「選択中」。角なしで縦に連結 -->
                                             <!-- 「選択中」が狭い画面・大きい文字でも1行に収まるよう左右の余白を小さくする -->

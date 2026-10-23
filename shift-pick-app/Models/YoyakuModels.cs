@@ -28,7 +28,7 @@ namespace shift_pick_app.Models
         [ObservableProperty]
         private bool _isConflict;
 
-        // 全事業所タブで希望事業所の行：★を表示する
+        // 希望事業所の行：ブックマークを表示する（両タブ共通）
         [ObservableProperty]
         private bool _isPreferredMarkVisible;
     }

@@ -212,24 +212,22 @@ namespace shift_pick_app.ViewModels
         private async Task Register()
         {
             ErrorMessage = string.Empty;
-            if (!HasSelection)
-            {
-                ErrorMessage = "希望事業所を選択してください。";
-                return;
-            }
-
-            bool confirmed = await _dialog.ConfirmAsync("希望事業所登録", Util.PhraseJpText("|選択した|事業所を|希望事業所として|登録しますか？"));
+            // 未選択でも保存できる（希望事業所なし）。その場合は確認文を変える
+            string message = HasSelection
+                ? Util.PhraseJpText("|選択した|事業所を|希望事業所として|保存しますか？")
+                : Util.PhraseJpText("|事業所が|選択されていません。\n|希望事業所なしで|保存しますか？");
+            bool confirmed = await _dialog.ConfirmAsync("希望事業所の保存", message);
             if (!confirmed)
                 return;
 
             await RunBusyAsync(ProcessingMessage, async () =>
             {
-                // デモ：登録の代わり
+                // デモ：保存の代わり
                 await Task.Delay(1000);
                 DemoOffices.PreferredIds = [.. _allOffices.Where(o => o.IsSelected).Select(o => o.Id)];
             });
 
-            bool goBack = await _dialog.ShowResultAsync("登録しました", Util.PhraseJpText("|希望事業所を|登録しました。"),
+            bool goBack = await _dialog.ShowResultAsync("保存しました", Util.PhraseJpText("|希望事業所を|保存しました。"),
                                                         FromYoyaku ? "予約に戻る" : "メインメニューへ", "閉じる");
             if (goBack)
             {

@@ -7,16 +7,14 @@ namespace shift_pick_app.Models
     /// </summary>
     public class Prefecture
     {
-        public Prefecture(string name, string image, bool isNameVisible)
+        public Prefecture(string name, string image)
         {
             Name = name;
             Image = image;
-            IsNameVisible = isNameVisible;
         }
 
         public string Name { get; }
         public string Image { get; }
-        public bool IsNameVisible { get; }
     }
 
     /// <summary>

@@ -29,12 +29,10 @@ namespace shift_pick_app.Models
             new(11, "○○L事業所", "○○市", 135.8),
         ];
 
-        public static readonly int[] DefaultPreferredIds = [1, 3, 4, 6];
-
         /// <summary>
         /// 希望事業所の事業所ID（SW008 の登録で置き換え）
         /// </summary>
-        public static List<int> PreferredIds { get; set; } = [.. DefaultPreferredIds];
+        public static List<int> PreferredIds { get; set; } = [1, 3, 4, 6];
 
         public static OfficeInfo Get(int id) => All.First(o => o.Id == id);
 

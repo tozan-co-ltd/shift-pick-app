@@ -36,61 +36,6 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- デモ用設定（一時的な切り替え） -->
-                <Border Style="{StaticResource Card}" Padding="16,12">
-                    <VerticalStackLayout>
-                        <HorizontalStackLayout Spacing="8">
-                            <Label Text="&#xf013;" Style="{StaticResource LabelIcon}" />
-                            <Label Text="デモ用設定" Style="{StaticResource InputLabel}" />
-                        </HorizontalStackLayout>
-
-                        <!-- デモ用（SW003 お知らせ） -->
-                        <Grid ColumnDefinitions="*,Auto">
-                            <Label Text="お知らせ：データあり"
-                                   FontSize="14"
-                                   VerticalOptions="Center" />
-                            <Switch Grid.Column="1"
-                                    IsToggled="{Binding HasNews, Mode=TwoWay}" />
-                        </Grid>
-
-                        <!-- デモ用（SW004・SW006・SW008 希望事業所） -->
-                        <Grid ColumnDefinitions="*,Auto">
-                            <Label Text="希望事業所：登録あり"
-                                   FontSize="14"
-                                   VerticalOptions="Center" />
-                            <Switch Grid.Column="1"
-                                    IsToggled="{Binding HasPreferredOffices, Mode=TwoWay}" />
-                        </Grid>
-
-                        <!-- テスト用（SW007 カレンダー） -->
-                        <Grid ColumnDefinitions="*,Auto">
-                            <Label Text="カレンダー：独自"
-                                   FontSize="14"
-                                   VerticalOptions="Center" />
-                            <Switch Grid.Column="1"
-                                    IsToggled="{Binding CustomCalendar, Mode=TwoWay}" />
-                        </Grid>
-
-                        <!-- デモ用（SW008 都道府県カード） -->
-                        <Grid ColumnDefinitions="*,Auto">
-                            <Label Text="都道府県：名前入り画像"
-                                   FontSize="14"
-                                   VerticalOptions="Center" />
-                            <Switch Grid.Column="1"
-                                    IsToggled="{Binding PrefectureImageWithName, Mode=TwoWay}" />
-                        </Grid>
-
-                        <!-- デモ用（SW008 都道府県カードの並べ方） -->
-                        <Grid ColumnDefinitions="*,Auto">
-                            <Label Text="都道府県：地方ごと"
-                                   FontSize="14"
-                                   VerticalOptions="Center" />
-                            <Switch Grid.Column="1"
-                                    IsToggled="{Binding PrefectureByRegion, Mode=TwoWay}" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
-
                 <!-- ログアウト -->
                 <Button Text="ログアウト"
                         shared:ButtonIcon.Glyph="&#xf08b;"

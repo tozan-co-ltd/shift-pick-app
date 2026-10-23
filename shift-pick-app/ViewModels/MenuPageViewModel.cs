@@ -35,52 +35,10 @@ namespace shift_pick_app.ViewModels
             "○○：○○○○○○○○○○（2日前）",
         ];
 
-        // デモ用の一時的な切り替え：SW003 に即時反映
-        public bool HasNews
-        {
-            get => DemoSettings.HasNews;
-            set
-            {
-                DemoSettings.HasNews = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(IsNewsEmpty));
-            }
-        }
+        public bool HasNews => News.Count > 0;
 
+        // データなし：「通知はありません。」
         public bool IsNewsEmpty => !HasNews;
-
-        // デモ用の一時的な切り替え：SW004・SW006・SW008 を開いたときに反映（オン = デモの希望事業所 / オフ = 未登録）
-        public bool HasPreferredOffices
-        {
-            get => DemoOffices.PreferredIds.Count > 0;
-            set => DemoOffices.PreferredIds = value ? [.. DemoOffices.DefaultPreferredIds] : [];
-        }
-
-        /// <summary>
-        /// メニューを開いたとき：SW008 の登録で変わった希望事業所をスイッチに反映
-        /// </summary>
-        public void RefreshDemoSettings() => OnPropertyChanged(nameof(HasPreferredOffices));
-
-        // デモ用の一時的な切り替え：SW008 を開いたときに反映
-        public bool PrefectureImageWithName
-        {
-            get => DemoSettings.PrefectureImageWithName;
-            set => DemoSettings.PrefectureImageWithName = value;
-        }
-
-        // デモ用の一時的な切り替え：SW008 を開いたときに反映（オン = 地方の見出し付き / オフ = 設計書どおりの見出しなし）
-        public bool PrefectureByRegion
-        {
-            get => DemoSettings.PrefectureByRegion;
-            set => DemoSettings.PrefectureByRegion = value;
-        }
-
-        // デモ用の一時的な切り替え：SW007 を開いたときに反映
-        public bool CustomCalendar
-        {
-            get => DemoSettings.CustomCalendar;
-            set => DemoSettings.CustomCalendar = value;
-        }
 
         public List<MainMenuItem> MenuItems { get; } =
         [

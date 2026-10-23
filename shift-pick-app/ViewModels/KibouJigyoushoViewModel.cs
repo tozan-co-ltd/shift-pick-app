@@ -16,14 +16,11 @@ namespace shift_pick_app.ViewModels
             _navigation = navigation;
             _dialog = dialog;
 
-            bool withName = DemoSettings.PrefectureImageWithName;
-            Prefectures = [.. PrefectureData.Select(p =>
-                new Prefecture(p.Name, withName ? $"named_{p.Key}.png" : $"{p.Key}.png", !withName))];
-
+            List<Prefecture> prefectures = [.. PrefectureData.Select(p => new Prefecture(p.Name, $"{p.Key}.png"))];
             int start = 0;
             foreach (var (name, count) in RegionData)
             {
-                PrefectureGroups.Add(new PrefectureGroup(name, Prefectures.Skip(start).Take(count)));
+                PrefectureGroups.Add(new PrefectureGroup(name, prefectures.Skip(start).Take(count)));
                 start += count;
             }
 
@@ -79,16 +76,8 @@ namespace shift_pick_app.ViewModels
             ("近畿", 7), ("中国", 5), ("四国", 4), ("九州・沖縄", 8)
         ];
 
-        // 都道府県カード（JIS 順）と、地方ごとのグループ
-        public List<Prefecture> Prefectures { get; }
-
+        // 都道府県カード：地方ごとのグループ（JIS 順）
         public List<PrefectureGroup> PrefectureGroups { get; } = [];
-
-        // デモ用の一時的な切り替え（画面を開いたときに反映）：true = 地方ごと（見出し付き）/ false = 設計書どおり（見出しなし）
-        public bool IsRegionLayout { get; } = DemoSettings.PrefectureByRegion;
-
-        // 都道府県カードの一覧：地方ごとはグループ、設計書どおりは47件そのまま
-        public System.Collections.IEnumerable PrefectureItems => IsRegionLayout ? PrefectureGroups : Prefectures;
 
         // デモ：どの都道府県・GPS でも同じ事業所を表示
         private readonly List<Office> _allOffices;

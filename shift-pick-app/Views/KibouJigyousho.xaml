@@ -30,16 +30,15 @@
                 <!-- 区画の間は区画内より広く空ける -->
                 <Label Text="都道府県から探す" Style="{StaticResource InputLabel}" Margin="4,8,4,0" />
 
-                <!-- 都道府県カード（3列）：高さはコードビハインドで設定。
-                     デモ切り替え（フライアウト「都道府県：地方ごと」）：オン = 地方の見出し付き / オフ = 設計書どおり（見出しなし） -->
+                <!-- 都道府県カード（地方ごと・3列）：高さはコードビハインドで設定 -->
                 <Border x:Name="prefectureCard" Style="{StaticResource Card}" Padding="8">
-                    <CollectionView ItemsSource="{Binding PrefectureItems}"
-                                    IsGrouped="{Binding IsRegionLayout}"
+                    <CollectionView ItemsSource="{Binding PrefectureGroups}"
+                                    IsGrouped="True"
                                     SelectionMode="None">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="8" VerticalItemSpacing="8" />
                         </CollectionView.ItemsLayout>
-                        <!-- 地方の見出し（地方ごとのときのみ。Android は1行全体を使う） -->
+                        <!-- 地方の見出し（Android は1行全体を使う） -->
                         <CollectionView.GroupHeaderTemplate>
                             <DataTemplate x:DataType="models:PrefectureGroup">
                                 <Label Text="{Binding Name}"
@@ -67,7 +66,6 @@
                                                Aspect="AspectFit"
                                                HeightRequest="88" />
                                         <Label Text="{Binding Name}"
-                                               IsVisible="{Binding IsNameVisible}"
                                                FontSize="14"
                                                HorizontalOptions="Center" />
                                     </VerticalStackLayout>

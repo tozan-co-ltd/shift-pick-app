@@ -10,11 +10,6 @@ public partial class MenuPage : FlyoutPage
     {
         InitializeComponent();
         BindingContext = _viewModel = viewModel;
-        IsPresentedChanged += (_, _) =>
-        {
-            if (IsPresented)
-                _viewModel.RefreshDemoSettings();
-        };
     }
 
     /// <summary>

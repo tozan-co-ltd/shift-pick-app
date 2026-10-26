@@ -47,12 +47,15 @@
 	  <ApplicationId>jp.co.tozan.shift-pick-app</ApplicationId>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<!-- アプリアイコン設定：
-					Color：iOS は背景色がないと透明扱いになり App Store Connect の検証でエラーになる
-					ForegroundScale：Android のアダプティブアイコンは周囲が切り取られるため、ロゴ全体がセーフゾーンに入るよう縮小 -->
-		<MauiIcon Include="Resources\AppIcon\appicon.png" Color="#FFFFFF" ForegroundScale="0.5" />
+  <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+    <MauiIcon Include="Resources\AppIcon\appicon.png" Color="#FFFFFF" ForegroundScale="0.6" />
+  </ItemGroup>
 
+  <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
+    <MauiIcon Include="Resources\AppIcon\appicon.png" Color="#FFFFFF" ForegroundScale="0.85" />
+  </ItemGroup>
+
+	<ItemGroup>
 		<!-- スプラッシュスクリーン設定：画像はアプリアイコンを3/4に縮小したもの（Androidの角丸による端の途切れを防ぐため）
 					BaseSize：未指定だと iOS で画像が表示されない -->
 		<MauiSplashScreen Include="Resources\Splash\appicon.png" Color="#00245B" BaseSize="128,128" />

@@ -36,11 +36,13 @@ namespace shift_pick_app
             ApplyTheme();
             RequestedThemeChanged += (s, e) => ApplyTheme();
 
-            // 入力の下線を削除する
+            // 入力の下線・枠線を削除する
             Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
             {
 #if __ANDROID__
                 handler.PlatformView.BackgroundTintList = ColorStateList.ValueOf(Colors.Transparent.ToAndroid());
+#elif __IOS__
+                handler.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None;
 #endif
             });
 
@@ -55,6 +57,8 @@ namespace shift_pick_app
             {
 #if __ANDROID__
                 handler.PlatformView.BackgroundTintList = ColorStateList.ValueOf(Colors.Transparent.ToAndroid());
+#elif __IOS__
+                handler.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None;
 #endif
             });
         }

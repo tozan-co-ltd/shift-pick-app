@@ -5,16 +5,18 @@
              xmlns:shared="clr-namespace:shift_pick_app.Views.Shared"
              x:Class="shift_pick_app.Views.LoginPage"
              x:DataType="vm:LoginPageViewModel"
-             Title="ログイン">
+             Title="ログイン"
+             HideSoftInputOnTapped="True">
 
     <Grid>
         <ScrollView>
-            <Border Style="{StaticResource Card}" Margin="16" VerticalOptions="Center">
+            <Border Style="{StaticResource Card}" Margin="16" VerticalOptions="Center" MaximumWidthRequest="480">
                 <VerticalStackLayout Spacing="12">
 
                     <!-- アプリアイコン -->
                     <Border WidthRequest="180"
                             HeightRequest="180"
+                            Margin="0,0,0,12"
                             HorizontalOptions="Center"
                             StrokeShape="RoundRectangle 30"
                             Stroke="Transparent"
@@ -35,7 +37,6 @@
                                    Keyboard="Email"
                                    Placeholder="ユーザーID"
                                    IsTextPredictionEnabled="False"
-                                   FontSize="20"
                                    ReturnType="Next"
                                    Completed="OnUserIdCompleted" />
                         </Grid>
@@ -55,7 +56,6 @@
                                    Text="{Binding Password}"
                                    IsPassword="{Binding IsPasswordHidden}"
                                    Placeholder="パスワード"
-                                   FontSize="20"
                                    ReturnType="Done"
                                    ReturnCommand="{Binding LoginCommand}" />
                             <!-- 非表示中：目（タップで表示）/ 表示中：目に斜線（タップで隠す） -->
@@ -89,7 +89,7 @@
                     <Button Text="ログイン"
                             shared:ButtonIcon.Glyph="&#xf090;"
                             Command="{Binding LoginCommand}"
-                            FontSize="24" />
+                            FontSize="20" />
 
                     <!-- パスワードリセット -->
                     <Label Text="パスワードをお忘れの場合はこちら"

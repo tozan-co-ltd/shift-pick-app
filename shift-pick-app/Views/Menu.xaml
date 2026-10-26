@@ -11,6 +11,12 @@
     <!-- ハンバーガーメニュー -->
     <FlyoutPage.Flyout>
         <ContentPage Title="メニュー" x:DataType="vm:MenuPageViewModel">
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf0c9;"
+                                 FontFamily="FontAwesome6Solid"
+                                 Size="20"
+                                 Color="{DynamicResource OnBackground}" />
+            </ContentPage.IconImageSource>
             <VerticalStackLayout Padding="24,24,24,16" Spacing="20">
 
                 <!-- ヘッダー -->

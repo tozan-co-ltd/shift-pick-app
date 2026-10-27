@@ -16,7 +16,8 @@ namespace shift_pick_app.ViewModels
             _navigation = navigation;
             _dialog = dialog;
 
-            List<Prefecture> prefectures = [.. PrefectureData.Select(p => new Prefecture(p.Name, $"{p.Key}.png"))];
+            List<Prefecture> prefectures = [.. PrefectureData.Select((p, i) =>
+                new Prefecture(i + 1, p.Name, $"{p.Key}.png", DemoOffices.All.Any(o => o.PrefectureId == i + 1)))];
             int start = 0;
             foreach (var (name, count) in RegionData)
             {
@@ -79,14 +80,24 @@ namespace shift_pick_app.ViewModels
         // 都道府県カード：地方ごとのグループ（JIS 順）
         public List<PrefectureGroup> PrefectureGroups { get; } = [];
 
-        // デモ：どの都道府県・GPS でも同じ事業所を表示
+        // 全事業所
         private readonly List<Office> _allOffices;
+
+        // 2画面目に表示する都道府県（null = 全都道府県）
+        private int? _scopePrefectureId;
+
+        // 現在地（この画面を開いている間だけ使い回す）
+        private Location? _location;
+
+        private static readonly TimeSpan LocationMaxAge = TimeSpan.FromMinutes(5);
+
+        private static readonly string LocatingMessage = Util.PhraseJpText("|現在地を|取得中…");
 
         [ObservableProperty]
         private List<Office> _offices = [];
 
         /// <summary>
-        /// 2画面目の見出し（○○県の事業所（8件）/ 現在地から近い事業所（8件））
+        /// 2画面目の見出し
         /// </summary>
         [ObservableProperty]
         private string _officeListTitle = string.Empty;
@@ -111,39 +122,117 @@ namespace shift_pick_app.ViewModels
         partial void OnIsSortByDistanceChanged(bool value) => SortOffices();
 
         /// <summary>
-        /// 都道府県カード押下：事業所ID順で2画面目へ
+        /// 都道府県カード押下：その都道府県の事業所を事業所ID順で2画面目へ。
+        /// 事業所がない都道府県はお知らせのみ
         /// </summary>
         [RelayCommand]
-        private Task SelectPrefecture(Prefecture prefecture) =>
-            ShowOffices($"{prefecture.Name}の事業所", sortByDistance: false,
-                        Util.PhraseJpText($"|{prefecture.Name}の|事業所を|読み込み中…"));
+        private async Task SelectPrefecture(Prefecture prefecture)
+        {
+            if (!prefecture.IsAvailable)
+            {
+                await _dialog.AlertAsync("事業所なし", Util.PhraseJpText($"|{prefecture.Name}には|まだ|事業所が|ありません。"));
+                return;
+            }
+
+            await RunBusyAsync(Util.PhraseJpText($"|{prefecture.Name}の|事業所を|読み込み中…"), () =>
+            {
+                ShowOffices(prefecture.Id, $"{prefecture.Name}の事業所", sortByDistance: false);
+                return Task.CompletedTask;
+            });
+        }
 
         /// <summary>
-        /// 現在地から近い事業所を探す：現在位置から近い順で2画面目へ（デモは固定の距離）
+        /// 現在地から近い事業所を探す：現在地を取得し、全事業所を近い順で2画面目へ
         /// </summary>
         [RelayCommand]
-        private Task SelectByGps() =>
-            ShowOffices("現在地から近い事業所", sortByDistance: true,
-                        Util.PhraseJpText("|現在地から|近い|事業所を|読み込み中…"));
+        private async Task SelectByGps()
+        {
+            if (IsBusy)
+                return;
+
+            bool located = false;
+            await RunBusyAsync(LocatingMessage, async () =>
+            {
+                located = await UpdateLocationAsync();
+                if (located)
+                    ShowOffices(null, "現在地から近い事業所", sortByDistance: true);
+            });
+
+            if (!located)
+                await ShowLocationErrorAsync();
+        }
 
         [RelayCommand]
         private void SortById() => IsSortByDistance = false;
 
+        /// <summary>
+        /// 近い順：現在地がなければ先に取得する（取得できなければ事業所ID順のまま）
+        /// </summary>
         [RelayCommand]
-        private void SortByDistance() => IsSortByDistance = true;
+        private async Task SortByDistance()
+        {
+            if (IsSortByDistance || IsBusy)
+                return;
 
-        private Task ShowOffices(string title, bool sortByDistance, string loadingMessage) =>
-            RunBusyAsync(loadingMessage, () =>
+            bool located = false;
+            await RunBusyAsync(LocatingMessage, async () => located = await UpdateLocationAsync());
+
+            if (located)
+                IsSortByDistance = true;
+            else
+                await ShowLocationErrorAsync();
+        }
+
+        private void ShowOffices(int? prefectureId, string title, bool sortByDistance)
+        {
+            _scopePrefectureId = prefectureId;
+            IsSortByDistance = sortByDistance;
+            SortOffices();
+            OfficeListTitle = $"{title}（{Offices.Count}件）";
+            IsOfficeView = true;
+        }
+
+        private void SortOffices()
+        {
+            var offices = _allOffices.Where(o => _scopePrefectureId == null || o.PrefectureId == _scopePrefectureId);
+            Offices = IsSortByDistance ? [.. offices.OrderBy(o => o.DistanceKm)] : [.. offices.OrderBy(o => o.Id)];
+        }
+
+        /// <summary>
+        /// 現在地を取得して各事業所の距離を更新する。5分以内の現在地は使い回す
+        /// </summary>
+        private async Task<bool> UpdateLocationAsync()
+        {
+            if (_location == null || DateTimeOffset.Now - _location.Timestamp > LocationMaxAge)
             {
-                OfficeListTitle = $"{title}（{_allOffices.Count}件）";
-                IsSortByDistance = sortByDistance;
-                SortOffices();
-                IsOfficeView = true;
-                return Task.CompletedTask;
-            });
+                try
+                {
+                    var location = await Geolocation.Default.GetLastKnownLocationAsync();
+                    if (location == null || DateTimeOffset.Now - location.Timestamp > LocationMaxAge)
+                        location = await Geolocation.Default.GetLocationAsync(
+                            new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10)));
 
-        private void SortOffices() =>
-            Offices = IsSortByDistance ? [.. _allOffices.OrderBy(o => o.DistanceKm)] : [.. _allOffices.OrderBy(o => o.Id)];
+                    if (location == null)
+                        return false;
+                    _location = location;
+                }
+                catch (Exception)
+                {
+                    // 権限なし・位置情報オフ・非対応
+                    return false;
+                }
+            }
+
+            foreach (var office in _allOffices)
+            {
+                office.DistanceKm = Location.CalculateDistance(_location, office.Location, DistanceUnits.Kilometers);
+            }
+
+            return true;
+        }
+
+        private Task ShowLocationErrorAsync() =>
+            _dialog.AlertAsync("現在地の取得", Util.PhraseJpText("|現在地を|取得でき|ませんでした。\n|位置情報の|設定を|確認して|ください。"));
 
         /// <summary>
         /// 戻る（ナビゲーションバー・端末の戻るボタン共通）：

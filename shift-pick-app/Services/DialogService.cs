@@ -22,6 +22,14 @@ namespace shift_pick_app.Services
         }
 
         /// <summary>
+        /// お知らせ（OK のみ）
+        /// </summary>
+        public Task AlertAsync(string title, string message)
+        {
+            return CurrentPage.DisplayAlert(title, message, "OK");
+        }
+
+        /// <summary>
         /// 処理結果のポップアップ。主ボタンで true、副ボタン・外側タップ・戻るで false
         /// </summary>
         public async Task<bool> ShowResultAsync(string title, string message, string primary, string secondary)

@@ -25,8 +25,9 @@ namespace shift_pick_app.Models
     /// <summary>
     /// 予約・実績の1件（SW006）
     /// </summary>
-    public record Reservation(DateTime WorkDate, string OfficeName, ReservationStatus Status)
+    public record Reservation(DateTime WorkDate, int OfficeId, ReservationStatus Status)
     {
+        public string OfficeName => DemoOffices.Get(OfficeId).Name;
         public string WorkDateText => Util.ToJapaneseDate(WorkDate);
         public string StatusLabel => Status.ToLabel();
     }
@@ -38,12 +39,12 @@ namespace shift_pick_app.Models
     {
         public static readonly List<Reservation> Items =
         [
-            new(DateTime.Today, "○○事業所", ReservationStatus.Confirmed),
-            new(DateTime.Today.AddDays(1), "○○事業所", ReservationStatus.Confirmed),
-            new(DateTime.Today.AddDays(2), "○○○○○○○○事業所", ReservationStatus.Reserved),
-            new(DateTime.Today.AddDays(3), "○○事業所", ReservationStatus.Rejected),
-            new(DateTime.Today.AddDays(5), "○○事業所", ReservationStatus.Reserved),
-            new(DateTime.Today.AddDays(7), "○○事業所", ReservationStatus.Reserved),
+            new(DateTime.Today, 18, ReservationStatus.Confirmed),
+            new(DateTime.Today.AddDays(1), 24, ReservationStatus.Confirmed),
+            new(DateTime.Today.AddDays(2), 19, ReservationStatus.Reserved),
+            new(DateTime.Today.AddDays(3), 21, ReservationStatus.Rejected),
+            new(DateTime.Today.AddDays(5), 25, ReservationStatus.Reserved),
+            new(DateTime.Today.AddDays(7), 12, ReservationStatus.Reserved),
         ];
 
         /// <summary>

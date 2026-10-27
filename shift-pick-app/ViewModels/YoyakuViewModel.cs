@@ -38,21 +38,32 @@ namespace shift_pick_app.ViewModels
         // 申込で同一日付エラーになった後は、選択を変えるたびに赤字の行を再判定する
         private bool _isConflictShown;
 
-        // デモ用の固定値（今日から5日分）。選択状態は画面を閉じるまでここに残る（日付・タブを変えても保持）
+        // デモ用の固定値。選択状態は画面を閉じるまでここに残る（日付・タブを変えても保持）
         private readonly List<YoyakuSlot> _allSlots =
         [
-            new(DateTime.Today, 1),
-            new(DateTime.Today, 2),
-            new(DateTime.Today.AddDays(1), 3),
-            new(DateTime.Today.AddDays(1), 4),
-            new(DateTime.Today.AddDays(1), 5),
-            new(DateTime.Today.AddDays(1), 6),
-            new(DateTime.Today.AddDays(2), 1),
-            new(DateTime.Today.AddDays(2), 7),
-            new(DateTime.Today.AddDays(3), 5),
-            new(DateTime.Today.AddDays(3), 8),
-            new(DateTime.Today.AddDays(4), 2),
-            new(DateTime.Today.AddDays(4), 6),
+            new(DateTime.Today, 18),
+            new(DateTime.Today, 19),
+            new(DateTime.Today, 24),
+            new(DateTime.Today, 25),
+            new(DateTime.Today.AddDays(1), 24),
+            new(DateTime.Today.AddDays(1), 25),
+            new(DateTime.Today.AddDays(1), 26),
+            new(DateTime.Today.AddDays(1), 27),
+            new(DateTime.Today.AddDays(1), 37),
+            new(DateTime.Today.AddDays(1), 40),
+            new(DateTime.Today.AddDays(1), 41),
+            new(DateTime.Today.AddDays(2), 12),
+            new(DateTime.Today.AddDays(2), 18),
+            new(DateTime.Today.AddDays(2), 24),
+            new(DateTime.Today.AddDays(2), 37),
+            new(DateTime.Today.AddDays(3), 24),
+            new(DateTime.Today.AddDays(3), 25),
+            new(DateTime.Today.AddDays(4), 19),
+            new(DateTime.Today.AddDays(4), 25),
+            new(DateTime.Today.AddDays(4), 26),
+            new(DateTime.Today.AddDays(5), 18),
+            new(DateTime.Today.AddDays(5), 24),
+            new(DateTime.Today.AddDays(5), 37),
         ];
 
         /// <summary>

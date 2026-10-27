@@ -7,14 +7,18 @@ namespace shift_pick_app.Models
     /// </summary>
     public class Prefecture
     {
-        public Prefecture(string name, string image)
+        public Prefecture(int id, string name, string image, bool isAvailable)
         {
+            Id = id;
             Name = name;
             Image = image;
+            IsAvailable = isAvailable;
         }
 
+        public int Id { get; }   // 都道府県コード（JIS X 0401）
         public string Name { get; }
         public string Image { get; }
+        public bool IsAvailable { get; }   // 事業所あり
     }
 
     /// <summary>
@@ -39,15 +43,23 @@ namespace shift_pick_app.Models
         {
             Id = info.Id;
             Name = info.Name;
+            PrefectureId = info.PrefectureId;
             City = info.City;
-            DistanceKm = info.DistanceKm;
+            Location = new Location(info.Latitude, info.Longitude);
         }
 
         public int Id { get; }
         public string Name { get; }
+        public int PrefectureId { get; }
         public string City { get; }
-        public double DistanceKm { get; }   // デモ：現在地からの距離（GPS の代わり）
-        public string DistanceText => $"{DistanceKm:0.0}km";
+        public Location Location { get; }
+
+        // 現在地からの直線距離（現在地の取得前は null）
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DistanceText))]
+        private double? _distanceKm;
+
+        public string DistanceText => DistanceKm is double km ? $"{km:0.0}km" : "—";
 
         [ObservableProperty]
         private bool _isSelected;

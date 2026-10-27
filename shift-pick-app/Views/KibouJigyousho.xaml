@@ -55,6 +55,11 @@
                                         StrokeThickness="2"
                                         Stroke="{DynamicResource OutlineVariant}"
                                         BackgroundColor="{DynamicResource SurfaceContainer}">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsAvailable}" Value="False">
+                                            <Setter Property="Opacity" Value="0.38" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:KibouJigyoushoViewModel}},
                                                                                 Path=SelectPrefectureCommand,

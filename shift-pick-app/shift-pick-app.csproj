@@ -14,37 +14,24 @@
 		<ApplicationTitle>Shift Pick</ApplicationTitle>
 
 		<!-- アプリ識別子 -->
-		<ApplicationId>jp.co.tozan.shift_pick_app</ApplicationId>
+		<ApplicationId>jp.co.tozan.shiftpickapp</ApplicationId>
 
 		<!-- バージョン -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>	
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
-	  <ApplicationId>jp.co.tozan.shift-pick-app</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0-ios'">
-	  <CodesignKey>Apple Development: Created via API (V9FG95H3Q9)</CodesignKey>
-	  <CodesignProvision>VS: jp.co.tozan.shift-pick-app Development</CodesignProvision>
-	  <ProvisioningType>manual</ProvisioningType>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
-	  <ApplicationId>jp.co.tozan.shift-pick-app</ApplicationId>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-ios|AnyCPU'">
-	  <ApplicationId>jp.co.tozan.shift-pick-app</ApplicationId>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-ios|AnyCPU'">
-	  <ApplicationId>jp.co.tozan.shift-pick-app</ApplicationId>
+	  <CodesignKey>Apple Distribution: Tozan Co.Ltd. (78H7J49YN5)</CodesignKey>
+	  <CodesignProvision>Shonan Plus Shift Pick App</CodesignProvision>
+	  <ProvisioningType>automatic</ProvisioningType>
 	</PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
